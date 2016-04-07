@@ -1,5 +1,6 @@
 import argparse
 import csv
+import scoreboards
 
 class Contest:
     def __init__(self, name, rawData, preparedData):

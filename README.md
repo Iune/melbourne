@@ -12,6 +12,7 @@ If you are installing Python 3 on Windows, don't forget to select the option to 
 `Melbourne` requires the installation of one additional Python library before it can be used to generate scoreboards. This library is the `Python Imaging Library (PIL)` — more specifically, we will be using a fork of the library called `Pillow`.
 
 To install, run the following command in the terminal:
+	
 	pip3 install Pillow
 
 Note: Depending on your system, you might need administrative priviledges to run this command. You can get administrative priviledges by prefixing the above command with `sudo`.

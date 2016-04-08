@@ -1,0 +1,10 @@
+
+*.csv
+
+*.pyc
+
+*.pyc
+
+*.pyc
+
+__pycache__/scoreboards.cpython-35.pyc

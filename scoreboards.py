@@ -1,5 +1,5 @@
 from math import ceil
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont, ImageOps
 from unidecode import unidecode
 import copy
 import json
@@ -18,7 +18,7 @@ def isoToCountry():
     with open("Resources/countries.json", "r") as f:
         temp = json.load(f)
     for item in temp:
-        flags[item['name']] = item['alpha-2']
+        flags[item['name']] = item
     return flags
 
 # Makes sure the output directory exists. If it doesn't it creates said directory.
@@ -43,12 +43,12 @@ def generateScoreboardMaterial(contest, sortedData, currentVoterNumber, color="#
     scale = 3
     
     # Fonts
-    voterHeaderFont = ImageFont.truetype("RobotoCondensed-Regular.ttf", 12*scale, encoding="unic")
-    headerFont = ImageFont.truetype("RobotoCondensed-Bold.ttf", 21*scale, encoding="unic")
-    countryFont = ImageFont.truetype("RobotoCondensed-Regular.ttf", 10*scale, encoding="unic")
-    songFont = ImageFont.truetype("RobotoCondensed-Regular.ttf", 10*scale, encoding="unic")
-    pointsFont = ImageFont.truetype("RobotoCondensed-Light.ttf", 14*scale, encoding="unic")
-    totalFont = ImageFont.truetype("RobotoCondensed-Bold.ttf", 14*scale, encoding="unic")
+    voterHeaderFont = ImageFont.truetype("Resources/Fonts/RobotoCondensed-Regular.ttf", 12*scale, encoding="unic")
+    headerFont = ImageFont.truetype("Resources/Fonts/RobotoCondensed-Bold.ttf", 21*scale, encoding="unic")
+    countryFont = ImageFont.truetype("Resources/Fonts/RobotoCondensed-Regular.ttf", 10*scale, encoding="unic")
+    songFont = ImageFont.truetype("Resources/Fonts/RobotoCondensed-Regular.ttf", 10*scale, encoding="unic")
+    pointsFont = ImageFont.truetype("Resources/Fonts/RobotoCondensed-Light.ttf", 14*scale, encoding="unic")
+    totalFont = ImageFont.truetype("Resources/Fonts/RobotoCondensed-Bold.ttf", 14*scale, encoding="unic")
     
     # Colors
     lightGrey = (238, 238, 238)
@@ -68,32 +68,28 @@ def generateScoreboardMaterial(contest, sortedData, currentVoterNumber, color="#
 
 
     # We base the size of the image from the length of the longest entry or voter (which ever one is bigger)
-    longestString = ""
-    for entry in sortedData:
-        tmp = "{} - {}".format(entry['artist'].upper(), entry['song'].upper())
-        if len(tmp) > len(longestString):
-            longestString = tmp
-
     img = Image.new('RGBA', size=(1, 1))
     draw = ImageDraw.Draw(img)
 
-    entrySize = (0,0)
+    size = (0,0)
     userSize = (0,0)
+    titleSize = draw.textsize("{} Results".format(contest.name), font=headerFont)
+    voterSize = draw.textsize("Now Voting: {} ({}/{})".format(contest.voters[currentVoterNumber], currentVoterNumber+1, contest.numVoters), font=voterHeaderFont)
     for entry in sortedData:
         entryTmp = draw.textsize("{} - {}".format(entry['artist'].upper(), entry['song'].upper()), font=songFont)
         if displayCountries:
-        	userTmp = draw.textsize(entry['country'].upper(), font=countryFont)
-    	else:
-        	userTmp = draw.textsize(entry['user'].upper(), font=countryFont)
+            userTmp = draw.textsize(entry['country'].upper(), font=countryFont)
+        else:
+            userTmp = draw.textsize(entry['user'].upper(), font=countryFont)
 
-        if entryTmp[0] >= entrySize[0]:
-            entrySize = entryTmp
+        if entryTmp[0] >= size[0]:
+            size = entryTmp
 
         if userTmp[0] >= userSize[0]:
             userSize = userTmp
 
-    rectWidth = max(entrySize[0], userSize[0]) + 80*scale + flagOffset
-    width =  10*scale + (rectWidth) + 10*scale + (rectWidth) + 10*scale
+    rectWidth = max(size[0], userSize[0]) + 80*scale + flagOffset
+    width =  max(max((10*scale + (rectWidth) + 10*scale + (rectWidth) + 10*scale), (24*scale + titleSize[0] + 24*scale)), (5*scale + voterSize[0] + 5*scale))
     height = scale*(90 + 30*(int(contest.numEntries/2) + contest.numEntries%2) + 20)
 
     # Now, let's start with the actual scoreboard
@@ -105,7 +101,7 @@ def generateScoreboardMaterial(contest, sortedData, currentVoterNumber, color="#
 
     # Voting Top Bar
     draw.rectangle(((0, 0), (width, 21*scale)), fill=colorDark)
-    draw.text((5*scale, 3*scale), "Now Voting: {} ({}/{})".format(contest.voters[currentVoter], currentVoter+1, contest.numVoters), font=voterHeaderFont, fill=textWhite)
+    draw.text((5*scale, 3*scale), "Now Voting: {} ({}/{})".format(contest.voters[currentVoterNumber], currentVoterNumber+1, contest.numVoters), font=voterHeaderFont, fill=textWhite)
     # Contest Name Top Bar
     draw.rectangle(((0, 20*scale), (width, 65*scale)), fill=color)
     draw.text((24*scale, 31*scale), "{} Results".format(contest.name), font=headerFont, fill=textWhite)
@@ -129,10 +125,18 @@ def generateScoreboardMaterial(contest, sortedData, currentVoterNumber, color="#
         # Display the entry's country's flag (if displayFlags == True)
         if displayFlags:
             try:
-                countryISO =  flags[entry['country']]
-                flag = Image.open('Resources/Square/{}.png'.format(countryISO), 'r')
-                flag = flag.resize((20*scale, 20*scale), Image.ANTIALIAS)
-                img.paste(flag, (20*scale+xOffset, 95*scale + 30*yOffset*scale))
+                category = flags[entry['country']]['category']
+                countryISO =  flags[entry['country']]['alpha-2']
+                flag = Image.open('Resources/Flags/{}/{}.png'.format(category, countryISO), 'r')
+                fWidth, fHeight = flag.size
+                if fWidth < fHeight:
+                    flag = flag.resize((int((float(width)/height)*20*scale), 20*scale), Image.ANTIALIAS)
+                elif fWidth == fHeight:
+                    flag = flag.resize((20*scale, 20*scale), Image.ANTIALIAS)
+                else:
+                    flag = flag.resize((20*scale, int((float(height)/width)*20*scale)), Image.ANTIALIAS) 
+                flag = ImageOps.expand(flag, border=1, fill=textGreyMain)                   
+                img.paste(flag, (int(20*scale + 10*scale - flag.width/2.0) + xOffset, int(95*scale +10*scale - flag.height/2.0 + 30*yOffset*scale)))
             except IndexError:
                 countryISO = ""
             except KeyError:
@@ -149,18 +153,18 @@ def generateScoreboardMaterial(contest, sortedData, currentVoterNumber, color="#
         draw.text((20*scale+xOffset+flagOffset, 105.5*scale+30*scale*yOffset), "{} - {}".format(entry['artist'].upper(), entry['song'].upper()), font=songFont, fill=black)
  
         # Display the total points the entry currently has
-        draw.rectangle(((xOffset+20*scale+flagOffset+size[0]+10*scale, 95*scale+30*scale*yOffset), (xOffset+20*scale+flagOffset+size[0]+10*scale+27*scale, 95*scale+30*scale*yOffset+20*scale)), fill=colorDark)
+        draw.rectangle(((xOffset+20*scale+flagOffset+max(size[0],userSize[0])+10*scale, 95*scale+30*scale*yOffset), (xOffset+20*scale+flagOffset+max(size[0],userSize[0])+10*scale+27*scale, 95*scale+30*scale*yOffset+20*scale)), fill=colorDark)
         totalSize = draw.textsize("{}".format(entry['display']), font=totalFont)
-        draw.text((20*scale+xOffset+flagOffset+size[0]+10*scale+(27/2)*scale-(totalSize[0]/2.0), 97.5*scale+30*scale*yOffset), "{}".format(entry['display']), font=totalFont, fill=textWhite)                # dwg.add(dwg.text(insert=(267.5+xOffset,109.5+30*yOffset), text="{}".format(entry['display']), style="text-anchor: middle; font-size:14px; font-weight:700; font-family:'{}'; fill:{}; fill-opacity:1.00;".format(font, textWhite)))
+        draw.text((20*scale+xOffset+flagOffset+max(size[0],userSize[0])+10*scale+(27/2)*scale-(totalSize[0]/2.0), 97.5*scale+30*scale*yOffset), "{}".format(entry['display']), font=totalFont, fill=textWhite)                # dwg.add(dwg.text(insert=(267.5+xOffset,109.5+30*yOffset), text="{}".format(entry['display']), style="text-anchor: middle; font-size:14px; font-weight:700; font-family:'{}'; fill:{}; fill-opacity:1.00;".format(font, textWhite)))
 
         # Display the points awarded to the entry by the current voter
-        if entry['data'][currentVoter] != 0 and entry['data'][currentVoter] != '':
-            draw.rectangle(((xOffset+20*scale+flagOffset+size[0]+10*scale+27*scale, 95*scale+30*scale*yOffset), (xOffset+20*scale+flagOffset+size[0]+10*scale+27*scale+23*scale, 95*scale+30*scale*yOffset+20*scale)), fill=color)
-            ptsSize = draw.textsize("{}".format(entry['data'][currentVoter].upper(), font=pointsFont))
-            draw.text((20*scale+xOffset+flagOffset+size[0]+10*scale+27*scale+(22/2.0)*scale-(ptsSize[0]/2.0)*scale, 97.5*scale+30*scale*yOffset), "{}".format(entry['data'][currentVoter].upper()), font=pointsFont, fill=textWhite)        
+        if entry['data'][currentVoterNumber] != 0 and entry['data'][currentVoterNumber] != '':
+            draw.rectangle(((xOffset+20*scale+flagOffset+max(size[0],userSize[0])+10*scale+27*scale, 95*scale+30*scale*yOffset), (xOffset+20*scale+flagOffset+max(size[0],userSize[0])+10*scale+27*scale+23*scale, 95*scale+30*scale*yOffset+20*scale)), fill=color)
+            ptsSize = draw.textsize("{}".format(entry['data'][currentVoterNumber].upper(), font=pointsFont))
+            draw.text((20*scale+xOffset+flagOffset+max(size[0],userSize[0])+10*scale+27*scale+(22/2.0)*scale-(ptsSize[0]/2.0)*scale, 97.5*scale+30*scale*yOffset), "{}".format(entry['data'][currentVoterNumber].upper()), font=pointsFont, fill=textWhite)        
 
         # Draw a dividing line between entries 
         if currentEntry+1 != leftHalf and currentEntry+1 != (contest.numEntries):
             draw.line((10*scale+xOffset, 120*scale+30*scale*yOffset, 10*scale+rectWidth+xOffset, 120*scale+30*scale*yOffset), fill=textGreyMain, width=1)
 
-    img.save('{}/{} - {}.png'.format('Output', currentVoter+1, safeVoterName))
+    img.save('{}/{} - {}.png'.format('Output', currentVoterNumber+1, safeVoterName))

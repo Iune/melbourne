@@ -65,12 +65,13 @@ def main():
 
     # Load and pre-process the input data
     rawData = loadData(args.file)
-    contest = preparedData(rawData, args.name)
+    contest = prepareData(rawData, args.name)
 
     # Have each voter add their votes, and generate a scoreboard of the results after that voter
     for i in range(contest.numVoters):
         # Add voter's votes and sort results
         sortedData = processVoter(contest, i)
+        print("Generating Scoreboard {}/{} ({})".format(i+1, contest.numVoters, contest.voters[i]))
         # Generate scoreboard
         # If both color and colorDark values were not passed in, use default values
         if(args.colorDark == None and args.color == None):

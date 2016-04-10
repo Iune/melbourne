@@ -15,7 +15,7 @@ def hex_to_rgb(value):
 # (according to ISO standards), in order to map the two letter ISO code to the country's full name.
 def isoToCountry():
     flags = {}
-    with open("Resources/countries.json", "r") as f:
+    with open("Resources/countries.json", encoding="utf8") as f:
         temp = json.load(f)
     for item in temp:
         flags[item['name']] = item

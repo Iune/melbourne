@@ -14,11 +14,11 @@ class Contest:
 
 def loadData(fileLocation):
     data = []
-    with open(fileLocation) as file:
+    with open(fileLocation, encoding='utf8') as file:
         sniffer = csv.Sniffer()
         dialect = sniffer.sniff(file.readline())
 
-    with open(fileLocation) as file:
+    with open(fileLocation, encoding='utf8') as file:
         reader = csv.reader(file, delimiter=dialect.delimiter)
         for row in reader:
             data.append(row[1:])

@@ -5,11 +5,11 @@ What this means is that contest hosts need not worry about spending hours on mak
 
 # Installation
 ## Python 3
-`Melbourne` is written in **Python 3.5** and consequently needs Python to be installed on users' systems before it can work.
+`Melbourne` is written in Python 3 and consequently needs Python to be installed on users' systems before it can work.
 
 Installation on Windows and OSX is relatively simple; just navigate to [the official website](https://www.python.org/downloads/), and download and install the appropriate version of Python 3 for your operating system. 
 
-As long as you install Python 3 (and not Python 2), you should be fine. The latest version as of 7 April 2016 was Python 3.5.1.
+As long as you install Python 3 (and not Python 2), you should be fine. Anything with a version number of 3.x should be fine; the latest version as of 7 April 2016 was Python 3.5.1.
 
 ### OSX
 Apple distributes OSX with a version of Python already installed. Unfortunately, this version is from the older Python 2.7.x release which is *not* compatible with `Melbourne`; you will still need to install Python 3.
@@ -34,22 +34,22 @@ Open up the command line and type in the command to install these libraries.
 `pip` will download and install the two libraries and voilà! You have installed all the prequisites for `Melbourne`. Now let's get to actually downloading the program and using it.
 
 ## Melbourne
-Download and extract the zip file containing `Melbourne` to a convenient location on your hard drive. I personally use the home folder of my user account (as that is easy to access from the command line) but it's really personal preference and doesn't really affect the usage of the program.
+Download and extract the zip file containing `Melbourne` to a convenient location on your hard drive. I personally use the home folder of my user account (as that is easy to access from the command line) but it's really personal preference and does not affect the usage of the program.
 
 # Using `Melbourne`
 ## Quick Command Line Intro
 ### OSX and Linux
-To access the command line on OSX, we use an application called `Terminal` (as an aside, the "terminal" is a synonym for the command line).
+To access the command line on OSX, we use an application called `Terminal` (as an aside, the word "terminal" is a synonym for the command line).
 
 On Linux, the name for the terminal application is dependent on your distribution and desktop environment. Chances are, running a Linux distribution means that you probably already know the name of this program.
 
-OSX and Linux share a common ancestry, and as a result they largely use the same basic tools for navigating and using the command line, which is why I've lumped them together in this category.
+OSX and Linux share a common ancestry, and as a result they largely use the same basic tools and syntax for navigating and using the command line, which is why I've lumped them together in this guide.
 
-To list all the files and folders (also known as directories) in a directory, we use `ls`.
+To list all the files and folders (also known as directories) in a particular directory, we use `ls`. Here you can see the output when I type `ls` in my home directory.
 
 	$ ls
 	Desktop		Downloads	Movies		Pictures	Public
-	Documents	Library		Music		Programming	VirtualBox VMs
+	Documents	Library		Music
 
 To navigate into another folder (let's say I want to go to my `Desktop` folder, we use `cd`.
 
@@ -63,7 +63,7 @@ If I want to go back to the directory above, type:
 	
 ### Windows
 
-On versions of Windows prior to Windows 7, the only way to access the command line was through an application known as `Command Prompt`. However, beginning with Windows 7, Microsoft has also shipped an application called `Windows Powershell`, which is a much more powerful (and in my opinion, better) way to access the command line on Windows than `Command Prompt`.
+On versions of Windows prior to Windows 7, the only way to access the command line was through an application known as `Command Prompt`. Beginning with Windows 7, however, Microsoft has also shipped an application called `Windows Powershell`, which is a much more powerful (and in my opinion, better) way to access the command line on Windows than `Command Prompt`.
 
 There are some differences between Windows and OSX/Linux to keep in mind when accessing the command line.
 
@@ -85,7 +85,8 @@ Entry Placing  | Username | Artist's country of origin | Artist's name | Song ti
 
 > **Note:** `Melbourne` ignores the values in the `#` and `Total` columns when generating the scoreboards; it adds up the votes on the fly. These columns are present more for user convenience (although they're still required).
 > 
-> **Note:** The `Artist` column is used to display flags if that option is enabled — country name formats can be seen in `Resources/countries.json`.
+> **Note:** The `Artist` column is used to display flags if that option is enabled. 
+> >To see the acceptable ways to write out country names (the scoreboard generator will only be able to display a country's flag if you input it in the proper format), open `Resources/countries.json`. In general, the country name is formatted exactly like how it is normally written out, but if you are running into trouble, look in this file.
 
 ### Voter Formatting
 The votes are placed in the file after the six columns for the entry data; each voter comes in a separate column afterwards.
@@ -136,7 +137,7 @@ Each flag has a letter associated with it; to toggle the flag just type `-X` whe
 
 `Melbourne` has two flags:
 
-| Flag | Letter | Description |
+| Flag | Input | Description |
 | --- | --- | --- |
 | Display flags | `-f` | Display flags in the scoreboards |
 | Display countries or usernames | `-c` | Display an artist's country of origin above the artist name and song title instead of the associated username.

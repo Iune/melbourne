@@ -79,6 +79,9 @@ def main():
         # If only color's value was passed in, use that value and the default colorDark value
         elif(args.colorDark == None and args.color != None):
             scoreboards.generateScoreboardMaterial(contest, sortedData, i, displayFlags=args.flags, displayCountries=args.countries, color=args.color)            
+        # If only colorDark's value was passed in, use that value and the default color value
+        elif(args.colorDark != None and args.color == None):
+            scoreboards.generateScoreboardMaterial(contest, sortedData, i, displayFlags=args.flags, displayCountries=args.countries, colorDark=args.colorDark)            
         # Otherwise (both color and colorDark's values were passed in), use their given values
         else:
             scoreboards.generateScoreboardMaterial(contest, sortedData, i, displayFlags=args.flags, displayCountries=args.countries, color=args.color, colorDark=args.colorDark)            

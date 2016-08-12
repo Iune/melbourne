@@ -354,6 +354,11 @@
     	"category":"ISC"
 	},
     {
+        "alpha-2": "SEAL",
+        "name": "Saint Eva and Lepland",
+        "category":"ISC"
+    },
+    {
         "alpha-2": "Sofós",
         "name": "Sofós",
     	"category":"ISC"
@@ -493,6 +498,61 @@
         "name": "Waticania",
     	"category":"ISC"
 	},
+    {
+        "alpha-2": "Carpentaria",
+        "name": "Carpentaria",
+        "category":"WLSC"
+    },
+    {
+        "alpha-2": "Amhr",
+        "name": "Amhr",
+        "category":"WLSC"
+    },
+    {
+        "alpha-2": "Chocolate Empire",
+        "name": "Chocolate Empire",
+        "category":"WLSC"
+    },
+    {
+        "alpha-2": "Rahasia-Diati",
+        "name": "Rahasia-Diati",
+        "category":"WLSC"
+    },
+    {
+        "alpha-2": "Serenes",
+        "name": "Serenes",
+        "category":"WLSC"
+    },
+    {
+        "alpha-2": "Sjómaður",
+        "name": "Sjómaður",
+        "category":"WLSC"
+    },
+    {
+        "alpha-2": "Temekylopia",
+        "name": "Temekylopia",
+        "category":"WLSC"
+    },
+    {
+        "alpha-2": "Valienté",
+        "name": "Valienté",
+        "category":"WLSC"
+    },
+    {
+        "alpha-2": "Yistland",
+        "name": "Yistland",
+        "category":"WLSC"
+    },
+    {
+        "alpha-2": "Yönuit",
+        "name": "Yönuit",
+        "category":"WLSC"
+    },
+    {
+        "alpha-2": "L'Ester",
+        "name": "L'Ester",
+        "category":"WLSC"
+    },
     {
         "alpha-2": "AF",
         "name": "Afghanistan",

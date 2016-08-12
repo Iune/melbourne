@@ -86,6 +86,5 @@ def main():
         else:
             scoreboards.generateScoreboardMaterial(contest, sortedData, i, displayFlags=args.flags, displayCountries=args.countries, color=args.color, colorDark=args.colorDark)            
 
-
 if __name__ == "__main__":
     main()

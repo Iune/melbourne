@@ -5,6 +5,21 @@ import copy
 import json
 import os
 
+def appendInt(num):
+    if num > 9:
+        secondToLastDigit = str(num)[-2]
+        if secondToLastDigit == '1':
+            return 'th'
+    lastDigit = num % 10
+    if (lastDigit == 1):
+        return 'st'
+    elif (lastDigit == 2):
+        return 'nd'
+    elif (lastDigit == 3):
+        return 'rd'
+    else:
+        return 'th'
+
 # Function taken from http://stackoverflow.com/questions/214359/converting-hex-color-to-rgb-and-vice-versa
 def hex_to_rgb(value):
     value = value.lstrip('#')
@@ -40,7 +55,7 @@ def generateScoreboardMaterial(contest, sortedData, currentVoterNumber, color="#
     prepareOutputDirectory()
     flags = isoToCountry()
     safeVoterName = safeFileName(contest.voters[currentVoterNumber])    
-    scale = 3
+    scale = 4
     
     # Fonts
     voterHeaderFont = ImageFont.truetype("Resources/Fonts/RobotoCondensed-Regular.ttf", 12*scale, encoding="unic")
@@ -167,4 +182,143 @@ def generateScoreboardMaterial(contest, sortedData, currentVoterNumber, color="#
         if currentEntry+1 != leftHalf and currentEntry+1 != (contest.numEntries):
             draw.line((10*scale+xOffset, 120*scale+30*scale*yOffset, 10*scale+rectWidth+xOffset, 120*scale+30*scale*yOffset), fill=textGreyMain, width=1)
 
+    img = img.resize((int(width/2), int(height/2)), Image.ANTIALIAS)
     img.save('{}/{} - {}.png'.format('Output', currentVoterNumber+1, safeVoterName))
+
+# Generates a scoreboard image inspired by Wikipedia tables
+def generateScoreboardWiki(contest, sortedData, currentVoterNumber, displayFlags=True, displayCountries=True):
+    prepareOutputDirectory()
+    flags = isoToCountry()
+    safeVoterName = safeFileName(contest.voters[currentVoterNumber])    
+    scale = 3
+    
+    # Fonts
+    font = ImageFont.truetype("Resources/Fonts/RobotoCondensed-Regular.ttf", 11*scale, encoding="unic")
+    bold_font = ImageFont.truetype("Resources/Fonts/RobotoCondensed-Bold.ttf", 11*scale, encoding="unic")
+    
+    # Colors
+    black = (33, 33, 33)
+    light_blue = (29, 85, 176)
+    dark_blue = (11, 9, 126)
+    light_grey = (249, 249, 249)
+    dark_grey = (242, 242, 242)
+    border_grey = (172, 172, 172)
+
+    # If we are going to display flags, the text should be offset by 24 pixels to accomodate the flags
+    flagOffset = 0
+    if displayFlags:
+        flagOffset = 23*scale + 4*scale
+
+    # We base the size of the image from the length of the longest entry or voter (which ever one is bigger)
+    img = Image.new('RGBA', size=(1, 1))
+    draw = ImageDraw.Draw(img)
+
+    size = (0,0)
+    userSize = (0,0)
+
+    user_size = (0,0)
+    artist_size = (0,0)
+    song_size = (0,0)
+
+    # titleSize = draw.textsize("{} Results".format(contest.name), font=headerFont)
+    # voterSize = draw.textsize("Now Voting: {} ({}/{})".format(contest.voters[currentVoterNumber], currentVoterNumber+1, contest.numVoters), font=voterHeaderFont)
+    for entry in sortedData:
+        artistTmp = draw.textsize(entry['artist'], font=font)
+        songTmp = draw.textsize(entry['song'], font=font)
+        if displayCountries:
+            userTmp = draw.textsize(entry['country'], font=font)
+        else:
+            userTmp = draw.textsize(entry['user'], font=font)
+
+        if userTmp[0] >= user_size[0]:
+            user_size = userTmp
+        if artistTmp[0] >= artist_size[0]:
+            artist_size = artistTmp
+        if songTmp[0] >= song_size[0]:
+            song_size = songTmp
+
+
+
+    rectWidth = scale*8 + flagOffset + user_size[0] + scale*8 + artist_size[0] + scale*8 + song_size[0] + scale*50 + scale*50 + scale*50
+    width = rectWidth*2
+    height = scale*(24*2 + 24*(int(contest.numEntries/2) + contest.numEntries%2))
+    # height = scale*(24 + 24*(int(contest.numEntries/2) + contest.numEntries%2) + 20)
+
+    # Now, let's start with the actual scoreboard
+    img = Image.new('RGBA', size=(width, height))
+    draw = ImageDraw.Draw(img)
+
+    # Background rectangle for image
+    # draw.rectangle(((0, 0), (width, height)), fill=light_grey)
+
+    # Voting Top Bar
+    # draw.rectangle(((0, 0), (width, 21*scale)), fill=colorDark)
+    # draw.text((5*scale, 3*scale), "Now Voting: {} ({}/{})".format(contest.voters[currentVoterNumber], currentVoterNumber+1, contest.numVoters), font=voterHeaderFont, fill=textWhite)
+    # Contest Name Top Bar
+    # draw.rectangle(((0, 20*scale), (width, 65*scale)), fill=color)
+    # draw.text((24*scale, 31*scale), "{} Results".format(contest.name), font=headerFont, fill=textWhite)
+ 
+    # How many entries should be in the left column of the scoreboard
+    leftHalf = int(contest.numEntries/2) + contest.numEntries%2
+
+    for currentEntry in range(contest.numEntries):
+        if currentEntry < leftHalf:
+            xOffset = 0
+            yOffset = currentEntry + 2
+        else:
+            xOffset = rectWidth
+            yOffset = currentEntry - leftHalf + 2
+
+        entry = sortedData[currentEntry]
+        # Place
+        draw.rectangle(((xOffset, scale*23*yOffset), (xOffset+scale*50, scale*23*(yOffset+1))), fill=light_grey, outline=border_grey)
+        # Country
+        draw.rectangle(((xOffset+scale*50, scale*23*yOffset), (xOffset+scale*50+user_size[0]+flagOffset+scale*8, scale*23*(yOffset+1))), fill=light_grey, outline=border_grey)
+        draw.rectangle(((xOffset+scale*50+user_size[0]+flagOffset+scale*8, scale*23*yOffset), (xOffset+scale*50+user_size[0]+flagOffset+scale*8+artist_size[0]+scale*8, scale*23*(yOffset+1))), fill=light_grey, outline=border_grey)
+        draw.rectangle(((xOffset+scale*50+user_size[0]+flagOffset+scale*8+artist_size[0]+scale*8, scale*23*yOffset), (xOffset+scale*50+user_size[0]+flagOffset+scale*8+artist_size[0]+scale*8+song_size[0]+scale*8, scale*23*(yOffset+1))), fill=light_grey, outline=border_grey)
+        draw.rectangle(((xOffset+scale*50+user_size[0]+flagOffset+scale*8+artist_size[0]+scale*8+song_size[0]+scale*8, scale*23*yOffset), (xOffset+scale*50+user_size[0]+flagOffset+scale*8+artist_size[0]+scale*8+song_size[0]+scale*8+scale*50, scale*23*(yOffset+1))), fill=light_grey, outline=border_grey)
+        draw.rectangle(((xOffset+scale*50+user_size[0]+flagOffset+scale*8+artist_size[0]+scale*8+song_size[0]+scale*8+scale*50, scale*23*yOffset), (xOffset+scale*50+user_size[0]+flagOffset+scale*8+artist_size[0]+scale*8+song_size[0]+scale*8+scale*50+scale*50, scale*23*(yOffset+1))), fill=light_grey, outline=border_grey)
+
+        # Display the entry's country's flag (if displayFlags == True)
+        if displayFlags:
+            try:
+                category = flags[entry['country']]['category']
+                countryISO =  flags[entry['country']]['alpha-2']
+                flag = Image.open('Resources/Flags/{}/{}.png'.format(category, countryISO), 'r')
+                flag = flag.resize((23*scale, 15*scale), Image.ANTIALIAS) 
+                flag = ImageOps.expand(flag, border=1, fill=border_grey)                   
+                img.paste(flag, (xOffset+scale*50+scale*4, scale*23*yOffset+scale*4))
+            except IndexError:
+                countryISO = ""
+                print("Flag not found for: {}".format(entry['country']))
+            except KeyError:
+                countryISO = ""
+                print("Flag not found for: {}".format(entry['country']))
+
+        place_size = draw.textsize("{}{}".format(currentEntry+1, appendInt(currentEntry+1)), font=bold_font)
+        draw.text((xOffset+scale*25-place_size[0]/2, 23*scale*yOffset+scale*5), "{}{}".format(currentEntry+1, appendInt(currentEntry+1)), font=bold_font, fill=light_blue)
+
+        # Display either the entry's country or user
+        if displayCountries:
+            countryString = entry['country']
+        else:
+            countryString = entry['user']
+        draw.text((xOffset+scale*50+scale*4+flagOffset, 23*scale*yOffset+scale*5), countryString, font=font, fill=light_blue)
+
+        # Display the entry's artist and song title
+        draw.text((xOffset+scale*50+scale*4+flagOffset+user_size[0]+scale*4+scale*4, 23*scale*yOffset+scale*5), entry['artist'], font=font, fill=black)
+        draw.text((xOffset+scale*50+scale*4+flagOffset+user_size[0]+scale*4+scale*4+artist_size[0]+scale*8, 23*scale*yOffset+scale*5), entry['song'], font=font, fill=black)
+ 
+        # Display the total points the entry currently has
+        totalSize = draw.textsize("{}".format(entry['display']), font=font)
+        draw.text((xOffset+scale*50+scale*4+flagOffset+user_size[0]+scale*8+artist_size[0]+scale*8+song_size[0]+scale*4+scale*25-totalSize[0]/2, 23*scale*yOffset+scale*5), "{}".format(entry['display']), font=font, fill=black)
+
+        # draw.text((20*scale+xOffset+flagOffset+max(size[0],userSize[0])+10*scale+(27/2)*scale-(totalSize[0]/2.0), 97.5*scale+30*scale*yOffset), "{}".format(entry['display']), font=totalFont, fill=textWhite)                # dwg.add(dwg.text(insert=(267.5+xOffset,109.5+30*yOffset), text="{}".format(entry['display']), style="text-anchor: middle; font-size:14px; font-weight:700; font-family:'{}'; fill:{}; fill-opacity:1.00;".format(font, textWhite)))
+
+        # Display the points awarded to the entry by the current voter
+        if entry['data'][currentVoterNumber] != 0 and entry['data'][currentVoterNumber] != '':
+            ptsSize = draw.textsize("{}".format(entry['data'][currentVoterNumber].upper()), font=bold_font)
+            draw.text((xOffset+scale*50+scale*4+flagOffset+user_size[0]+scale*8+artist_size[0]+scale*8+song_size[0]+scale*4+scale*50+scale*25-ptsSize[0]/2, 23*scale*yOffset+scale*5), "{}".format(entry['data'][currentVoterNumber].upper()), font=bold_font, fill=black)
+
+    img.save('{}/{} - {}.png'.format('Output', currentVoterNumber+1, safeVoterName))
+

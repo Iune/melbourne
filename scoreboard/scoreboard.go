@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math"
 	"os"
+	"log"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -35,12 +36,12 @@ type fonts struct {
 }
 
 func getFonts(scale float64) *fonts {
-	voterHeader, _ := gg.LoadFontFace("Inconsolata-Regular.ttf", 14*scale)
-	header, _ := gg.LoadFontFace("Inconsolata-Bold.ttf", 14*scale)
-	user, _ := gg.LoadFontFace("Inconsolata-Regular.ttf", 12*scale)
-	entry, _ := gg.LoadFontFace("Inconsolata-Regular.ttf", 12*scale)
-	awardedPoints, _ := gg.LoadFontFace("Inconsolata-Regular.ttf", 14*scale)
-	totalPoints, _ := gg.LoadFontFace("Inconsolata-Bold.ttf", 14*scale)
+	voterHeader, _ := gg.LoadFontFace("fonts/Inconsolata-Regular.ttf", 14*scale)
+	header, _ := gg.LoadFontFace("fonts/Inconsolata-Bold.ttf", 14*scale)
+	user, _ := gg.LoadFontFace("fonts/Inconsolata-Regular.ttf", 12*scale)
+	entry, _ := gg.LoadFontFace("fonts/Inconsolata-Regular.ttf", 12*scale)
+	awardedPoints, _ := gg.LoadFontFace("fonts/Inconsolata-Regular.ttf", 14*scale)
+	totalPoints, _ := gg.LoadFontFace("fonts/Inconsolata-Bold.ttf", 14*scale)
 
 	return &fonts{
 		voterHeader:   voterHeader,
@@ -135,6 +136,9 @@ func GenerateScoreboards(contest *contest.Contest, options *Options) {
 		votes := make([]string, 0)
 		for _, currentEntry := range contest.Entries {
 			rawPoints := currentEntry.Votes[voterNum]
+			if strings.TrimSpace(strings.ToLower(rawPoints)) == "dq" {
+				currentEntry.Disqualify()
+			}
 			// TODO: Figure out why ParseInt isn't returning an int
 			if intPoints, err := strconv.ParseInt(rawPoints, 10, 0); err == nil {
 				currentEntry.AddPoints(int(intPoints))
@@ -157,6 +161,9 @@ type colors struct {
 	lightGrey, white, black, textGrey, textCaption, textWhite, main, accent, accentText string
 }
 
+// Given the accent color for the scoreboard, returns a colors struct with
+// the color values for the scoreboard. The accentText color is dynamically
+// calculated to be either black/white depending on the accent color.
 func getColors(accent string) *colors {
 	color, _ := colorful.Hex(accent)
 
@@ -183,20 +190,22 @@ func getColors(accent string) *colors {
 	}
 }
 
+// Helper function to reduce number of function calls in GenerateScoreboard
 func drawRectangle(dc *gg.Context, x float64, y float64, width float64, height float64, color string) {
 	dc.DrawRectangle(x, y, width, height)
 	dc.SetHexColor(color)
 	dc.Fill()
 }
 
+// Helper function to reduce number of function calls in GenerateScoreboard
 func drawText(dc *gg.Context, text string, x float64, y float64, ax float64, ay float64, font font.Face, color string) {
 	dc.SetFontFace(font)
 	dc.SetHexColor(color)
 	dc.DrawStringAnchored(text, x, y, ax, ay)
 }
 
-// GenerateScoreboard generates a scoreboard for the results at a given stage
-// in the voting process
+// GenerateScoreboard creates an individual scoreboard (PNG file) based on the current
+// standings of the contest, along with the options for the scoreboard
 func GenerateScoreboard(contest *contest.Contest, voterNum int, options *Options) {
 	fonts := getFonts(options.Scale)
 	sizes := getSizes(contest, options, voterNum)
@@ -250,11 +259,13 @@ func GenerateScoreboard(contest *contest.Contest, voterNum int, options *Options
 			flagLocation := fmt.Sprintf("flags/%s", entry.Flag)
 			image, err := gg.LoadPNG(flagLocation)
 			if err != nil {
-				panic(err)
+				log.Fatal(err)
 			}
 			image = resize.Thumbnail(uint(22*options.Scale), uint(22*options.Scale), image, resize.Bilinear)
+			iw, ih := image.Bounds().Dx(), image.Bounds().Dy()
 			dc.DrawImageAnchored(image, int(27*options.Scale+xOffset), int(87*options.Scale+35*options.Scale*yOffset), 0.5, 0.5)
-			dc.DrawRectangle(float64(16*options.Scale+xOffset), float64(76*options.Scale+35*options.Scale*yOffset), 22*options.Scale, 22*options.Scale)
+			// dc.DrawRectangle(float64(16*options.Scale+xOffset), float64(76*options.Scale+35*options.Scale*yOffset), 22*options.Scale, 22*options.Scale)
+			dc.DrawRectangle(float64(27*options.Scale+xOffset - float64(iw)/2), float64(87*options.Scale+35*options.Scale*yOffset - float64(ih)/2), float64(iw), float64(ih))
 			dc.SetHexColor(colors.textGrey)
 			dc.SetLineWidth(0.5)
 			dc.Stroke()
@@ -266,10 +277,14 @@ func GenerateScoreboard(contest *contest.Contest, voterNum int, options *Options
 
 		// Display entry string
 		entryText := fmt.Sprintf("%s – %s", entry.Artist, entry.Song)
-		drawText(dc, entryText, 20*options.Scale+xOffset+sizes.flagOffset, 92*options.Scale+35*options.Scale*yOffset, 0, 0.5, fonts.user, colors.black)
+		drawText(dc, entryText, 20*options.Scale+xOffset+sizes.flagOffset, 92*options.Scale+35*options.Scale*yOffset, 0, 0.5, fonts.entry, colors.black)
 
 		// Display entry's total points
-		drawRectangle(dc, 30*options.Scale+xOffset+sizes.flagOffset+math.Max(sizes.entryString, sizes.userString), 79*options.Scale+35*options.Scale*yOffset, 30*options.Scale, 20*options.Scale, colors.main)
+		if entry.IsDisqualified {
+			drawRectangle(dc, 30*options.Scale+xOffset+sizes.flagOffset+math.Max(sizes.entryString, sizes.userString), 79*options.Scale+35*options.Scale*yOffset, 30*options.Scale, 20*options.Scale, colors.textCaption)
+		} else {
+			drawRectangle(dc, 30*options.Scale+xOffset+sizes.flagOffset+math.Max(sizes.entryString, sizes.userString), 79*options.Scale+35*options.Scale*yOffset, 30*options.Scale, 20*options.Scale, colors.main)
+		}
 		totalPointsText := strconv.Itoa(entry.DisplayPoints)
 		drawText(dc, totalPointsText, 45*options.Scale+xOffset+sizes.flagOffset+math.Max(sizes.entryString, sizes.userString), 87*options.Scale+35*options.Scale*yOffset, 0.5, 0.5, fonts.totalPoints, colors.textWhite)
 

@@ -19,14 +19,22 @@ func (e *Entry) AddPoints(points int) {
 	}
 }
 
+func (e *Entry) Disqualify() {
+	e.Points = -1
+	e.IsDisqualified = true
+}
+
 func SortEntries(entries []*Entry) {
 	sort.Slice(entries, func(i, j int) bool {
-		if entries[i].DisplayPoints == entries[j].DisplayPoints {
-			if entries[i].NumVoters == entries[j].NumVoters {
-				return entries[i].User < entries[j].User
+		if entries[i].Points == entries[j].Points {
+			if entries[i].DisplayPoints == entries[j].DisplayPoints {
+				if entries[i].NumVoters == entries[j].NumVoters {
+					return entries[i].User < entries[j].User
+				}
+				return entries[i].NumVoters > entries[j].NumVoters
 			}
-			return entries[i].NumVoters > entries[j].NumVoters
+			return entries[i].DisplayPoints > entries[j].DisplayPoints
 		}
-		return entries[i].DisplayPoints > entries[j].DisplayPoints
+		return entries[i].Points > entries[j].Points
 	})
 }

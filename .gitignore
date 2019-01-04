@@ -1,6 +1,7 @@
 ### Jetbrains Specific Gitignore
 .DS_Store
 .idea
+*.iml
 
 ### Java Gitignore
 # Compiled class file

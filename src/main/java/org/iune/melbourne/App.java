@@ -11,6 +11,6 @@ public class App {
             System.exit(1);
         }
 
-       new Contest(args[0], new File(args[1]));
+       Contest contest = new Contest(args[0], new File(args[1]));
     }
 }

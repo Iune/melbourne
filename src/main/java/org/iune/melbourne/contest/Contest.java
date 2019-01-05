@@ -26,6 +26,7 @@ public class Contest {
             throw new IOException("Can't open file " + contestFile.getAbsolutePath());
         }
 
+        this.name = name;
         this.voters = this.setVoters(processor);
         this.entries = this.setEntries(processor);
     }

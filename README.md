@@ -12,7 +12,11 @@ mvn clean package shade:shade
 
 # Usage
 
+```
+java -jar melbourne-cli.jar contestName filePath
+```
+
 To use `melbourne-cli`, two arguments must be specified:
 
-* `contestName` is the name of the contest. The program will automatically append `Results` to the contest name when printing the results. For example, `FSC 189` would yield `FSC 189 Results`.
+* `contestName` is the name of the contest. The program will automatically append "Results" to the `contestName` when returning results; "FSC 189" would yield "FSC 189 Results".
 * `filePath` is the path to the input CSV file.

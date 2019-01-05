@@ -6,11 +6,11 @@ import java.io.File;
 
 public class App {
     public static void main (String[] args) throws java.io.IOException {
-        if (args.length != 1) {
-            System.err.println("Usage: java Contest FILENAME");
+        if (args.length != 2) {
+            System.err.println("Usage: java Contest NAME FILENAME");
             System.exit(1);
         }
 
-       new Contest("Name", new File(args[0]));
+       new Contest(args[0], new File(args[1]));
     }
 }

@@ -6,7 +6,7 @@
 
   <groupId>org.iune.melbourne</groupId>
   <artifactId>contest</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <version>5.0.0-SNAPSHOT</version>
 
   <name>Contest</name>
   <url>https://www.melbourne.iune.org</url>

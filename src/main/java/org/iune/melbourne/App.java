@@ -1,11 +1,9 @@
 package org.iune.melbourne;
 
 import com.univocity.parsers.common.processor.RowListProcessor;
-import org.mozilla.universalchardet.ReaderFactory;
+import org.iune.melbourne.contest.Loader;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.Reader;
 
 /**
  * Hello world!

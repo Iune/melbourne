@@ -1,5 +1,6 @@
 package org.iune.melbourne;
 
+import org.iune.melbourne.contest.Loader;
 import org.junit.Test;
 
 import java.io.File;

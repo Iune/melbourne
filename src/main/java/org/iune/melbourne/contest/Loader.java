@@ -1,4 +1,4 @@
-package org.iune.melbourne;
+package org.iune.melbourne.contest;
 
 import com.univocity.parsers.common.processor.RowListProcessor;
 import com.univocity.parsers.csv.CsvParser;

@@ -110,4 +110,7 @@ public class Entry {
     public boolean getDisqualificationStatus(int voter) {
         return this.disqualificationStatus.get(voter);
     }
+
+    public boolean getFinalDisqualificationStatus() { return this.disqualificationStatus.get(this.disqualificationStatus.size() - 1); }
+
 }

@@ -1,4 +1,4 @@
-package org.iune.melbourne;
+package org.iune.melbourne.contest;
 
 import org.iune.melbourne.contest.Contest;
 

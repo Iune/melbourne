@@ -15,22 +15,23 @@ public class Entry {
     private List<Integer> sortingPoints;
     private List<Boolean> disqualificationStatus;
 
-    Entry(String country, String flag, String artist, String song, List<String> votes) {
+    public Entry(String country, File flag, String artist, String song, List<String> votes) {
         this.country = country;
-        this.flag = new File(flag);
+        this.flag = flag;
         this.artist = artist;
         this.song = song;
 
         this.votes = votes;
-        this.setDisplayPoints();
-        this.setSortingPoints();
+        this.displayPoints = this.setDisplayPoints();
+        this.sortingPoints = this.setSortingPoints();
+        this.disqualificationStatus = this.setDisqualificationStatus();
     }
 
     public boolean validateFlag() {
         return this.flag.exists();
     }
 
-    private void setDisplayPoints() {
+    private List<Integer> setDisplayPoints() {
         List<Integer> displayPoints = new ArrayList<>();
 
         int total = 0;
@@ -47,23 +48,31 @@ public class Entry {
             displayPoints.add(total);
         }
 
-        this.displayPoints = displayPoints;
+        return displayPoints;
     }
 
-    private void setSortingPoints() {
+    private List<Integer> setSortingPoints() {
         List<Integer> sortingPoints = new ArrayList<>();
+
+        boolean isDisqualified = false;
+        for (int i = 0; i < this.votes.size(); i++) {
+            if (this.votes.get(i).equalsIgnoreCase("DQ")) isDisqualified = true;
+
+            if (isDisqualified) sortingPoints.add(-1000);
+            else sortingPoints.add(this.displayPoints.get(i));
+        }
+        return sortingPoints;
+    }
+
+    private List<Boolean> setDisqualificationStatus() {
         List<Boolean> disqualificationStatus = new ArrayList<>();
 
         boolean isDisqualified = false;
         for (int i = 0; i < this.votes.size(); i++) {
             if (this.votes.get(i).equalsIgnoreCase("DQ")) isDisqualified = true;
             disqualificationStatus.add(isDisqualified);
-
-            if (isDisqualified) sortingPoints.add(-1000);
-            else sortingPoints.add(this.displayPoints.get(i));
         }
-        this.sortingPoints = sortingPoints;
-        this.disqualificationStatus = disqualificationStatus;
+        return disqualificationStatus;
     }
 
     public String getCountry() {

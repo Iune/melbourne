@@ -1,7 +1,6 @@
 package org.iune.melbourne;
 
-import com.univocity.parsers.common.processor.RowListProcessor;
-import org.iune.melbourne.contest.Loader;
+import org.iune.melbourne.contest.Contest;
 
 import java.io.File;
 
@@ -16,10 +15,6 @@ public class App {
             System.exit(1);
         }
 
-       RowListProcessor processor = Loader.loadFile(new File(args[0]));
-        Loader.parseFile(processor);
-
-        /*String encoding = Loader.detectFileEncoding(new File(args[0]));
-        System.out.println("Encoding is " + encoding);*/
+       new Contest("Name", new File(args[0]));
     }
 }

@@ -9,6 +9,7 @@ import org.mozilla.universalchardet.UniversalDetector;
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Loader {
@@ -56,4 +57,5 @@ public class Loader {
 
         for (String elem : headers) System.out.println(elem);
     }
+
 }

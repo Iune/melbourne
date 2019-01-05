@@ -5,10 +5,10 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.iune.melbourne</groupId>
-  <artifactId>cli</artifactId>
+  <artifactId>melbourne-cli</artifactId>
   <version>5.0.0-SNAPSHOT</version>
 
-  <name>cli</name>
+  <name>melbourne-cli</name>
   <url>https://www.iune.melbourne.com</url>
 
   <properties>

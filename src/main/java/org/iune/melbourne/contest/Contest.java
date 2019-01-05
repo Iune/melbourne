@@ -119,6 +119,8 @@ public class Contest {
         return this.voters;
     }
 
+    public int getNumVoters() { return this.voters.size(); }
+
     public List<Entry> getEntries() {
         return this.entries;
     }

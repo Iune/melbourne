@@ -99,9 +99,13 @@ public class Entry {
         return this.displayPoints.get(voter);
     }
 
-    public int getsortingPoints(int voter) {
+    public int getFinalDisplayPoints() { return this.displayPoints.get(this.displayPoints.size() - 1); }
+
+    public int getSortingPoints(int voter) {
         return this.sortingPoints.get(voter);
     }
+
+    public int getFinalSortingPoints() { return this.sortingPoints.get(this.sortingPoints.size() - 1); }
 
     public boolean getDisqualificationStatus(int voter) {
         return this.disqualificationStatus.get(voter);

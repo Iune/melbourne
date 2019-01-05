@@ -59,4 +59,16 @@ public class Contest {
 
         return entries;
     }
+
+    public String getName() {
+        return this.name;
+    }
+
+    public List<String> getVoters() {
+        return this.voters;
+    }
+
+    public List<Entry> getEntries() {
+        return this.entries;
+    }
 }

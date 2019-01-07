@@ -35,12 +35,11 @@ public class Entry {
         List<Integer> displayPoints = new ArrayList<>();
 
         int total = 0;
-        for(String vote : this.votes) {
+        for (String vote : this.votes) {
             int currentVote;
             try {
                 currentVote = Integer.parseInt(vote);
-            }
-            catch (NumberFormatException e) {
+            } catch (NumberFormatException e) {
                 currentVote = 0;
             }
 
@@ -99,18 +98,41 @@ public class Entry {
         return this.displayPoints.get(voter);
     }
 
-    public int getFinalDisplayPoints() { return this.displayPoints.get(this.displayPoints.size() - 1); }
+    public int getFinalDisplayPoints() {
+        return this.getDisplayPoints((this.displayPoints.size() - 1));
+    }
 
     public int getSortingPoints(int voter) {
         return this.sortingPoints.get(voter);
     }
 
-    public int getFinalSortingPoints() { return this.sortingPoints.get(this.sortingPoints.size() - 1); }
+    public int getFinalSortingPoints() {
+        return this.getSortingPoints(this.sortingPoints.size() - 1);
+    }
 
     public boolean getDisqualificationStatus(int voter) {
         return this.disqualificationStatus.get(voter);
     }
 
-    public boolean getFinalDisqualificationStatus() { return this.disqualificationStatus.get(this.disqualificationStatus.size() - 1); }
+    public boolean getFinalDisqualificationStatus() {
+        return this.getDisqualificationStatus(this.disqualificationStatus.size() - 1);
+    }
 
+    public int getNumVoters(int voter) {
+        if (voter < 0 || voter >= this.votes.size())
+            throw new ArrayIndexOutOfBoundsException("Voter number was invalid");
+
+        int numVoters = 0;
+        for (int i = 0; i < voter; i++) {
+            try {
+                numVoters++;
+            } catch (NumberFormatException e) {
+            }
+        }
+        return numVoters;
+    }
+
+    public int getFinalNumVoters() {
+        return this.getNumVoters(this.votes.size() - 1);
+    }
 }

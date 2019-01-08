@@ -1,9 +1,8 @@
-# Melbourne
-
 <p align="center">
   <img width="200" height="200" src="https://i.imgur.com/QGBjgVm.png">
 </p>
 
+# Melbourne
 
 `melbourne-gui` is the version of `melbourne` with a graphical user interface.
 

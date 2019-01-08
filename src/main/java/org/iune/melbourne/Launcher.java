@@ -16,8 +16,8 @@ public class Launcher extends Application {
 
     @SuppressWarnings("static-access")
     public void start(Stage stage) {
-        stage.setTitle("Hello World!");
-        stage.getIcons().add(new Image(Launcher.class.getResourceAsStream("/Logo.png")));
+        stage.setTitle("Melbourne");
+        stage.getIcons().add(new Image(Launcher.class.getResourceAsStream("/icons/Icon.png")));
 
         StackPane root = new StackPane();
         stage.setScene(new Scene(root, 250, 250));

@@ -1,4 +1,4 @@
-package org.iune.melbourne;
+package org.iune.melbourne.cli;
 
 import org.iune.melbourne.contest.Contest;
 import org.iune.melbourne.contest.Entry;

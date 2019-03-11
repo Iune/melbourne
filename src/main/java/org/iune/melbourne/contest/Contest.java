@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Contest {
-    private String name;
+    private final String name;
     private List<String> voters;
     private List<Entry> entries;
 
@@ -27,8 +27,8 @@ public class Contest {
         }
 
         this.name = name;
-        this.voters = this.setVoters(processor);
-        this.entries = this.setEntries(processor);
+        this.voters = setVoters(processor);
+        this.entries = setEntries(processor);
     }
 
     private static List<String> setVoters(RowListProcessor processor) {
@@ -46,18 +46,16 @@ public class Contest {
         List<Entry> entries = new ArrayList<>();
 
         List<String[]> rows = processor.getRows();
-        for (int i = 0; i < rows.size(); i++) {
-            String[] row = rows.get(i);
-
+        for (String[] row : processor.getRows()) {
             String country = row[1];
             File flag = new File(row[2]);
             String artist = row[3];
             String song = row[4];
 
             List<String> votes = new ArrayList<>();
-            for(int j = 6; j < row.length; j++) {
-                if(row[j] == null) votes.add("");
-                else votes.add(row[j]);
+            for(int i = 6; i < row.length; i++) {
+                if(row[i] == null) votes.add("");
+                else votes.add(row[i]);
             }
 
             entries.add(new Entry(country, flag, artist, song, votes));

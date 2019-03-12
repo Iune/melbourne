@@ -64,19 +64,7 @@ public class Contest {
         return entries;
     }
 
-    private static String detectFileEncoding(File filePath) throws IOException, IllegalArgumentException {
-        try {
-            String encoding = UniversalDetector.detectCharset(filePath);
-            if (encoding != null) return encoding;
-            else throw new IllegalArgumentException("Can't detect encoding of " + filePath.getAbsolutePath());
-        } catch (IOException e) {
-            throw new IOException("Can't open file " + filePath.getAbsolutePath());
-        }
-    }
-
     private static RowListProcessor loadFile(File filePath) throws IOException {
-        String fileEncoding = detectFileEncoding(filePath);
-
         Reader reader = null;
         try {
             reader = ReaderFactory.createBufferedReader(filePath);
@@ -100,13 +88,6 @@ public class Contest {
             if (reader != null) reader.close();
         }
 
-    }
-
-    private static void parseFile(RowListProcessor rowProcessor) {
-        String[] headers = rowProcessor.getHeaders();
-        List<String[]> rows = rowProcessor.getRows();
-
-        for (String elem : headers) System.out.println(elem);
     }
 
     public String getName() {

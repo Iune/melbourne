@@ -118,21 +118,34 @@ public class Entry {
         return this.getDisqualificationStatus(this.disqualificationStatus.size() - 1);
     }
 
-    public int getNumVoters(int voter) {
+    public int getNumVotersAfterVoter(int voter) {
         if (voter < 0 || voter >= this.votes.size())
             throw new ArrayIndexOutOfBoundsException("Voter number was invalid");
 
         int numVoters = 0;
-        for (int i = 0; i < voter; i++) {
+        if (voter == 0) {
             try {
+                Integer.parseInt(this.votes.get(0));
                 numVoters++;
             } catch (NumberFormatException e) {
+                // Not a valid voter
+            }
+        } else {
+            for (int i = 0; i <= voter; i++) {
+                try {
+                    Integer.parseInt(this.votes.get(i));
+                    numVoters++;
+                } catch (NumberFormatException e) {
+                    // Not a valid voter
+                }
             }
         }
+
+
         return numVoters;
     }
 
     public int getFinalNumVoters() {
-        return this.getNumVoters(this.votes.size() - 1);
+        return this.getNumVotersAfterVoter(this.votes.size() - 1);
     }
 }

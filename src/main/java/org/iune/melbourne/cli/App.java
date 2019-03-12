@@ -21,7 +21,6 @@ public class App {
 
     public static void printResults(Contest contest) {
         List<Entry> entries = contest.getEntries();
-        int numVoters = contest.getVoters().size();
         entries.sort(Comparator.comparing(Entry::getFinalSortingPoints, Comparator.reverseOrder())
                 .thenComparing(Entry::getFinalDisplayPoints, Comparator.reverseOrder())
                 .thenComparing(Entry::getCountry)
@@ -33,8 +32,8 @@ public class App {
 
         for (int i = 0; i < entries.size(); i++) {
             Entry entry = entries.get(i);
-            if (entry.getFinalDisqualificationStatus()) System.out.printf("%2d | %3d | %s: %s - %s (Disqualified)\n", i+1, entry.getFinalDisplayPoints(), entry.getCountry(), entry.getArtist(), entry.getSong());
-            else System.out.printf("%2d | %3d | %s: %s - %s\n", i+1, entry.getFinalDisplayPoints(), entry.getCountry(), entry.getArtist(), entry.getSong());
+            if (entry.getFinalDisqualificationStatus()) System.out.printf("%2d | %3f | %s: %s - %s (Disqualified)\n", i+1, entry.getFinalDisplayPoints(), entry.getCountry(), entry.getArtist(), entry.getSong());
+            else System.out.printf("%2d | %3f | %s: %s - %s\n", i+1, entry.getFinalDisplayPoints(), entry.getCountry(), entry.getArtist(), entry.getSong());
         }
     }
 }

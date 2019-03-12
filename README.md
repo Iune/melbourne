@@ -7,7 +7,7 @@
 To build `melbourne-cli`, run the following command in the terminal:
 
 ```
-mvn clean package shade:shade
+mvn clean package
 ```
 
 # Usage

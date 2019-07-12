@@ -1,6 +1,5 @@
 import webcolors
-from PyQt5.QtGui import QColor, QFont, QFontMetrics, QImage, QPainter, QPen
-from PyQt5.QtCore import Qt, QRect, QRectF, QPoint, QPointF, QSizeF
+from PyQt5.QtGui import QColor, QFont, QFontMetrics
 
 DEFAULT_FONT_FAMILY = "Comfortaa"
 DEFAULT_ACCENT_COLOR = "#FCB906"
@@ -8,7 +7,8 @@ DEFAULT_SCALE = 3.0
 
 
 class ScoreboardDetails:
-    def __init__(self, contest, output_dir, title, accent_color=DEFAULT_ACCENT_COLOR, display_flags=True, scale=DEFAULT_SCALE):
+    def __init__(self, contest, output_dir, title, accent_color=DEFAULT_ACCENT_COLOR, display_flags=True,
+                 scale=DEFAULT_SCALE):
         self.contest = contest
         self.output_dir = output_dir
 
@@ -20,12 +20,12 @@ class ScoreboardDetails:
 
 class ScoreboardFonts:
     def __init__(self, family, scale=DEFAULT_SCALE):
-        self.voter_header = QFont(family, 14*scale)
-        self.contest_header = QFont(family, 14*scale, weight=QFont.DemiBold)
-        self.country = QFont(family, 12*scale)
-        self.entry_details = QFont(family, 12*scale)
-        self.awarded_pts = QFont(family, 14*scale)
-        self.total_pts = QFont(family, 14*scale, weight=QFont.DemiBold)
+        self.voter_header = QFont(family, 14 * scale)
+        self.contest_header = QFont(family, 14 * scale, weight=QFont.DemiBold)
+        self.country = QFont(family, 12 * scale)
+        self.entry_details = QFont(family, 12 * scale)
+        self.awarded_pts = QFont(family, 14 * scale)
+        self.total_pts = QFont(family, 14 * scale, weight=QFont.DemiBold)
 
 
 class ScoreboardColors:
@@ -39,7 +39,7 @@ class ScoreboardColors:
         self.country_text = ScoreboardColors._hex_to_rgb("#7E7E7E")
 
         self.accent = ScoreboardColors._hex_to_rgb(accent_color)
-        if self.accent.red()*0.299 + self.accent.green()*0.587+self.accent.blue()*0.114 > 186:
+        if self.accent.red() * 0.299 + self.accent.green() * 0.587 + self.accent.blue() * 0.114 > 186:
             self.accent_text = ScoreboardColors._hex_to_rgb("#212121")
         else:
             self.accent_text = ScoreboardColors._hex_to_rgb("#FFFFFF")
@@ -73,16 +73,15 @@ class ScoreboardSizes:
                 self.entry_details = current_entry
 
         if details.display_flags:
-            self.flag_offset = 24*details.scale
+            self.flag_offset = 24 * details.scale
         else:
             self.flag_offset = 0
 
         self.rectangle = max(
-            self.country, self.entry_details) + self.flag_offset + 80*details.scale
+            self.country, self.entry_details) + self.flag_offset + 80 * details.scale
 
-        self.width = max(max(30*details.scale+2*self.rectangle, 48 *
-                             details.scale+self.contest_header), 10*details.scale+self.voter_header)
+        self.width = max(max(30 * details.scale + 2 * self.rectangle, 48 *
+                             details.scale + self.contest_header), 10 * details.scale + self.voter_header)
 
-        num_entries_in_left_column = contest.num_entries/2 + contest.num_entries % 2
-        self.height = 2*details.scale + 35*details.scale * \
-            num_entries_in_left_column + 80*details.scale
+        num_entries_in_left_column = contest.num_entries / 2 + contest.num_entries % 2
+        self.height = 2 * details.scale + 35 * details.scale * num_entries_in_left_column + 80 * details.scale

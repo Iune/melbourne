@@ -84,7 +84,7 @@ class Scoreboard:
                     painter.drawImage(QPoint(27 * scale - flag.width() / 2.0 + x_offset,
                                              87 * scale - flag.height() / 2.0 + 35 * scale * y_offset), flag)
                 except FileNotFoundError:
-                    pass
+                    continue
 
             # Display entry details
             self._draw_text(painter,
@@ -143,7 +143,7 @@ class Scoreboard:
             new_x -= size / 2.0
         elif flags & Qt.AlignRight:
             new_x += size / 2.0
-        elif flags & Qt.AlignVCenter:
+        if flags & Qt.AlignVCenter:
             new_y += size / 2.0
         elif flags & Qt.AlignTop:
             new_y += size

@@ -1,5 +1,6 @@
-from contest.entry import Entry
 import xlrd
+
+from contest.entry import Entry
 
 
 class Contest:
@@ -82,14 +83,3 @@ class Contest:
             x.artist,
             x.song
         ])
-
-
-# def main():
-#     file_path = "/Users/aditya/Documents/2003.xlsx"
-#     contest = Contest.from_file(file_path)
-#     for entry in contest.results_after_voter(0):
-#         print(entry.country, entry.display_pts[0])
-
-
-# if __name__ == "__main__":
-#     main()

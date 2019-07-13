@@ -4,19 +4,17 @@ from os.path import join
 import qtawesome as qta
 import webcolors
 from PyQt5.QtGui import QColor
-from PyQt5.QtWidgets import QDialog, QGridLayout, QGroupBox, QLineEdit, QPushButton, QLabel, QVBoxLayout, QWidget, \
-    QCheckBox, QProgressBar, QFileDialog, QColorDialog, QMessageBox
+from PyQt5.QtWidgets import QGridLayout, QGroupBox, QLineEdit, QPushButton, QLabel, QVBoxLayout, QWidget, \
+    QCheckBox, QProgressBar, QFileDialog, QColorDialog, QMessageBox, QMainWindow
 
 from contest.contest import Contest
 from gui.thread import ScoreboardThread
 from scoreboard.utilities import ScoreboardDetails
 
-# DEFAULT_STYLESHEET = "font-family: 'Lato';"
-DEFAULT_STYLESHEET = ""
 DEFAULT_ACCENT_COLOR = "#FCB906"
 
 
-class MainWindow(QDialog):
+class MainWindow(QMainWindow):
     def __init__(self, app_context):
         super(MainWindow, self).__init__()
         self.app_context = app_context
@@ -30,7 +28,6 @@ class MainWindow(QDialog):
 
     def _init_window(self):
         self.setWindowTitle(self.title)
-        self.setStyleSheet(DEFAULT_STYLESHEET)
 
         # Set Window Size
         self.setMaximumSize(500, 300)
@@ -121,7 +118,10 @@ class MainWindow(QDialog):
         layout.addWidget(file_details_group)
         layout.addWidget(scoreboard_details_group)
         layout.addWidget(generation_group)
-        self.setLayout(layout)
+
+        central_widget = QWidget()
+        central_widget.setLayout(layout)
+        self.setCentralWidget(central_widget)
 
     def _set_input_file(self):
         home_directory = expanduser('~')
@@ -171,13 +171,15 @@ class MainWindow(QDialog):
             if self.display_flags_check.isChecked():
                 invalid_flags = get_invalid_flags(self)
                 if invalid_flags:
+                    self.display_flags_check.setChecked(False)
                     alert = QMessageBox()
-                    alert.setStyleSheet(DEFAULT_STYLESHEET)
                     alert.setIcon(QMessageBox.Warning)
                     alert.setText("Invalid flags were specified in the input file.")
                     alert.setWindowTitle("Invalid Flags Specified")
-                    alert.setDetailedText('\n'.join(sorted(invalid_flags)))
+                    alert.setDetailedText('\n'.join(sorted(["{} was not found".format(flag) for flag in invalid_flags])))
                     alert.setStandardButtons(QMessageBox.Ok)
+                    alert.setDefaultButton(QMessageBox.Ok)
+                    alert.setEscapeButton(QMessageBox.Ok)
                     alert.exec_()
 
     def _check_if_ready(self):

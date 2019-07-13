@@ -11,6 +11,7 @@ class AppContext(ApplicationContext):
     def run(self):
         self._register_fonts()
         self.app.setStyle("Fusion")
+        self.app.setApplicationName("Melbourne")
         window = MainWindow(self)
         window.show()
         return self.app.exec_()

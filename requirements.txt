@@ -4,7 +4,7 @@ fbs==0.8.3
 macholib==1.11
 pathvalidate==0.29.0
 PyInstaller==3.5
-PySide2==5.13.0
+PySide2==5.12.3
 QtAwesome==0.5.7
 QtPy==1.8.0
 sip==4.19.8

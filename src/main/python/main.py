@@ -19,7 +19,6 @@ class AppContext(ApplicationContext):
     def _register_fonts(self):
         QFontDatabase.addApplicationFont(self.get_resource(join("fonts", "FiraSans-Medium.otf")))
         QFontDatabase.addApplicationFont(self.get_resource(join("fonts", "FiraSans-Regular.otf")))
-        QFontDatabase.addApplicationFont(self.get_resource(join("fonts", "ZillaSlab-Medium.otf")))
         QFontDatabase.addApplicationFont(self.get_resource(join("fonts", "ZillaSlab-Regular.otf")))
 
 

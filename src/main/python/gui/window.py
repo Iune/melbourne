@@ -1,6 +1,7 @@
 from os.path import expanduser
 from os.path import join
 
+import fbs_runtime
 import qtawesome as qta
 import webcolors
 from PySide2.QtCore import Qt
@@ -32,9 +33,14 @@ class MainWindow(QMainWindow):
         self.setWindowTitle(self.title)
 
         # Set Window Size
-        self.setMaximumSize(500, 430)
-        self.setMinimumSize(500, 430)
-        self.resize(500, 430)
+        if fbs_runtime.platform.is_windows():
+            self.setMaximumSize(500, 430)
+            self.setMinimumSize(500, 430)
+            self.resize(500, 430)
+        else:
+            self.setMaximumSize(500, 300)
+            self.setMinimumSize(500, 300)
+            self.resize(500, 300)
 
     def _init_menus(self):
         menu = self.menuBar()

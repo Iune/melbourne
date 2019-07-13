@@ -23,16 +23,17 @@ class ScoreboardDetails:
 
 class ScoreboardFonts:
     def __init__(self, scale=DEFAULT_SCALE):
+        # Due to rendering differences between OSX and Windows, we need to scale down the text on Windows
         if fbs_runtime.platform.is_windows():
-            os_scale = 72/96
+            font_os_scale = (72 / 96) * ((196 / 19) / 14)
         else:
-            os_scale = 1.0
-        self.voter_header = QFont(DEFAULT_BASE_FONT_FAMILY, 14 * scale * os_scale)
-        self.contest_header = QFont(DEFAULT_BASE_FONT_FAMILY, 14 * scale * os_scale)
-        self.country = QFont(DEFAULT_BASE_FONT_FAMILY, 12 * scale * os_scale)
-        self.entry_details = QFont(DEFAULT_BASE_FONT_FAMILY, 12 * scale * os_scale)
-        self.awarded_pts = QFont(DEFAULT_POINTS_FONT_FAMILY, 14 * scale * os_scale)
-        self.total_pts = QFont(DEFAULT_POINTS_FONT_FAMILY, 14 * scale * os_scale, weight=QFont.DemiBold)
+            font_os_scale = 1.0
+        self.voter_header = QFont(DEFAULT_BASE_FONT_FAMILY, 14 * scale * font_os_scale)
+        self.contest_header = QFont(DEFAULT_BASE_FONT_FAMILY, 14 * scale * font_os_scale)
+        self.country = QFont(DEFAULT_BASE_FONT_FAMILY, 12 * scale * font_os_scale)
+        self.entry_details = QFont(DEFAULT_BASE_FONT_FAMILY, 12 * scale * font_os_scale)
+        self.awarded_pts = QFont(DEFAULT_POINTS_FONT_FAMILY, 14 * scale * font_os_scale)
+        self.total_pts = QFont(DEFAULT_POINTS_FONT_FAMILY, 14 * scale * font_os_scale, weight=QFont.DemiBold)
 
 
 class ScoreboardColors:
@@ -53,8 +54,8 @@ class ScoreboardColors:
             self.accent_text = ScoreboardColors._hex_to_rgb("#FFFFFF")
 
     @staticmethod
-    def _hex_to_rgb(hex):
-        rgb = webcolors.hex_to_rgb(hex)
+    def _hex_to_rgb(hex_code):
+        rgb = webcolors.hex_to_rgb(hex_code)
         return QColor(rgb.red, rgb.green, rgb.blue)
 
 

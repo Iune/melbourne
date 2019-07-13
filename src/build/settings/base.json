@@ -1,0 +1,6 @@
+{
+    "app_name": "Melbourne",
+    "author": "Aditya Duri",
+    "main_module": "src/main/python/main.py",
+    "version": "5.0.0"
+}

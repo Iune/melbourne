@@ -1,6 +1,5 @@
 import sys
 
-import qdarkstyle
 from fbs_runtime.application_context.PyQt5 import ApplicationContext
 
 from gui.window import MainWindow
@@ -8,7 +7,6 @@ from gui.window import MainWindow
 
 class AppContext(ApplicationContext):
     def run(self):
-        # self.app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
         self.app.setStyle("Fusion")
         window = MainWindow(self)
         window.show()

@@ -1,21 +1,19 @@
 from os import makedirs
 from os.path import isdir, join
 
-from PyQt5.QtCore import Qt, QRect, QRectF, QPoint, QPointF, QSizeF
-from PyQt5.QtGui import QImage, QPainter, QPen, QFont
+from PySide2.QtCore import Qt, QRect, QRectF, QPoint, QPointF, QSizeF
+from PySide2.QtGui import QImage, QPainter, QPen
 from pathvalidate import sanitize_filename
 
 from scoreboard.utilities import ScoreboardColors, ScoreboardFonts, ScoreboardSizes
 
-DEFAULT_FONT_FAMILY = "Helvetica Neue"
-
 
 class Scoreboard:
-    def __init__(self, app_context, details, font_family=DEFAULT_FONT_FAMILY):
+    def __init__(self, app_context, details):
         self.app_context = app_context
         self.details = details
         self.contest = details.contest
-        self.fonts = ScoreboardFonts(font_family, details.scale)
+        self.fonts = ScoreboardFonts(details.scale)
         self.colors = ScoreboardColors(details.accent_color)
 
     def generate(self, voter_num):
@@ -50,7 +48,7 @@ class Scoreboard:
         # Display contest title
         self._draw_rectangle(painter, QPoint(0, 30 * scale), QPoint(sizes.width, 30 * scale), self.colors.accent)
         self._draw_text(painter, QPoint(10 * scale, 45 * scale), "{} Results".format(self.details.title),
-                        self.fonts.voter_header, self.colors.accent_text, Qt.AlignLeft)
+                        self.fonts.contest_header, self.colors.accent_text, Qt.AlignLeft)
 
         # Draw background rectangles for entry details
         left_col = int(self.contest.num_entries / 2) + self.contest.num_entries % 2
@@ -97,13 +95,22 @@ class Scoreboard:
                             Qt.AlignLeft)
 
             # Display the entry's total number of received points
-            self._draw_rectangle(painter, QPoint(30 * scale + x_offset + sizes.flag_offset + sizes.entry_details,
-                                                 77 * scale + 35 * scale * y_offset),
-                                 QPoint(29 * scale, 20 * scale), self.colors.main)
-            self._draw_text(painter, QPoint(44.5 * scale + x_offset + sizes.flag_offset + sizes.entry_details,
-                                            87 * scale + 35 * scale * y_offset),
-                            "{}".format(entry.display_pts[voter_num]),
-                            self.fonts.total_pts, self.colors.white_text, Qt.AlignHCenter)
+            if entry.dq_statuses[voter_num]:
+                self._draw_rectangle(painter, QPoint(30 * scale + x_offset + sizes.flag_offset + sizes.entry_details,
+                                                     77 * scale + 35 * scale * y_offset),
+                                     QPoint(29 * scale, 20 * scale), self.colors.grey_text)
+                self._draw_text(painter, QPoint(44.5 * scale + x_offset + sizes.flag_offset + sizes.entry_details,
+                                                87 * scale + 35 * scale * y_offset),
+                                "{}".format(entry.display_pts[voter_num]),
+                                self.fonts.total_pts, self.colors.black, Qt.AlignHCenter)
+            else:
+                self._draw_rectangle(painter, QPoint(30 * scale + x_offset + sizes.flag_offset + sizes.entry_details,
+                                                     77 * scale + 35 * scale * y_offset),
+                                     QPoint(29 * scale, 20 * scale), self.colors.main)
+                self._draw_text(painter, QPoint(44.5 * scale + x_offset + sizes.flag_offset + sizes.entry_details,
+                                                87 * scale + 35 * scale * y_offset),
+                                "{}".format(entry.display_pts[voter_num]),
+                                self.fonts.total_pts, self.colors.white_text, Qt.AlignHCenter)
 
             # Display the entry's number of points received by the current voter
             if len(entry.votes[voter_num]) > 0:

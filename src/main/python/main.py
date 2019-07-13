@@ -1,8 +1,8 @@
 import sys
 from os.path import join
 
-from PyQt5.QtGui import QFontDatabase
-from fbs_runtime.application_context.PyQt5 import ApplicationContext
+from PySide2.QtGui import QFontDatabase
+from fbs_runtime.application_context.PySide2 import ApplicationContext
 
 from gui.window import MainWindow
 
@@ -17,8 +17,9 @@ class AppContext(ApplicationContext):
         return self.app.exec_()
 
     def _register_fonts(self):
-        QFontDatabase.addApplicationFont(self.get_resource(join("fonts", "Ubuntu-B.ttf")))
-        QFontDatabase.addApplicationFont(self.get_resource(join("fonts", "Ubuntu-R.ttf")))
+        QFontDatabase.addApplicationFont(self.get_resource(join("fonts", "FiraSans-Medium.otf")))
+        QFontDatabase.addApplicationFont(self.get_resource(join("fonts", "FiraSans-Regular.otf")))
+        QFontDatabase.addApplicationFont(self.get_resource(join("fonts", "ZillaSlab-Regular.otf")))
 
 
 def main():

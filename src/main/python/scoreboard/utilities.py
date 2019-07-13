@@ -1,8 +1,11 @@
 import webcolors
-from PyQt5.QtGui import QColor, QFont, QFontMetrics
+from PySide2.QtGui import QColor, QFont, QFontMetrics
 
 DEFAULT_ACCENT_COLOR = "#FCB906"
-DEFAULT_SCALE = 3.0
+DEFAULT_SCALE = 2.5
+
+DEFAULT_BASE_FONT_FAMILY = "Zilla Slab"
+DEFAULT_POINTS_FONT_FAMILY = "Fira Sans"
 
 
 class ScoreboardDetails:
@@ -18,13 +21,13 @@ class ScoreboardDetails:
 
 
 class ScoreboardFonts:
-    def __init__(self, family, scale=DEFAULT_SCALE):
-        self.voter_header = QFont(family, 14 * scale)
-        self.contest_header = QFont(family, 14 * scale, weight=QFont.Bold)
-        self.country = QFont(family, 12 * scale)
-        self.entry_details = QFont(family, 12 * scale)
-        self.awarded_pts = QFont(family, 14 * scale)
-        self.total_pts = QFont(family, 14 * scale, weight=QFont.Bold)
+    def __init__(self, scale=DEFAULT_SCALE):
+        self.voter_header = QFont(DEFAULT_BASE_FONT_FAMILY, 14 * scale)
+        self.contest_header = QFont(DEFAULT_BASE_FONT_FAMILY, 14 * scale)
+        self.country = QFont(DEFAULT_BASE_FONT_FAMILY, 12 * scale)
+        self.entry_details = QFont(DEFAULT_BASE_FONT_FAMILY, 12 * scale)
+        self.awarded_pts = QFont(DEFAULT_POINTS_FONT_FAMILY, 14 * scale)
+        self.total_pts = QFont(DEFAULT_POINTS_FONT_FAMILY, 14 * scale, weight=QFont.DemiBold)
 
 
 class ScoreboardColors:
@@ -83,5 +86,5 @@ class ScoreboardSizes:
         self.width = max(max(30 * details.scale + 2 * self.rectangle, 48 *
                              details.scale + self.contest_header), 10 * details.scale + self.voter_header)
 
-        num_entries_in_left_column = contest.num_entries / 2 + contest.num_entries % 2
-        self.height = 2 * details.scale + 35 * details.scale * num_entries_in_left_column + 80 * details.scale
+        num_entries_in_left_column = int(contest.num_entries / 2) + contest.num_entries % 2
+        self.height = 10 * details.scale + 35 * details.scale * num_entries_in_left_column + 70 * details.scale

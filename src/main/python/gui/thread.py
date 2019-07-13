@@ -1,10 +1,10 @@
-from PyQt5.QtCore import QThread, pyqtSignal
+from PySide2.QtCore import QThread, Signal, Slot
 
 from scoreboard.scoreboard import Scoreboard
 
 
 class ScoreboardThread(QThread):
-    progress = pyqtSignal(int)
+    progress = Signal(int)
 
     def __init__(self, app_context, details, parent=None):
         QThread.__init__(self, parent)

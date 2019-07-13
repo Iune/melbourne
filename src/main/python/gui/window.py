@@ -3,8 +3,8 @@ from os.path import join
 
 import qtawesome as qta
 import webcolors
-from PyQt5.QtGui import QColor
-from PyQt5.QtWidgets import QGridLayout, QGroupBox, QLineEdit, QPushButton, QLabel, QVBoxLayout, QWidget, \
+from PySide2.QtGui import QColor
+from PySide2.QtWidgets import QGridLayout, QGroupBox, QLineEdit, QPushButton, QLabel, QVBoxLayout, QWidget, \
     QCheckBox, QProgressBar, QFileDialog, QColorDialog, QMessageBox, QMainWindow
 
 from contest.contest import Contest

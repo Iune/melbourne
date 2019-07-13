@@ -32,7 +32,7 @@ class MainWindow(QMainWindow):
         self.setWindowTitle(self.title)
 
         # Set Window Size
-        self.setMaximumSize(500, 4300)
+        self.setMaximumSize(500, 430)
         self.setMinimumSize(500, 430)
         self.resize(500, 430)
 

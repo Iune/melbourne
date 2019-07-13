@@ -1,3 +1,4 @@
+import fbs_runtime
 import webcolors
 from PySide2.QtGui import QColor, QFont, QFontMetrics
 
@@ -22,12 +23,16 @@ class ScoreboardDetails:
 
 class ScoreboardFonts:
     def __init__(self, scale=DEFAULT_SCALE):
-        self.voter_header = QFont(DEFAULT_BASE_FONT_FAMILY, 14 * scale)
-        self.contest_header = QFont(DEFAULT_BASE_FONT_FAMILY, 14 * scale)
-        self.country = QFont(DEFAULT_BASE_FONT_FAMILY, 12 * scale)
-        self.entry_details = QFont(DEFAULT_BASE_FONT_FAMILY, 12 * scale)
-        self.awarded_pts = QFont(DEFAULT_POINTS_FONT_FAMILY, 14 * scale)
-        self.total_pts = QFont(DEFAULT_POINTS_FONT_FAMILY, 14 * scale, weight=QFont.DemiBold)
+        if fbs_runtime.platform.is_windows():
+            os_scale = 72/96
+        else:
+            os_scale = 1.0
+        self.voter_header = QFont(DEFAULT_BASE_FONT_FAMILY, 14 * scale * os_scale)
+        self.contest_header = QFont(DEFAULT_BASE_FONT_FAMILY, 14 * scale * os_scale)
+        self.country = QFont(DEFAULT_BASE_FONT_FAMILY, 12 * scale * os_scale)
+        self.entry_details = QFont(DEFAULT_BASE_FONT_FAMILY, 12 * scale * os_scale)
+        self.awarded_pts = QFont(DEFAULT_POINTS_FONT_FAMILY, 14 * scale * os_scale)
+        self.total_pts = QFont(DEFAULT_POINTS_FONT_FAMILY, 14 * scale * os_scale, weight=QFont.DemiBold)
 
 
 class ScoreboardColors:

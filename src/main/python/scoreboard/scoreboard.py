@@ -26,6 +26,7 @@ class Scoreboard:
         painter = QPainter()
         painter.begin(image)
         painter.setRenderHint(QPainter.Antialiasing, True)
+        painter.setRenderHint(QPainter.TextAntialiasing, True)
         self._draw_scoreboard(painter, sizes, voter_num)
         painter.end()
 

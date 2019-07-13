@@ -3,9 +3,10 @@ from os.path import join
 
 import qtawesome as qta
 import webcolors
-from PySide2.QtGui import QColor
+from PySide2.QtCore import Qt
+from PySide2.QtGui import QColor, QKeySequence, QPixmap
 from PySide2.QtWidgets import QGridLayout, QGroupBox, QLineEdit, QPushButton, QLabel, QVBoxLayout, QWidget, \
-    QCheckBox, QProgressBar, QFileDialog, QColorDialog, QMessageBox, QMainWindow
+    QCheckBox, QProgressBar, QFileDialog, QColorDialog, QMessageBox, QMainWindow, QAction, QDialogButtonBox, QDialog
 
 from contest.contest import Contest
 from gui.thread import ScoreboardThread
@@ -25,14 +26,42 @@ class MainWindow(QMainWindow):
 
         self._init_window()
         self._init_layout()
+        self._init_menus()
 
     def _init_window(self):
         self.setWindowTitle(self.title)
 
         # Set Window Size
-        self.setMaximumSize(500, 300)
-        self.setMinimumSize(500, 300)
-        self.resize(500, 300)
+        self.setMaximumSize(500, 325)
+        self.setMinimumSize(500, 325)
+        self.resize(500, 325)
+
+    def _init_menus(self):
+        menu = self.menuBar()
+        # menu.setNativeMenuBar(False)
+
+        file_menu = menu.addMenu('&File')
+
+        input_file_action = QAction("Select Input File", self)
+        input_file_action.triggered.connect(self._set_input_file)
+        input_file_action.setShortcut(QKeySequence.Open)
+
+        output_folder_action = QAction("Select Output Folder", self)
+        output_folder_action.triggered.connect(self._set_output_folder)
+        output_folder_action.setShortcut(QKeySequence("Ctrl+Shift+O"))
+
+        reload_contest_action = QAction("Reload Contest Details", self)
+        reload_contest_action.triggered.connect(self._reload_contest)
+        reload_contest_action.setShortcut(QKeySequence("Ctrl+R"))
+
+        file_menu.addAction(input_file_action)
+        file_menu.addAction(output_folder_action)
+        file_menu.addAction(reload_contest_action)
+
+        help_menu = self.menuBar().addMenu("&Help")
+        about_action = QAction("&About", self)
+        about_action.triggered.connect(self._show_about_dialog)
+        help_menu.addAction(about_action)
 
     def _init_layout(self):
         # File Details Grid
@@ -80,7 +109,6 @@ class MainWindow(QMainWindow):
         self.display_flags_check = QCheckBox('Display Flags')
         self.display_flags_check.setChecked(False)
         self.display_flags_check.stateChanged.connect(self._validate_flags)
-        # self.display_flags_check.clicked.connect(self._reset_accent_color)
 
         scoreboard_details_grid.addWidget(QLabel('Scoreboard Title'), 0, 0)
         scoreboard_details_grid.addWidget(self.scoreboard_title_le, 0, 1, 1, 2)
@@ -123,6 +151,10 @@ class MainWindow(QMainWindow):
         central_widget.setLayout(layout)
         self.setCentralWidget(central_widget)
 
+    def _show_about_dialog(self):
+        about_dialog = AboutDialog(self.app_context)
+        about_dialog.exec_()
+
     def _set_input_file(self):
         home_directory = expanduser('~')
         dialog = QFileDialog()
@@ -130,8 +162,38 @@ class MainWindow(QMainWindow):
         path = dialog.getOpenFileName(self, 'Select Excel Spreadsheet', home_directory, 'Excel (*.xls, *.xlsx)')
         if path and len(path[0]) > 0:
             self.input_file_le.setText(path[0])
-            self.contest = Contest.from_file(path[0])
-            self._validate_flags()
+            self._load_contest()
+
+    def _load_contest(self):
+        if len(self.input_file_le.text()) > 0:
+            try:
+                self.contest = Contest.from_file(self.input_file_le.text())
+                self._validate_flags()
+            except ValueError as err:
+                self.input_file_le.setText("")
+                self.contest = None
+                self._check_if_ready()
+                alert = QMessageBox()
+                alert.setIcon(QMessageBox.Critical)
+                alert.setText("Unable to load contest details from file")
+                alert.setWindowTitle("Error Loading Contest")
+                alert.setDetailedText("{}".format(err))
+                alert.setStandardButtons(QMessageBox.Ok)
+                alert.setDefaultButton(QMessageBox.Ok)
+                alert.setEscapeButton(QMessageBox.Ok)
+                alert.exec_()
+
+    def _reload_contest(self):
+        self._load_contest()
+
+        alert = QMessageBox()
+        alert.setIcon(QMessageBox.Information)
+        alert.setText("Successfully reloaded contest details from file")
+        alert.setWindowTitle("Reloaded Contest Details")
+        alert.setStandardButtons(QMessageBox.Ok)
+        alert.setDefaultButton(QMessageBox.Ok)
+        alert.setEscapeButton(QMessageBox.Ok)
+        alert.exec_()
 
     def _set_output_folder(self):
         home_directory = expanduser('~')
@@ -224,3 +286,35 @@ class MainWindow(QMainWindow):
 
     def _update_progress_bar(self, voter):
         self.progress_bar.setValue(voter)
+
+
+class AboutDialog(QDialog):
+    def __init__(self, app_context):
+        super(AboutDialog, self).__init__()
+
+        ok_btn = QDialogButtonBox.Ok
+        self.button_box = QDialogButtonBox(ok_btn)
+        self.button_box.accepted.connect(self.accept)
+        self.button_box.rejected.connect(self.reject)
+
+        layout = QVBoxLayout()
+
+        title = QLabel("Melbourne")
+        font = title.font()
+        font.setPointSize(20)
+        font.setBold(True)
+        title.setFont(font)
+
+        logo = QLabel()
+        logo.setPixmap(QPixmap(app_context.get_resource("logo_128.png")))
+
+        layout.addWidget(title)
+        layout.addWidget(logo)
+        layout.addWidget(QLabel("Version 5.0.0"))
+        layout.addWidget(QLabel("Copyright © Aditya Duri"))
+
+        for i in range(0, layout.count()):
+            layout.itemAt(i).setAlignment(Qt.AlignHCenter)
+
+        layout.addWidget(self.button_box)
+        self.setLayout(layout)

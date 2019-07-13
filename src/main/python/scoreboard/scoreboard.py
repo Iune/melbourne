@@ -4,9 +4,10 @@ from os.path import isdir, join
 from PyQt5.QtCore import Qt, QRect, QRectF, QPoint, QPointF, QSizeF
 from PyQt5.QtGui import QImage, QPainter, QPen
 from pathvalidate import sanitize_filename
+
 from scoreboard.utilities import ScoreboardColors, ScoreboardFonts, ScoreboardSizes
 
-DEFAULT_FONT_FAMILY = "Comfortaa"
+DEFAULT_FONT_FAMILY = "Ubuntu"
 
 
 class Scoreboard:

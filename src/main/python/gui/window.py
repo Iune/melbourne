@@ -11,7 +11,8 @@ from contest.contest import Contest
 from gui.thread import ScoreboardThread
 from scoreboard.utilities import ScoreboardDetails
 
-DEFAULT_STYLESHEET = "font-family: 'Lato';"
+# DEFAULT_STYLESHEET = "font-family: 'Lato';"
+DEFAULT_STYLESHEET = ""
 DEFAULT_ACCENT_COLOR = "#FCB906"
 
 

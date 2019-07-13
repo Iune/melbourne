@@ -1,13 +1,12 @@
 import webcolors
 from PyQt5.QtGui import QColor, QFont, QFontMetrics
 
-DEFAULT_FONT_FAMILY = "Comfortaa"
 DEFAULT_ACCENT_COLOR = "#FCB906"
 DEFAULT_SCALE = 3.0
 
 
 class ScoreboardDetails:
-    def __init__(self, contest, output_dir, title, accent_color=DEFAULT_ACCENT_COLOR, display_flags=True,
+    def __init__(self, contest, output_dir, title, accent_color, display_flags=True,
                  scale=DEFAULT_SCALE):
         self.contest = contest
         self.output_dir = output_dir
@@ -21,11 +20,11 @@ class ScoreboardDetails:
 class ScoreboardFonts:
     def __init__(self, family, scale=DEFAULT_SCALE):
         self.voter_header = QFont(family, 14 * scale)
-        self.contest_header = QFont(family, 14 * scale, weight=QFont.DemiBold)
+        self.contest_header = QFont(family, 14 * scale, weight=QFont.Bold)
         self.country = QFont(family, 12 * scale)
         self.entry_details = QFont(family, 12 * scale)
         self.awarded_pts = QFont(family, 14 * scale)
-        self.total_pts = QFont(family, 14 * scale, weight=QFont.DemiBold)
+        self.total_pts = QFont(family, 14 * scale, weight=QFont.Bold)
 
 
 class ScoreboardColors:

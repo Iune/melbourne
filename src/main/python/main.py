@@ -1,5 +1,7 @@
 import sys
+from os.path import join
 
+from PyQt5.QtGui import QFontDatabase
 from fbs_runtime.application_context.PyQt5 import ApplicationContext
 
 from gui.window import MainWindow
@@ -7,10 +9,15 @@ from gui.window import MainWindow
 
 class AppContext(ApplicationContext):
     def run(self):
+        self._register_fonts()
         self.app.setStyle("Fusion")
         window = MainWindow(self)
         window.show()
         return self.app.exec_()
+
+    def _register_fonts(self):
+        QFontDatabase.addApplicationFont(self.get_resource(join("fonts", "Ubuntu-B.ttf")))
+        QFontDatabase.addApplicationFont(self.get_resource(join("fonts", "Ubuntu-R.ttf")))
 
 
 def main():

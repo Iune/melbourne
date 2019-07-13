@@ -1,5 +1,5 @@
 <p align="center">
-  <img width="256" height="256" src="/logo/img_256.jpg?raw=true">
+  <img width="256" height="256" src="/logo/img_256.png?raw=true">
 </p>
 
 # Melbourne

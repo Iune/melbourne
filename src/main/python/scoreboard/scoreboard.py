@@ -52,13 +52,13 @@ class Scoreboard:
                         self.fonts.voter_header, self.colors.accent_text, Qt.AlignLeft)
 
         # Draw background rectangles for entry details
-        left_col = self.contest.num_entries / 2 + self.contest.num_entries % 2
+        left_col = int(self.contest.num_entries / 2) + self.contest.num_entries % 2
         right_col = self.contest.num_entries - left_col
         self._draw_rectangle(painter, QPoint(10 * scale, 70 * scale),
-                             QPoint(sizes.rectangle, 4 * scale + 35 * scale * left_col), self.colors.white,
+                             QPoint(sizes.rectangle, 0 * scale + 35 * scale * left_col), self.colors.white,
                              border=self.colors.grey_text, border_width=0.5 * scale)
         self._draw_rectangle(painter, QPoint(20 * scale + sizes.rectangle, 70 * scale),
-                             QPoint(sizes.rectangle, 4 * scale + 35 * scale * right_col), self.colors.white,
+                             QPoint(sizes.rectangle, 0 * scale + 35 * scale * right_col), self.colors.white,
                              border=self.colors.grey_text, border_width=0.5 * scale)
 
         entries = self.contest.results_after_voter(voter_num)
@@ -92,7 +92,7 @@ class Scoreboard:
                             entry.country, self.fonts.country, self.colors.country_text, Qt.AlignLeft)
             self._draw_text(painter,
                             QPoint(20 * scale + x_offset + sizes.flag_offset, 94 * scale + 35 * scale * y_offset),
-                            "{} – {}".format(entry.artist, entry.song), self.fonts.country, self.colors.black,
+                            "{} – {}".format(entry.artist, entry.song), self.fonts.entry_details, self.colors.black,
                             Qt.AlignLeft)
 
             # Display the entry's total number of received points
@@ -123,8 +123,8 @@ class Scoreboard:
             if i + 1 != left_col and i + 1 != self.contest.num_entries:
                 painter.setPen(QPen(self.colors.grey_text, 0.5 * scale))
                 painter.drawLine(
-                    QPoint(10 * scale + x_offset, 106 * scale + 35 * scale * y_offset),
-                    QPoint(10 * scale + x_offset + sizes.rectangle, 106 * scale + 35 * scale * y_offset))
+                    QPoint(10 * scale + x_offset, 104.5 * scale + 35 * scale * y_offset),
+                    QPoint(10 * scale + x_offset + sizes.rectangle, 104.5 * scale + 35 * scale * y_offset))
 
     @staticmethod
     def _draw_text(painter, point, text, font, color, flags):

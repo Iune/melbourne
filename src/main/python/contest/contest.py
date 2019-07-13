@@ -4,8 +4,7 @@ from contest.entry import Entry
 
 
 class Contest:
-    def __init__(self, name, entries, voters):
-        self.name = name
+    def __init__(self, entries, voters):
         self.entries = entries
         self.voters = voters
 
@@ -37,11 +36,7 @@ class Contest:
                 votes=[str(cell.value).strip() for cell in row[6:]]
             ))
 
-        return Contest(
-            name=None,
-            entries=entries,
-            voters=voters
-        )
+        return Contest(entries=entries, voters=voters)
 
     def final_results(self):
         return sorted(self.entries, key=lambda x: [

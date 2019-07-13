@@ -38,7 +38,8 @@ class ScoreboardColors:
         self.country_text = ScoreboardColors._hex_to_rgb("#7E7E7E")
 
         self.accent = ScoreboardColors._hex_to_rgb(accent_color)
-        if self.accent.red() * 0.299 + self.accent.green() * 0.587 + self.accent.blue() * 0.114 > 186:
+        luminance = (self.accent.red() * 0.299 + self.accent.green() * 0.587 + self.accent.blue() * 0.114) / 255
+        if luminance > 0.5:
             self.accent_text = ScoreboardColors._hex_to_rgb("#212121")
         else:
             self.accent_text = ScoreboardColors._hex_to_rgb("#FFFFFF")

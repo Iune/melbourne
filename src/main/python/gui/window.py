@@ -101,7 +101,7 @@ class MainWindow(QMainWindow):
         self.generate_btn.setDefault(False)
         self.generate_btn.setAutoDefault(False)
         self.generate_btn.clicked.connect(self._generate_scoreboards)
-        self.cancel_btn = QPushButton(qta.icon('fa5s.times', color='#F44336'), ' Cancel')
+        self.cancel_btn = QPushButton(qta.icon('fa5s.stop', color='#F44336'), ' Cancel')
         self.cancel_btn.setEnabled(False)
         self.cancel_btn.setDefault(False)
         self.cancel_btn.setAutoDefault(False)
@@ -176,7 +176,8 @@ class MainWindow(QMainWindow):
                     alert.setIcon(QMessageBox.Warning)
                     alert.setText("Invalid flags were specified in the input file.")
                     alert.setWindowTitle("Invalid Flags Specified")
-                    alert.setDetailedText('\n'.join(sorted(["{} was not found".format(flag) for flag in invalid_flags])))
+                    alert.setDetailedText(
+                        '\n'.join(sorted(["{} was not found".format(flag) for flag in invalid_flags])))
                     alert.setStandardButtons(QMessageBox.Ok)
                     alert.setDefaultButton(QMessageBox.Ok)
                     alert.setEscapeButton(QMessageBox.Ok)
@@ -189,6 +190,7 @@ class MainWindow(QMainWindow):
             self.generate_btn.setEnabled(False)
 
     def _generate_scoreboards(self):
+        self._validate_flags()
         self.progress_bar.setMaximum(self.contest.num_voters)
         self.progress_bar.setValue(0)
 

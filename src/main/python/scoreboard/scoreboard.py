@@ -2,12 +2,12 @@ from os import makedirs
 from os.path import isdir, join
 
 from PyQt5.QtCore import Qt, QRect, QRectF, QPoint, QPointF, QSizeF
-from PyQt5.QtGui import QImage, QPainter, QPen
+from PyQt5.QtGui import QImage, QPainter, QPen, QFont
 from pathvalidate import sanitize_filename
 
 from scoreboard.utilities import ScoreboardColors, ScoreboardFonts, ScoreboardSizes
 
-DEFAULT_FONT_FAMILY = "Ubuntu"
+DEFAULT_FONT_FAMILY = "Helvetica Neue"
 
 
 class Scoreboard:

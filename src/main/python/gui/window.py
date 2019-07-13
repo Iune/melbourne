@@ -38,7 +38,6 @@ class MainWindow(QMainWindow):
 
     def _init_menus(self):
         menu = self.menuBar()
-        # menu.setNativeMenuBar(False)
 
         file_menu = menu.addMenu('&File')
 

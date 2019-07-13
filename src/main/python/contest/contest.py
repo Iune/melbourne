@@ -28,12 +28,21 @@ class Contest:
 
         entries = []
         for row in [row for row in sheet.get_rows()][1:]:
+            contest = str(row[1].value).strip()
+            flag = str(row[2].value).strip()
+            artist = str(row[3].value).strip()
+            song = str(row[4].value).strip()
+            votes = [str(cell.value).strip() for cell in row[6:]]
+
+            if not contest and not flag and not artist and not song:
+                continue
+
             entries.append(Entry(
-                country=str(row[1].value).strip(),
-                flag=str(row[2].value).strip(),
-                artist=str(row[3].value).strip(),
-                song=str(row[4].value).strip(),
-                votes=[str(cell.value).strip() for cell in row[6:]]
+                country=contest,
+                flag=flag,
+                artist=artist,
+                song=song,
+                votes=votes
             ))
 
         return Contest(entries=entries, voters=voters)

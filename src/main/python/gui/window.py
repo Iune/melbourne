@@ -249,6 +249,8 @@ class MainWindow(QMainWindow):
                     alert.setDefaultButton(QMessageBox.Ok)
                     alert.setEscapeButton(QMessageBox.Ok)
                     alert.exec_()
+                    return False
+        return True
 
     def _check_if_ready(self):
         if self.contest and len(self.output_folder_le.text()) > 0 and len(self.scoreboard_title_le.text()) > 0:
@@ -257,7 +259,9 @@ class MainWindow(QMainWindow):
             self.generate_btn.setEnabled(False)
 
     def _generate_scoreboards(self):
-        self._validate_flags()
+        ready_to_generate = self._validate_flags()
+        if not ready_to_generate:
+            return
         self.progress_bar.setMaximum(self.contest.num_voters)
         self.progress_bar.setValue(0)
 

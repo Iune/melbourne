@@ -3,7 +3,8 @@ import webcolors
 from PySide2.QtGui import QColor, QFont, QFontMetrics
 
 DEFAULT_ACCENT_COLOR = "#FCB906"
-DEFAULT_SCALE = 2.5
+DEFAULT_IMAGE_SCALE = 2.5
+DEFAULT_WINDOWS_DPI_SCALING = 1.5
 
 DEFAULT_BASE_FONT_FAMILY = "Zilla Slab"
 DEFAULT_POINTS_FONT_FAMILY = "Fira Sans"
@@ -11,29 +12,35 @@ DEFAULT_POINTS_FONT_FAMILY = "Fira Sans"
 
 class ScoreboardDetails:
     def __init__(self, contest, output_dir, title, accent_color, display_flags=True,
-                 scale=DEFAULT_SCALE):
+                 image_scale=DEFAULT_IMAGE_SCALE, windows_dpi_scaling=DEFAULT_WINDOWS_DPI_SCALING):
         self.contest = contest
         self.output_dir = output_dir
 
         self.title = title
         self.accent_color = accent_color
         self.display_flags = display_flags
-        self.scale = scale
+        self.scale = image_scale
+
+        # On Windows, text is rendered differently depending on the DPI scaling factor which we need to account for
+        self.windows_ui_scaling = windows_dpi_scaling
 
 
 class ScoreboardFonts:
-    def __init__(self, scale=DEFAULT_SCALE):
+    def __init__(self, image_scale=DEFAULT_IMAGE_SCALE, windows_dpi_scaling=DEFAULT_WINDOWS_DPI_SCALING):
         # Due to rendering differences between OSX and Windows, we need to scale down the text on Windows
         if fbs_runtime.platform.is_windows():
-            font_os_scale = (72 / 96) * ((196 / 19) / 14)
+            windows_mac_canonical_pixel_ratio = 72.0 / 96.0
+            adjustment_factor = (196.0 / 19.0) / 14.0
+            windows_ui_scaling_factor = DEFAULT_WINDOWS_DPI_SCALING / windows_dpi_scaling
+            font_os_scale = windows_mac_canonical_pixel_ratio * adjustment_factor * windows_ui_scaling_factor
         else:
             font_os_scale = 1.0
-        self.voter_header = QFont(DEFAULT_BASE_FONT_FAMILY, 14 * scale * font_os_scale)
-        self.contest_header = QFont(DEFAULT_BASE_FONT_FAMILY, 14 * scale * font_os_scale)
-        self.country = QFont(DEFAULT_BASE_FONT_FAMILY, 12 * scale * font_os_scale)
-        self.entry_details = QFont(DEFAULT_BASE_FONT_FAMILY, 12 * scale * font_os_scale)
-        self.awarded_pts = QFont(DEFAULT_POINTS_FONT_FAMILY, 14 * scale * font_os_scale)
-        self.total_pts = QFont(DEFAULT_POINTS_FONT_FAMILY, 14 * scale * font_os_scale, weight=QFont.DemiBold)
+        self.voter_header = QFont(DEFAULT_BASE_FONT_FAMILY, 14 * image_scale * font_os_scale)
+        self.contest_header = QFont(DEFAULT_BASE_FONT_FAMILY, 14 * image_scale * font_os_scale)
+        self.country = QFont(DEFAULT_BASE_FONT_FAMILY, 12 * image_scale * font_os_scale)
+        self.entry_details = QFont(DEFAULT_BASE_FONT_FAMILY, 12 * image_scale * font_os_scale)
+        self.awarded_pts = QFont(DEFAULT_POINTS_FONT_FAMILY, 14 * image_scale * font_os_scale)
+        self.total_pts = QFont(DEFAULT_POINTS_FONT_FAMILY, 14 * image_scale * font_os_scale, weight=QFont.DemiBold)
 
 
 class ScoreboardColors:

@@ -13,7 +13,7 @@ class Scoreboard:
         self.app_context = app_context
         self.details = details
         self.contest = details.contest
-        self.fonts = ScoreboardFonts(details.scale)
+        self.fonts = ScoreboardFonts(image_scale=details.scale, windows_dpi_scaling=details.windows_dpi_scaling)
         self.colors = ScoreboardColors(details.accent_color)
 
     def generate(self, voter_num):

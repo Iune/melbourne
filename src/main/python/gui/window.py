@@ -31,7 +31,6 @@ class MainWindow(QMainWindow):
 
     def _init_window(self):
         self.setWindowTitle(self.title)
-
         # Set Window Size
         if fbs_runtime.platform.is_windows():
             self.setMaximumSize(600, 560)
@@ -265,6 +264,9 @@ class MainWindow(QMainWindow):
         self.progress_bar.setMaximum(self.contest.num_voters)
         self.progress_bar.setValue(0)
 
+        # On Windows, the DPI scaling factor affects how text is rendered in scoreboards
+        dpi_scaling_factor = self.logicalDpiX() / 96.0
+
         self.thread = ScoreboardThread(
             self.app_context,
             ScoreboardDetails(
@@ -272,7 +274,8 @@ class MainWindow(QMainWindow):
                 output_dir=self.output_folder_le.text(),
                 title=self.scoreboard_title_le.text(),
                 accent_color=self.accent_color_le.text(),
-                display_flags=self.display_flags_check.isChecked()
+                display_flags=self.display_flags_check.isChecked(),
+                windows_dpi_scaling=dpi_scaling_factor
             ))
 
         self.thread.progress.connect(self._update_progress_bar)

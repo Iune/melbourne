@@ -29,17 +29,12 @@ class MainWindow(QMainWindow):
         self._init_layout()
         self._init_menus()
 
+        # Resize the window to fit its contents
+        self.adjustSize()
+        self.setMinimumSize(self.width(), self.height())
+
     def _init_window(self):
         self.setWindowTitle(self.title)
-        # Set Window Size
-        if fbs_runtime.platform.is_windows():
-            self.setMaximumSize(600, 560)
-            self.setMinimumSize(600, 560)
-            self.resize(600, 560)
-        else:
-            self.setMaximumSize(500, 300)
-            self.setMinimumSize(500, 300)
-            self.resize(500, 300)
 
     def _init_menus(self):
         menu = self.menuBar()

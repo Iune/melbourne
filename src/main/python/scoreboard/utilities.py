@@ -22,7 +22,7 @@ class ScoreboardDetails:
         self.scaling = image_scaling
 
         # On Windows, text is rendered differently depending on the DPI scaling factor which we need to account for
-        self.windows_ui_scaling = windows_dpi_scaling
+        self.windows_dpi_scaling = windows_dpi_scaling
 
 
 class ScoreboardFonts:

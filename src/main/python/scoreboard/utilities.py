@@ -3,7 +3,8 @@ import webcolors
 from PySide2.QtGui import QColor, QFont, QFontMetrics
 
 DEFAULT_ACCENT_COLOR = "#FCB906"
-DEFAULT_SCALE = 2.5
+DEFAULT_IMAGE_scaling = 2.5
+DEFAULT_WINDOWS_DPI_SCALING = 1.5
 
 DEFAULT_BASE_FONT_FAMILY = "Zilla Slab"
 DEFAULT_POINTS_FONT_FAMILY = "Fira Sans"
@@ -11,29 +12,35 @@ DEFAULT_POINTS_FONT_FAMILY = "Fira Sans"
 
 class ScoreboardDetails:
     def __init__(self, contest, output_dir, title, accent_color, display_flags=True,
-                 scale=DEFAULT_SCALE):
+                 image_scaling=DEFAULT_IMAGE_scaling, windows_dpi_scaling=DEFAULT_WINDOWS_DPI_SCALING):
         self.contest = contest
         self.output_dir = output_dir
 
         self.title = title
         self.accent_color = accent_color
         self.display_flags = display_flags
-        self.scale = scale
+        self.scaling = image_scaling
+
+        # On Windows, text is rendered differently depending on the DPI scaling factor which we need to account for
+        self.windows_ui_scaling = windows_dpi_scaling
 
 
 class ScoreboardFonts:
-    def __init__(self, scale=DEFAULT_SCALE):
+    def __init__(self, image_scaling=DEFAULT_IMAGE_scaling, windows_dpi_scaling=DEFAULT_WINDOWS_DPI_SCALING):
         # Due to rendering differences between OSX and Windows, we need to scale down the text on Windows
         if fbs_runtime.platform.is_windows():
-            font_os_scale = (72 / 96) * ((196 / 19) / 14)
+            windows_mac_canonical_pixel_ratio = 72.0 / 96.0
+            adjustment_factor = (196.0 / 19.0) / 14.0
+            windows_ui_scaling_factor = DEFAULT_WINDOWS_DPI_SCALING / windows_dpi_scaling
+            font_os_scaling = windows_mac_canonical_pixel_ratio * adjustment_factor * windows_ui_scaling_factor
         else:
-            font_os_scale = 1.0
-        self.voter_header = QFont(DEFAULT_BASE_FONT_FAMILY, 14 * scale * font_os_scale)
-        self.contest_header = QFont(DEFAULT_BASE_FONT_FAMILY, 14 * scale * font_os_scale)
-        self.country = QFont(DEFAULT_BASE_FONT_FAMILY, 12 * scale * font_os_scale)
-        self.entry_details = QFont(DEFAULT_BASE_FONT_FAMILY, 12 * scale * font_os_scale)
-        self.awarded_pts = QFont(DEFAULT_POINTS_FONT_FAMILY, 14 * scale * font_os_scale)
-        self.total_pts = QFont(DEFAULT_POINTS_FONT_FAMILY, 14 * scale * font_os_scale, weight=QFont.DemiBold)
+            font_os_scaling = 1.0
+        self.voter_header = QFont(DEFAULT_BASE_FONT_FAMILY, 14 * image_scaling * font_os_scaling)
+        self.contest_header = QFont(DEFAULT_BASE_FONT_FAMILY, 14 * image_scaling * font_os_scaling)
+        self.country = QFont(DEFAULT_BASE_FONT_FAMILY, 12 * image_scaling * font_os_scaling)
+        self.entry_details = QFont(DEFAULT_BASE_FONT_FAMILY, 12 * image_scaling * font_os_scaling)
+        self.awarded_pts = QFont(DEFAULT_POINTS_FONT_FAMILY, 14 * image_scaling * font_os_scaling)
+        self.total_pts = QFont(DEFAULT_POINTS_FONT_FAMILY, 14 * image_scaling * font_os_scaling, weight=QFont.DemiBold)
 
 
 class ScoreboardColors:
@@ -82,15 +89,15 @@ class ScoreboardSizes:
                 self.entry_details = current_entry
 
         if details.display_flags:
-            self.flag_offset = 24 * details.scale
+            self.flag_offset = 24 * details.scaling
         else:
             self.flag_offset = 0
 
         self.rectangle = max(
-            self.country, self.entry_details) + self.flag_offset + 80 * details.scale
+            self.country, self.entry_details) + self.flag_offset + 80 * details.scaling
 
-        self.width = max(max(30 * details.scale + 2 * self.rectangle, 48 *
-                             details.scale + self.contest_header), 10 * details.scale + self.voter_header)
+        self.width = max(max(30 * details.scaling + 2 * self.rectangle, 48 *
+                             details.scaling + self.contest_header), 10 * details.scaling + self.voter_header)
 
         num_entries_in_left_column = int(contest.num_entries / 2) + contest.num_entries % 2
-        self.height = 10 * details.scale + 35 * details.scale * num_entries_in_left_column + 70 * details.scale
+        self.height = 10 * details.scaling + 35 * details.scaling * num_entries_in_left_column + 70 * details.scaling

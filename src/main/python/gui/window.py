@@ -317,7 +317,7 @@ class AboutDialog(QDialog):
 
         layout.addWidget(title)
         layout.addWidget(logo)
-        layout.addWidget(QLabel("Version 5.0.0"))
+        layout.addWidget(QLabel("Version 5.0.1"))
         layout.addWidget(QLabel("Copyright © Aditya Duri"))
 
         for i in range(0, layout.count()):

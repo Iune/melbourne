@@ -74,7 +74,7 @@ class Scoreboard:
             if self.details.display_flags:
                 try:
                     flag = QImage(self.app_context.get_resource(join("flags", entry.flag)))
-                    flag = flag.scalingdToWidth(
+                    flag = flag.scaledToWidth(
                         20 * scaling, Qt.SmoothTransformation)
                     self._draw_rectangle(painter,
                                          QPoint(27 * scaling - flag.width() / 2.0 + x_offset, 87 *

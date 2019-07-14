@@ -34,9 +34,9 @@ class MainWindow(QMainWindow):
 
         # Set Window Size
         if fbs_runtime.platform.is_windows():
-            self.setMaximumSize(500, 430)
-            self.setMinimumSize(500, 430)
-            self.resize(500, 430)
+            self.setMaximumSize(600, 560)
+            self.setMinimumSize(600, 560)
+            self.resize(600, 560)
         else:
             self.setMaximumSize(500, 300)
             self.setMinimumSize(500, 300)

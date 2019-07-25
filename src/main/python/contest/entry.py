@@ -66,7 +66,7 @@ class Entry:
         count = 0
         for vote in self.votes[:voter+1]:
             try:
-                current_pts = int(vote)
+                current_pts = int(float(vote))
                 if current_pts == points:
                     count += 1
             except ValueError:

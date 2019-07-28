@@ -1,6 +1,3 @@
-from os.path import isfile
-
-
 class Entry:
     def __init__(self, country, flag, artist, song, votes):
         self.country = country
@@ -12,7 +9,7 @@ class Entry:
         self.display_pts = self._set_display_pts()
         self.sorting_pts = self._set_sorting_pts()
         self.dq_statuses = self._set_dq_statuses()
-        self.num_voters = self.voter_count_after_voter(len(self.votes)-1)
+        self.num_voters = self.voter_count_after_voter(len(self.votes) - 1)
 
     def _set_display_pts(self):
         display_pts = []
@@ -53,7 +50,7 @@ class Entry:
     def voter_count_after_voter(self, voter):
         self._validate_voter_num(voter)
         num_votes = 0
-        for vote in self.votes[:voter+1]:
+        for vote in self.votes[:voter + 1]:
             try:
                 if int(float(vote)):
                     num_votes += 1
@@ -64,7 +61,7 @@ class Entry:
     def pts_count_after_voter(self, points, voter):
         self._validate_voter_num(voter)
         count = 0
-        for vote in self.votes[:voter+1]:
+        for vote in self.votes[:voter + 1]:
             try:
                 current_pts = int(float(vote))
                 if current_pts == points:
@@ -74,4 +71,4 @@ class Entry:
         return count
 
     def pts_count(self, points):
-        return self.pts_count_after_voter(points, len(self.votes)-1)
+        return self.pts_count_after_voter(points, len(self.votes) - 1)

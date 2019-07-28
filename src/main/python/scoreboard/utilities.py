@@ -2,7 +2,9 @@ import fbs_runtime
 import webcolors
 from PySide2.QtGui import QColor, QFont, QFontMetrics
 
+DEFAULT_MAIN_COLOR = "#2F292B"
 DEFAULT_ACCENT_COLOR = "#FCB906"
+
 DEFAULT_IMAGE_scaling = 2.5
 DEFAULT_WINDOWS_DPI_SCALING = 1.5
 
@@ -11,12 +13,13 @@ DEFAULT_POINTS_FONT_FAMILY = "Fira Sans"
 
 
 class ScoreboardDetails:
-    def __init__(self, contest, output_dir, title, accent_color, display_flags=True,
+    def __init__(self, contest, output_dir, title, main_color, accent_color, display_flags=True,
                  image_scaling=DEFAULT_IMAGE_scaling, windows_dpi_scaling=DEFAULT_WINDOWS_DPI_SCALING):
         self.contest = contest
         self.output_dir = output_dir
 
         self.title = title
+        self.main_color = main_color
         self.accent_color = accent_color
         self.display_flags = display_flags
         self.scaling = image_scaling
@@ -44,14 +47,20 @@ class ScoreboardFonts:
 
 
 class ScoreboardColors:
-    def __init__(self, accent_color=DEFAULT_ACCENT_COLOR):
-        self.main = ScoreboardColors._hex_to_rgb("#2F292B")
+    def __init__(self, main_color=DEFAULT_MAIN_COLOR, accent_color=DEFAULT_ACCENT_COLOR):
         self.light_grey = ScoreboardColors._hex_to_rgb("#EEEEEE")
         self.white = ScoreboardColors._hex_to_rgb("#FAFAFA")
         self.black = ScoreboardColors._hex_to_rgb("#212121")
         self.grey_text = ScoreboardColors._hex_to_rgb("#C4C4C4")
         self.white_text = ScoreboardColors._hex_to_rgb("#FFFFFF")
         self.country_text = ScoreboardColors._hex_to_rgb("#7E7E7E")
+
+        self.main = ScoreboardColors._hex_to_rgb(main_color)
+        luminance = (self.main.red() * 0.299 + self.main.green() * 0.587 + self.main.blue() * 0.114) / 255
+        if luminance > 0.5:
+            self.main_text = ScoreboardColors._hex_to_rgb("#212121")
+        else:
+            self.main_text = ScoreboardColors._hex_to_rgb("#FFFFFF")
 
         self.accent = ScoreboardColors._hex_to_rgb(accent_color)
         luminance = (self.accent.red() * 0.299 + self.accent.green() * 0.587 + self.accent.blue() * 0.114) / 255

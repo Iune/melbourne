@@ -14,7 +14,7 @@ class Scoreboard:
         self.details = details
         self.contest = details.contest
         self.fonts = ScoreboardFonts(image_scaling=details.scaling, windows_dpi_scaling=details.windows_dpi_scaling)
-        self.colors = ScoreboardColors(details.accent_color)
+        self.colors = ScoreboardColors(details.main_color, details.accent_color)
 
     def generate(self, voter_num):
         if not isdir(self.details.output_dir):
@@ -44,7 +44,7 @@ class Scoreboard:
         self._draw_rectangle(painter, QPoint(0, 0), QPoint(sizes.width, 30 * scaling), self.colors.main)
         self._draw_text(painter, QPoint(10 * scaling, 15 * scaling),
                         "Now Voting: {} ({}/{})".format(contest.voters[voter_num], voter_num + 1, contest.num_voters),
-                        self.fonts.voter_header, self.colors.white_text, Qt.AlignLeft)
+                        self.fonts.voter_header, self.colors.main_text, Qt.AlignLeft)
 
         # Display contest title
         self._draw_rectangle(painter, QPoint(0, 30 * scaling), QPoint(sizes.width, 30 * scaling), self.colors.accent)
@@ -111,7 +111,7 @@ class Scoreboard:
                 self._draw_text(painter, QPoint(44.5 * scaling + x_offset + sizes.flag_offset + sizes.entry_details,
                                                 87 * scaling + 35 * scaling * y_offset),
                                 "{}".format(entry.display_pts[voter_num]),
-                                self.fonts.total_pts, self.colors.white_text, Qt.AlignHCenter)
+                                self.fonts.total_pts, self.colors.main_text, Qt.AlignHCenter)
 
             # Display the entry's number of points received by the current voter
             if len(entry.votes[voter_num]) > 0:

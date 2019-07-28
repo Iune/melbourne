@@ -1,7 +1,6 @@
 from os.path import expanduser
 from os.path import join
 
-import fbs_runtime
 import qtawesome as qta
 import webcolors
 from PySide2.QtCore import Qt
@@ -13,6 +12,7 @@ from contest.contest import Contest
 from gui.thread import ScoreboardThread
 from scoreboard.utilities import ScoreboardDetails
 
+DEFAULT_MAIN_COLOR = "#2F292B"
 DEFAULT_ACCENT_COLOR = "#FCB906"
 
 
@@ -95,6 +95,18 @@ class MainWindow(QMainWindow):
 
         self.scoreboard_title_le = QLineEdit()
         self.scoreboard_title_le.textChanged.connect(self._check_if_ready)
+
+        self.main_color_btn = QPushButton(qta.icon('fa5s.brush', color=DEFAULT_MAIN_COLOR), ' Main Color')
+        self.main_color_btn.setDefault(False)
+        self.main_color_btn.setAutoDefault(False)
+        self.main_color_btn.clicked.connect(self._set_main_color)
+        self.reset_main_color_btn = QPushButton(qta.icon('fa5s.redo-alt', color="#212121"), ' Reset')
+        self.reset_main_color_btn.setDefault(False)
+        self.reset_main_color_btn.setAutoDefault(False)
+        self.reset_main_color_btn.clicked.connect(self._reset_main_color)
+        self.main_color_le = QLineEdit(DEFAULT_MAIN_COLOR)
+        self.main_color_le.setReadOnly(True)
+
         self.accent_color_btn = QPushButton(qta.icon('fa5s.brush', color=DEFAULT_ACCENT_COLOR), ' Accent Color')
         self.accent_color_btn.setDefault(False)
         self.accent_color_btn.setAutoDefault(False)
@@ -105,16 +117,20 @@ class MainWindow(QMainWindow):
         self.reset_accent_color_btn.clicked.connect(self._reset_accent_color)
         self.accent_color_le = QLineEdit(DEFAULT_ACCENT_COLOR)
         self.accent_color_le.setReadOnly(True)
+
         self.display_flags_check = QCheckBox('Display Flags')
         self.display_flags_check.setChecked(False)
         self.display_flags_check.stateChanged.connect(self._validate_flags)
 
         scoreboard_details_grid.addWidget(QLabel('Scoreboard Title'), 0, 0)
         scoreboard_details_grid.addWidget(self.scoreboard_title_le, 0, 1, 1, 2)
-        scoreboard_details_grid.addWidget(self.accent_color_btn, 1, 0)
-        scoreboard_details_grid.addWidget(self.reset_accent_color_btn, 1, 1)
-        scoreboard_details_grid.addWidget(self.accent_color_le, 1, 2)
-        scoreboard_details_grid.addWidget(self.display_flags_check, 2, 0, 1, 3)
+        scoreboard_details_grid.addWidget(self.main_color_btn, 1, 0)
+        scoreboard_details_grid.addWidget(self.reset_main_color_btn, 1, 1)
+        scoreboard_details_grid.addWidget(self.main_color_le, 1, 2)
+        scoreboard_details_grid.addWidget(self.accent_color_btn, 2, 0)
+        scoreboard_details_grid.addWidget(self.reset_accent_color_btn, 2, 1)
+        scoreboard_details_grid.addWidget(self.accent_color_le, 2, 2)
+        scoreboard_details_grid.addWidget(self.display_flags_check, 3, 0, 1, 3)
         scoreboard_details_group = QGroupBox('Scoreboard Details')
         scoreboard_details_group.setLayout(scoreboard_details_grid)
 
@@ -202,6 +218,22 @@ class MainWindow(QMainWindow):
         if path and len(path) > 0:
             self.output_folder_le.setText(path)
 
+    def _set_main_color(self):
+        color_btn_hex = webcolors.hex_to_rgb(self.accent_color_le.text())
+        main_color = QColor(color_btn_hex.red, color_btn_hex.green, color_btn_hex.blue)
+
+        dialog = QColorDialog()
+        dialog.setCurrentColor(main_color)
+        color = dialog.getColor(main_color, self, "Select Main Color")
+        if color.isValid():
+            hex_color = webcolors.rgb_to_hex((color.red(), color.green(), color.blue())).upper()
+            self.main_color_le.setText(hex_color)
+            self.main_color_btn.setIcon(qta.icon('fa5s.brush', color=hex_color))
+
+    def _reset_main_color(self):
+        self.main_color_le.setText(DEFAULT_MAIN_COLOR)
+        self.main_color_btn.setIcon(qta.icon('fa5s.brush', color=DEFAULT_MAIN_COLOR))
+
     def _set_accent_color(self):
         color_btn_hex = webcolors.hex_to_rgb(self.accent_color_le.text())
         accent_color = QColor(color_btn_hex.red, color_btn_hex.green, color_btn_hex.blue)
@@ -268,6 +300,7 @@ class MainWindow(QMainWindow):
                 contest=self.contest,
                 output_dir=self.output_folder_le.text(),
                 title=self.scoreboard_title_le.text(),
+                main_color=self.main_color_le.text(),
                 accent_color=self.accent_color_le.text(),
                 display_flags=self.display_flags_check.isChecked(),
                 windows_dpi_scaling=dpi_scaling_factor

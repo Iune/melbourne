@@ -14,7 +14,18 @@ steps:
 - script: echo Hello, world!
   displayName: 'Run a one-line script'
 
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+- task: UsePythonVersion@0
+  inputs:
+    versionSpec: '3.6'  
+
+- script: pip install -r requirements.txt
+  displayName: 'Install requirements'
+
+- script: fbs freeze
+  displayName: "Freeze for FBS"
+
+- script: fbs installer
+  displayName: "Create installer"
+
+- script: ls target
+  displayName: "List all files in target"

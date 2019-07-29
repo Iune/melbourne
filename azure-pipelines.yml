@@ -32,3 +32,11 @@ steps:
 
 - script: ls target
   displayName: 'List all files in target'
+
+- task: GithubRelease@0
+  displayName: 'Create macOS GitHub Release'   
+  inputs:
+    gitHubConnection: Iune
+    repositoryName: Iune/melbourne  
+    addChangeLog: true  
+    assets: $(Build.ArtifactStagingDirectory)/*.dmg

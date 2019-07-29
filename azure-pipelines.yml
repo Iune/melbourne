@@ -18,8 +18,8 @@ steps:
   inputs:
     versionSpec: '3.6'  
 
-- script: sudo apt-get -y install python3-dev
-  displayName: 'Install Python development dependencies'
+- script: python3.6 -m venv venv && source venv/bin/activate
+  displayName: 'Set up virtual environment'
 
 - script: pip install -r requirements.txt
   displayName: 'Install requirements'

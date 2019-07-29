@@ -8,7 +8,7 @@ trigger:
 - pipeline-development
 
 pool:
-  vmImage: 'ubuntu-latest'
+  vmImage: 'macOS-10.14'
 
 steps:
 - script: echo Hello, world!

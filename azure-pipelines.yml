@@ -18,14 +18,17 @@ steps:
   inputs:
     versionSpec: '3.6'  
 
+- script: sudo apt-get -y install python3-dev
+  displayName: 'Install Python development dependencies'
+
 - script: pip install -r requirements.txt
   displayName: 'Install requirements'
 
 - script: fbs freeze
-  displayName: "Freeze for FBS"
+  displayName: 'Freeze for FBS'
 
 - script: fbs installer
-  displayName: "Create installer"
+  displayName: 'Create installer'
 
 - script: ls target
-  displayName: "List all files in target"
+  displayName: 'List all files in target'

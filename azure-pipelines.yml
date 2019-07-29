@@ -5,6 +5,7 @@
 
 trigger:
 - master
+- pipeline-development
 
 pool:
   vmImage: 'ubuntu-latest'

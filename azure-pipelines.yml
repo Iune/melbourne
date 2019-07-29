@@ -35,8 +35,10 @@ steps:
 
 - task: GithubRelease@0
   displayName: 'Create macOS GitHub Release'   
+  condition: startsWith(variables['Build.SourceBranch'], 'refs/tags/release-v')   
   inputs:
     gitHubConnection: "Melbourne Releases"
     repositoryName: Iune/melbourne  
     addChangeLog: true  
+    isDraft: true
     assets: $(Build.ArtifactStagingDirectory)/*.dmg

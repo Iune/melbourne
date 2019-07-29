@@ -33,6 +33,11 @@ steps:
 - script: ls target
   displayName: 'List all files in target'
 
+- task: CopyFiles@2
+  inputs:
+    contents: "target/*.dmg"
+    targetFolder: $(Build.ArtifactStagingDirectory)
+
 - task: GithubRelease@0
   displayName: 'Create macOS GitHub Release'   
   condition: startsWith(variables['Build.SourceBranch'], 'refs/tags/release-v')   

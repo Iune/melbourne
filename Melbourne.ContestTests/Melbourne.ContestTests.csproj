@@ -15,4 +15,13 @@
   <ItemGroup>
     <ProjectReference Include="..\Melbourne.Contest\Melbourne.Contest.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="resources\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="resources\FSC 199.xlsx" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="resources\FSC 199.xlsx" />
+  </ItemGroup>
 </Project>

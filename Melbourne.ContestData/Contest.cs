@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using ExcelDataReader;
 
-namespace Melbourne.Contest
+namespace Melbourne.ContestData
 {
     public class Contest
     {

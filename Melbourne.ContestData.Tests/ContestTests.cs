@@ -1,12 +1,12 @@
+using Melbourne.ContestData;
 using NUnit.Framework;
-using Melbourne.Contest;
 using System.Collections.Generic;
 
-namespace Melbourne.ContestTests
+namespace Melbourne.ContestData.Tests
 {
     public class ContestTests
     {
-        private Contest.Contest contest;
+        private Contest contest;
 
         [SetUp]
         public void Setup()
@@ -21,7 +21,7 @@ namespace Melbourne.ContestTests
             };
 
             List<string> voters = new List<string>() { "Estonia", "Latvia", "Russia", "Denmark", "Hungary" };
-            contest = new Contest.Contest(entries, voters);
+            contest = new Contest(entries, voters);
         }
 
         [Test]

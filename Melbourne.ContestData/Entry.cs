@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Melbourne.Contest
+namespace Melbourne.ContestData
 {
     public class Entry
     {

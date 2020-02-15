@@ -1,9 +1,9 @@
 
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Melbourne.Contest", "Melbourne.Contest\Melbourne.Contest.csproj", "{161613E9-B006-43FA-B67C-DA120EED2B28}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Melbourne.ContestData", "Melbourne.ContestData\Melbourne.ContestData.csproj", "{161613E9-B006-43FA-B67C-DA120EED2B28}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Melbourne.ContestTests", "Melbourne.ContestTests\Melbourne.ContestTests.csproj", "{18737A20-028F-4D05-AC56-3471A109C9BB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Melbourne.ContestData.Tests", "Melbourne.ContestData.Tests\Melbourne.ContestData.Tests.csproj", "{18737A20-028F-4D05-AC56-3471A109C9BB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

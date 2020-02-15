@@ -4,6 +4,8 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
 
     <IsPackable>false</IsPackable>
+    <ReleaseVersion>6.0.0</ReleaseVersion>
+    <AssemblyName>Melbourne.ContestDataTests</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
@@ -13,15 +15,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Melbourne.Contest\Melbourne.Contest.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="resources\" />
-  </ItemGroup>
-  <ItemGroup>
     <None Remove="resources\FSC 199.xlsx" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="resources\FSC 199.xlsx" />
+    <ProjectReference Include="..\Melbourne.ContestData\Melbourne.ContestData.csproj" />
   </ItemGroup>
 </Project>

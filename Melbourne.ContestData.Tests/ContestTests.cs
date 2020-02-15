@@ -1,6 +1,6 @@
-using Melbourne.ContestData;
 using NUnit.Framework;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Melbourne.ContestData.Tests
 {
@@ -39,9 +39,9 @@ namespace Melbourne.ContestData.Tests
         [Test]
         public void TestWinner()
         {
-            Assert.AreEqual("Estonia", contest.FinalResults[0].Country);
-            Assert.AreEqual(36, contest.FinalResults[0].DisplayPoints[contest.NumVoters - 1]);
-            Assert.AreEqual(3, contest.FinalResults[0].VoterCount[contest.NumVoters - 1]);
+            Assert.AreEqual("Estonia", contest.FinalResults.First().Country);
+            Assert.AreEqual(36, contest.FinalResults.First().DisplayPoints.Last());
+            Assert.AreEqual(3, contest.FinalResults.First().VoterCount.Last());
         }
 
         [Test]
@@ -52,21 +52,10 @@ namespace Melbourne.ContestData.Tests
 
             Assert.AreEqual("Denmark", denmark.Country);
             Assert.AreEqual("Russia", russia.Country);
-            Assert.AreEqual(26, denmark.DisplayPoints[contest.NumVoters - 1]);
-            Assert.AreEqual(26, russia.DisplayPoints[contest.NumVoters - 1]);
-            Assert.AreEqual(3, denmark.VoterCount[contest.NumVoters - 1]);
-            Assert.AreEqual(3, russia.VoterCount[contest.NumVoters - 1]);
-        }
-
-        [Test]
-        public void TestDisqualification()
-        {
-            Entry hungary = contest.FinalResults[contest.NumVoters - 1];
-
-            Assert.AreEqual("Hungary", hungary.Country);
-            Assert.AreEqual(28, hungary.DisplayPoints[contest.NumVoters - 1]);
-            Assert.AreEqual(-1000, hungary.SortingPoints[contest.NumVoters - 1]);
-            Assert.AreEqual(true, hungary.DisqualificationStatus[contest.NumVoters - 1]);
+            Assert.AreEqual(26, denmark.DisplayPoints.Last());
+            Assert.AreEqual(26, russia.DisplayPoints.Last());
+            Assert.AreEqual(3, denmark.VoterCount.Last());
+            Assert.AreEqual(3, russia.VoterCount.Last());
         }
     }
 }

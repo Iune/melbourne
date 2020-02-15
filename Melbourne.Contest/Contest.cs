@@ -56,6 +56,11 @@ namespace Melbourne.Contest
                 string artist = row[3].ToString();
                 string song = row[4].ToString();
 
+                if(country.Equals(string.Empty) && artist.Equals(string.Empty) && song.Equals(string.Empty))
+                {
+                    continue;
+                }
+
                 List<string> votes = new List<string>();
                 foreach (DataColumn column in sheet.Columns.Cast<DataColumn>().Skip(6))
                 {

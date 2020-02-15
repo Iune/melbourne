@@ -1,7 +1,5 @@
 using NUnit.Framework;
 using Melbourne.Contest;
-using System.IO;
-using System;
 using System.Collections.Generic;
 
 namespace Melbourne.ContestTests
@@ -13,50 +11,16 @@ namespace Melbourne.ContestTests
         [SetUp]
         public void Setup()
         {
-            List<Entry> entries = new List<Contest.Entry>()
+            List<Entry> entries = new List<Entry>()
             {
-                new Entry(
-                    "Estonia",
-                    "World/ee.png",
-                    "Ines",
-                    "Once in a Lifetime",
-                    new List<string>() { "X", "12", "12", "12", "" }
-                    ),
-                new Entry(
-                    "Latvia",
-                    "World/lv.png",
-                    "Brainstorm",
-                    "My Star",
-                    new List<string>() { "12", "X", "10", "10", "" }
-                    ),
-                new Entry(
-                    "Russia",
-                    "World/ru.png",
-                    "Alsou",
-                    "Solo",
-                    new List<string>() { "10", "8", "X", "8", "" }
-                    ),
-                new Entry(
-                    "Denmark",
-                    "World/dk.png",
-                    "Olson Brothers",
-                    "Fly on the Wings of Love",
-                    new List<string>() { "8", "10", "8", "X", "" }
-                    ),
-                new Entry(
-                    "Hungary",
-                    "World/hu.png",
-                    "",
-                    "",
-                    new List<string>() { "7", "7", "7", "7", "DQ" }
-                    )
+                new Entry("Estonia", "World/ee.png", "Ines", "Once in a Lifetime", new List<string>() { "X", "12", "12", "12", "" }),
+                new Entry("Latvia", "World/lv.png", "Brainstorm", "My Star", new List<string>() { "12", "X", "10", "10", "" }),
+                new Entry("Russia", "World/ru.png", "Alsou", "Solo", new List<string>() { "10", "8", "X", "8", "" }),
+                new Entry("Denmark", "World/dk.png", "Olson Brothers", "Fly on the Wings of Love", new List<string>() { "8", "10", "8", "X", "" }),
+                new Entry("Hungary", "World/hu.png", "", "", new List<string>() { "7", "7", "7", "7", "DQ" })
             };
 
-            List<string> voters = new List<string>()
-            {
-                "Estonia", "Latvia", "Russia", "Denmark", "Hungary"
-            };
-
+            List<string> voters = new List<string>() { "Estonia", "Latvia", "Russia", "Denmark", "Hungary" };
             contest = new Contest.Contest(entries, voters);
         }
 

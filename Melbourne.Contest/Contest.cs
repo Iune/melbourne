@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
+using System.IO;
 using System.Linq;
+using ExcelDataReader;
 
 namespace Melbourne.Contest
 {
@@ -15,9 +18,52 @@ namespace Melbourne.Contest
             Voters = voters;
         }
 
-        public Contest()
+        public Contest(String fileLocation)
         {
-            // TODO: Add constructor to load from Excel file
+            System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
+            using var stream = File.Open(fileLocation, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            using var reader = ExcelReaderFactory.CreateReader(stream);
+
+            DataSet spreadsheet = reader.AsDataSet();
+            DataTable sheet = spreadsheet.Tables[0];
+
+            // Validate number of columns
+            if (sheet.Columns.Count < 7)
+            {
+                throw new ArgumentException("Excel sheet does not have enough columns");
+            }
+
+            // Validate number of rows
+            if (sheet.Rows.Count < 2)
+            {
+                throw new ArgumentException("Excel sheet does not have enough rows");
+            }
+
+            // Load voters
+            DataRow headerRow = sheet.Rows[0];
+            Voters = new List<string>();
+            foreach (DataColumn column in sheet.Columns.Cast<DataColumn>().Skip(6))
+            {
+                Voters.Add(headerRow[column].ToString());
+            }
+
+            // Load entries
+            Entries = new List<Entry>();
+            foreach (DataRow row in sheet.Rows.Cast<DataRow>().Skip(1))
+            {
+                string country = row[1].ToString();
+                string flag = row[2].ToString();
+                string artist = row[3].ToString();
+                string song = row[4].ToString();
+
+                List<string> votes = new List<string>();
+                foreach (DataColumn column in sheet.Columns.Cast<DataColumn>().Skip(6))
+                {
+                    votes.Add(row[column].ToString());
+                }
+
+                Entries.Add(new Entry(country, flag, artist, song, votes));
+            }
         }
 
         public int NumEntries
@@ -61,7 +107,7 @@ namespace Melbourne.Contest
         {
             get
             {
-                if(Voters.Count > 0)
+                if (Voters.Count > 0)
                 {
                     return ResultsAfterVoter(Voters.Count - 1);
                 }

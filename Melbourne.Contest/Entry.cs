@@ -11,6 +11,11 @@ namespace Melbourne.Contest
         public string Song { get; }
         public List<string> Votes { get; }
 
+        public List<int> VoterCount { get; private set; }
+        public List<int> DisplayPoints { get; private set; }
+        public List<int> SortingPoints { get; private set; }
+        public List<bool> DisqualificationStatus { get; private set; }
+
         public Entry(string country, string flag, string artist, string song, List<string> votes)
         {
             Country = country;
@@ -18,80 +23,73 @@ namespace Melbourne.Contest
             Artist = artist;
             Song = song;
             Votes = votes;
+
+            VoterCount = setVoterCount(Votes);
+            DisplayPoints = setDisplayPoints();
+            DisqualificationStatus = setDisqualificationStatus();
+            SortingPoints = setSortingPoints();
         }
 
-        public List<int> VoterCount
+        private List<int> setVoterCount(List<string> votes)
         {
-            get
+            List<int> numVoters = new List<int>();
+            int count = 0;
+            foreach (string vote in votes)
             {
-                List<int> numVoters = new List<int>();
-                int count = 0;
-                foreach (string vote in Votes)
+                if (Int32.TryParse(vote, out int points))
                 {
-                    if (Int32.TryParse(vote, out int points))
-                    {
-                        count++;
-                        numVoters.Add(count);
-                    }
+                    count++;
                 }
-                return numVoters;
+                numVoters.Add(count);
             }
+            return numVoters;
         }
 
-        public List<int> DisplayPoints
+        private List<int> setDisplayPoints()
         {
-            get
+            List<int> displayPoints = new List<int>();
+            int total = 0;
+            foreach (string vote in Votes)
             {
-                List<int> displayPoints = new List<int>();
-                int total = 0;
-                foreach (string vote in Votes)
+                if (Int32.TryParse(vote, out int points))
                 {
-                    if (Int32.TryParse(vote, out int points))
-                    {
-                        total += points;
-                        displayPoints.Add(total);
-                    }
+                    total += points;
                 }
-                return displayPoints;
+                displayPoints.Add(total);
             }
+            return displayPoints;
         }
 
-        public List<bool> DisqualificationStatus
+        private List<bool> setDisqualificationStatus()
         {
-            get
+            List<bool> disqualificationStatus = new List<bool>();
+            bool isDisqualified = false;
+            foreach (string vote in Votes)
             {
-                List<bool> disqualificationStatus = new List<bool>();
-                bool isDisqualified = false;
-                foreach (string vote in Votes)
+                if (vote.ToLower().Equals("dq") || isDisqualified)
                 {
-                    if (vote.ToLower().Equals("dq") || isDisqualified)
-                    {
-                        isDisqualified = true;
-                    }
-                    disqualificationStatus.Add(isDisqualified);
+                    isDisqualified = true;
                 }
-                return disqualificationStatus;
+                disqualificationStatus.Add(isDisqualified);
             }
+            return disqualificationStatus;
         }
 
-        public List<int> SortingPoints
+        private List<int> setSortingPoints()
         {
-            get
+            List<int> sortingPoints = new List<int>();
+            for (int index = 0; index < DisplayPoints.Count; index++)
             {
-                List<int> sortingPoints = new List<int>();
-                for (int index = 0; index < DisplayPoints.Count; index++)
+                if (DisqualificationStatus[index])
                 {
-                    if (DisqualificationStatus[index])
-                    {
-                        sortingPoints.Add(-1000);
-                    }
-                    else
-                    {
-                        sortingPoints.Add(DisplayPoints[index]);
-                    }
+                    sortingPoints.Add(-1000);
                 }
-                return sortingPoints;
+                else
+                {
+                    sortingPoints.Add(DisplayPoints[index]);
+                }
             }
+            return sortingPoints;
         }
 
         public int PointsCountAfterVoter(int points, int voter)
@@ -102,7 +100,7 @@ namespace Melbourne.Contest
             }
 
             int count = 0;
-            foreach (string vote in Votes.GetRange(0, (int) voter))
+            foreach (string vote in Votes.GetRange(0, (int)voter))
             {
                 if (Int32.TryParse(vote, out int parsedPoints))
                 {

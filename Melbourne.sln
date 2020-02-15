@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Melbourne.Contest", "Melbourne.Contest\Melbourne.Contest.csproj", "{161613E9-B006-43FA-B67C-DA120EED2B28}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Melbourne.ContestTests", "Melbourne.ContestTests\Melbourne.ContestTests.csproj", "{18737A20-028F-4D05-AC56-3471A109C9BB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -13,6 +15,10 @@ Global
 		{161613E9-B006-43FA-B67C-DA120EED2B28}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{161613E9-B006-43FA-B67C-DA120EED2B28}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{161613E9-B006-43FA-B67C-DA120EED2B28}.Release|Any CPU.Build.0 = Release|Any CPU
+		{18737A20-028F-4D05-AC56-3471A109C9BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{18737A20-028F-4D05-AC56-3471A109C9BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{18737A20-028F-4D05-AC56-3471A109C9BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{18737A20-028F-4D05-AC56-3471A109C9BB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		Policies = $0
@@ -20,6 +26,10 @@ Global
 		$1.DirectoryNamespaceAssociation = PrefixedHierarchical
 		$0.StandardHeader = $2
 		$0.VersionControlPolicy = $3
+		$0.TextStylePolicy = $4
+		$4.FileWidth = 80
+		$4.TabsToSpaces = True
+		$4.scope = text/plain
 		version = 6.0.0
 	EndGlobalSection
 EndGlobal

@@ -5,7 +5,4 @@
     <ReleaseVersion>6.0.0</ReleaseVersion>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Compile Remove="Class1.cs" />
-  </ItemGroup>
 </Project>

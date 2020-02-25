@@ -70,6 +70,13 @@ class Scoreboard:
                 x_offset = 10 * scaling + sizes.rectangle
                 y_offset = i - left_col
 
+            # Display the entry's current ranking
+            if self.details.display_ranking:
+                self._draw_text(painter, QPoint(27 * scaling + x_offset,
+                                                87 * scaling + 35 * scaling * y_offset),
+                                str(i + 1),
+                                self.fonts.ranking, self.colors.grey_text, Qt.AlignHCenter)
+
             # Display the entry's country flag
             if self.details.display_flags:
                 try:
@@ -77,38 +84,38 @@ class Scoreboard:
                     flag = flag.scaledToWidth(
                         20 * scaling, Qt.SmoothTransformation)
                     self._draw_rectangle(painter,
-                                         QPoint(27 * scaling - flag.width() / 2.0 + x_offset, 87 *
+                                         QPoint(27 * scaling - flag.width() / 2.0 + x_offset + sizes.rank_offset, 87 *
                                                 scaling - flag.height() / 2.0 + 35 * scaling * y_offset),
                                          QPoint(flag.width() + 0.5, flag.height() + 0.5),
                                          self.colors.white, border=self.colors.grey_text, border_width=0.5 * scaling)
-                    painter.drawImage(QPoint(27 * scaling - flag.width() / 2.0 + x_offset,
+                    painter.drawImage(QPoint(27 * scaling - flag.width() / 2.0 + x_offset + sizes.rank_offset,
                                              87 * scaling - flag.height() / 2.0 + 35 * scaling * y_offset), flag)
                 except FileNotFoundError:
                     continue
 
             # Display entry details
             self._draw_text(painter,
-                            QPoint(20 * scaling + x_offset + sizes.flag_offset, 80 * scaling + 35 * scaling * y_offset),
+                            QPoint(20 * scaling + x_offset + sizes.rank_offset + sizes.flag_offset, 80 * scaling + 35 * scaling * y_offset),
                             entry.country, self.fonts.country, self.colors.country_text, Qt.AlignLeft)
             self._draw_text(painter,
-                            QPoint(20 * scaling + x_offset + sizes.flag_offset, 94 * scaling + 35 * scaling * y_offset),
+                            QPoint(20 * scaling + x_offset + sizes.rank_offset + sizes.flag_offset, 94 * scaling + 35 * scaling * y_offset),
                             "{} – {}".format(entry.artist, entry.song), self.fonts.entry_details, self.colors.black,
                             Qt.AlignLeft)
 
             # Display the entry's total number of received points
             if entry.dq_statuses[voter_num]:
-                self._draw_rectangle(painter, QPoint(30 * scaling + x_offset + sizes.flag_offset + sizes.entry_details,
+                self._draw_rectangle(painter, QPoint(30 * scaling + x_offset + sizes.rank_offset + sizes.flag_offset + sizes.entry_details,
                                                      77 * scaling + 35 * scaling * y_offset),
                                      QPoint(29 * scaling, 20 * scaling), self.colors.grey_text)
-                self._draw_text(painter, QPoint(44.5 * scaling + x_offset + sizes.flag_offset + sizes.entry_details,
+                self._draw_text(painter, QPoint(44.5 * scaling + x_offset + sizes.rank_offset + sizes.flag_offset + sizes.entry_details,
                                                 87 * scaling + 35 * scaling * y_offset),
                                 "{}".format(entry.display_pts[voter_num]),
                                 self.fonts.total_pts, self.colors.black, Qt.AlignHCenter)
             else:
-                self._draw_rectangle(painter, QPoint(30 * scaling + x_offset + sizes.flag_offset + sizes.entry_details,
+                self._draw_rectangle(painter, QPoint(30 * scaling + x_offset + sizes.rank_offset + sizes.flag_offset + sizes.entry_details,
                                                      77 * scaling + 35 * scaling * y_offset),
                                      QPoint(29 * scaling, 20 * scaling), self.colors.main)
-                self._draw_text(painter, QPoint(44.5 * scaling + x_offset + sizes.flag_offset + sizes.entry_details,
+                self._draw_text(painter, QPoint(44.5 * scaling + x_offset + sizes.rank_offset + sizes.flag_offset + sizes.entry_details,
                                                 87 * scaling + 35 * scaling * y_offset),
                                 "{}".format(entry.display_pts[voter_num]),
                                 self.fonts.total_pts, self.colors.main_text, Qt.AlignHCenter)
@@ -116,7 +123,7 @@ class Scoreboard:
             # Display the entry's number of points received by the current voter
             if len(entry.votes[voter_num]) > 0:
                 self._draw_rectangle(painter,
-                                     QPoint(59 * scaling + x_offset + sizes.flag_offset + sizes.entry_details,
+                                     QPoint(59 * scaling + x_offset + sizes.rank_offset + sizes.flag_offset + sizes.entry_details,
                                             77 * scaling + 35 * scaling * y_offset),
                                      QPoint(24 * scaling, 20 * scaling), self.colors.accent)
 
@@ -124,7 +131,7 @@ class Scoreboard:
                     votes_string = int(float(entry.votes[voter_num]))
                 except ValueError:
                     votes_string = entry.votes[voter_num]
-                self._draw_text(painter, QPoint(71 * scaling + x_offset + sizes.flag_offset + sizes.entry_details,
+                self._draw_text(painter, QPoint(71 * scaling + x_offset + sizes.rank_offset + sizes.flag_offset + sizes.entry_details,
                                                 87 * scaling + 35 * scaling * y_offset),
                                 str(votes_string), self.fonts.awarded_pts, self.colors.accent_text, Qt.AlignHCenter)
 

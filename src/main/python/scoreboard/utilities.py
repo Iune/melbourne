@@ -13,7 +13,7 @@ DEFAULT_POINTS_FONT_FAMILY = "Fira Sans"
 
 
 class ScoreboardDetails:
-    def __init__(self, contest, output_dir, title, main_color, accent_color, display_flags=True,
+    def __init__(self, contest, output_dir, title, main_color, accent_color, display_flags=True, display_ranking=True,
                  image_scaling=DEFAULT_IMAGE_scaling, windows_dpi_scaling=DEFAULT_WINDOWS_DPI_SCALING):
         self.contest = contest
         self.output_dir = output_dir
@@ -22,6 +22,7 @@ class ScoreboardDetails:
         self.main_color = main_color
         self.accent_color = accent_color
         self.display_flags = display_flags
+        self.display_ranking = display_ranking
         self.scaling = image_scaling
 
         # On Windows, text is rendered differently depending on the DPI scaling factor which we need to account for
@@ -44,6 +45,7 @@ class ScoreboardFonts:
         self.entry_details = QFont(DEFAULT_BASE_FONT_FAMILY, 12 * image_scaling * font_os_scaling)
         self.awarded_pts = QFont(DEFAULT_POINTS_FONT_FAMILY, 14 * image_scaling * font_os_scaling)
         self.total_pts = QFont(DEFAULT_POINTS_FONT_FAMILY, 14 * image_scaling * font_os_scaling, weight=QFont.DemiBold)
+        self.ranking = QFont(DEFAULT_POINTS_FONT_FAMILY, 14 * image_scaling * font_os_scaling, weight=QFont.DemiBold)
 
 
 class ScoreboardColors:
@@ -102,8 +104,13 @@ class ScoreboardSizes:
         else:
             self.flag_offset = 0
 
+        if details.display_ranking:
+            self.rank_offset = 24 * details.scaling
+        else:
+            self.rank_offset = 0
+
         self.rectangle = max(
-            self.country, self.entry_details) + self.flag_offset + 80 * details.scaling
+            self.country, self.entry_details) + self.rank_offset + self.flag_offset + 80 * details.scaling
 
         self.width = max(max(30 * details.scaling + 2 * self.rectangle, 48 *
                              details.scaling + self.contest_header), 10 * details.scaling + self.voter_header)

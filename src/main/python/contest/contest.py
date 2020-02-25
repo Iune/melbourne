@@ -35,7 +35,7 @@ class Contest:
             votes = [str(cell.value).strip() for cell in row[6:]]
 
             # We want to stop reading once we see a blank row
-            if not (country and flag and artist and song):
+            if not (country and artist and song):
                 break
 
             entries.append(

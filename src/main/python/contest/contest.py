@@ -35,7 +35,7 @@ class Contest:
             song = str(row[4].value).strip()
             votes = [str(cell.value).strip() for cell in row[6:]]
 
-            # We want to stop reading once we see a blank row
+            # We want to stop reading once we see a row without these required fields
             if not (country and artist and song):
                 break
 

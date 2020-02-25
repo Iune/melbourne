@@ -49,26 +49,6 @@ class Contest:
 
         return Contest(entries=entries, voters=voters)
 
-    def final_results(self):
-        return sorted(self.entries, key=lambda x: [
-            -x.sorting_pts[-1],
-            -x.display_pts[-1],
-            -x.num_voters,
-            -x.pts_count(12),
-            -x.pts_count(10),
-            -x.pts_count(8),
-            -x.pts_count(7),
-            -x.pts_count(6),
-            -x.pts_count(5),
-            -x.pts_count(4),
-            -x.pts_count(3),
-            -x.pts_count(2),
-            -x.pts_count(1),
-            x.country,
-            x.artist,
-            x.song
-        ])
-
     def results_after_voter(self, voter):
         self._validate_voter_num(voter)
         return sorted(self.entries, key=lambda x: [
@@ -89,3 +69,6 @@ class Contest:
             x.artist,
             x.song
         ])
+
+    def final_results(self):
+        return self.results_after_voter(self.num_voters - 1)

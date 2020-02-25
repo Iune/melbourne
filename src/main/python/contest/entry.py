@@ -69,6 +69,3 @@ class Entry:
             except ValueError:
                 continue
         return count
-
-    def pts_count(self, points):
-        return self.pts_count_after_voter(points, len(self.votes) - 1)

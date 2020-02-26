@@ -122,6 +122,9 @@ class MainWindow(QMainWindow):
         self.display_flags_check.setChecked(False)
         self.display_flags_check.stateChanged.connect(self._validate_flags)
 
+        self.display_ranking_check = QCheckBox('Display Ranking')
+        self.display_ranking_check.setChecked(False)
+
         scoreboard_details_grid.addWidget(QLabel('Scoreboard Title'), 0, 0)
         scoreboard_details_grid.addWidget(self.scoreboard_title_le, 0, 1, 1, 2)
         scoreboard_details_grid.addWidget(self.main_color_btn, 1, 0)
@@ -130,7 +133,8 @@ class MainWindow(QMainWindow):
         scoreboard_details_grid.addWidget(self.accent_color_btn, 2, 0)
         scoreboard_details_grid.addWidget(self.reset_accent_color_btn, 2, 1)
         scoreboard_details_grid.addWidget(self.accent_color_le, 2, 2)
-        scoreboard_details_grid.addWidget(self.display_flags_check, 3, 0, 1, 3)
+        scoreboard_details_grid.addWidget(self.display_flags_check, 3, 0, 1, 1)
+        scoreboard_details_grid.addWidget(self.display_ranking_check, 3, 1, 1, 2)
         scoreboard_details_group = QGroupBox('Scoreboard Details')
         scoreboard_details_group.setLayout(scoreboard_details_grid)
 
@@ -303,6 +307,7 @@ class MainWindow(QMainWindow):
                 main_color=self.main_color_le.text(),
                 accent_color=self.accent_color_le.text(),
                 display_flags=self.display_flags_check.isChecked(),
+                display_ranking=self.display_ranking_check.isChecked(),
                 windows_dpi_scaling=dpi_scaling_factor
             ))
 

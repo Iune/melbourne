@@ -133,6 +133,9 @@ class MainWindow(QMainWindow):
         self.display_flags_check = QCheckBox('Display Flags')
         self.display_flags_check.setChecked(False)
         self.display_flags_check.stateChanged.connect(self._validate_flags)
+        self.flag_borders_check = QCheckBox('Display Borders Around Flags')
+        self.flag_borders_check.setChecked(True)
+        self.flag_borders_check.setVisible(False)
 
         scoreboard_title_label = QLabel('Scoreboard Title')
         scoreboard_title_label.setAlignment(Qt.AlignCenter)
@@ -145,6 +148,7 @@ class MainWindow(QMainWindow):
         scoreboard_details_grid.addWidget(self.reset_accent_color_btn, 2, 1)
         scoreboard_details_grid.addWidget(self.accent_color_le, 2, 2)
         scoreboard_details_grid.addWidget(self.display_flags_check, 3, 0, 1, 3)
+        scoreboard_details_grid.addWidget(self.flag_borders_check, 3, 1, 1, 3)
         scoreboard_details_group = QGroupBox('Scoreboard Details')
         scoreboard_details_group.setLayout(scoreboard_details_grid)
 
@@ -274,11 +278,14 @@ class MainWindow(QMainWindow):
                     invalid.append(flag)
             return invalid
 
-        if self.contest:
-            if self.display_flags_check.isChecked():
+        if self.display_flags_check.isChecked():
+            self.flag_borders_check.setVisible(True)
+            if self.contest:
                 invalid_flags = get_invalid_flags(self)
                 if invalid_flags:
                     self.display_flags_check.setChecked(False)
+                    self.flag_borders_check.setVisible(False)
+                    
                     alert = QMessageBox()
                     alert.setIcon(QMessageBox.Warning)
                     alert.setText("Invalid flags were specified in the input file.")
@@ -290,6 +297,8 @@ class MainWindow(QMainWindow):
                     alert.setEscapeButton(QMessageBox.Ok)
                     alert.exec_()
                     return False
+        else:
+            self.flag_borders_check.setVisible(False)
         return True
 
     def _check_if_input_file_set(self):
@@ -323,6 +332,7 @@ class MainWindow(QMainWindow):
                 main_color=self.main_color_le.text(),
                 accent_color=self.accent_color_le.text(),
                 display_flags=self.display_flags_check.isChecked(),
+                display_flag_borders=self.display_flags_check.isChecked() and self.flag_borders_check.isChecked(),
                 windows_dpi_scaling=dpi_scaling_factor
             ))
 

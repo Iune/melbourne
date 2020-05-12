@@ -10,6 +10,7 @@ class Contest:
 
         self.num_entries = len(self.entries)
         self.num_voters = len(self.voters)
+        self._unique_points = list(sorted(self._find_unique_points(), reverse=True))
 
     def _validate_voter_num(self, voter):
         if voter < 0 or voter >= len(self.voters):
@@ -54,21 +55,21 @@ class Contest:
         return sorted(self.entries, key=lambda x: [
             -x.sorting_pts[voter],
             -x.display_pts[voter],
-            -x.voter_count_after_voter(voter),
-            -x.pts_count_after_voter(12, voter),
-            -x.pts_count_after_voter(10, voter),
-            -x.pts_count_after_voter(8, voter),
-            -x.pts_count_after_voter(7, voter),
-            -x.pts_count_after_voter(6, voter),
-            -x.pts_count_after_voter(5, voter),
-            -x.pts_count_after_voter(4, voter),
-            -x.pts_count_after_voter(3, voter),
-            -x.pts_count_after_voter(2, voter),
-            -x.pts_count_after_voter(1, voter),
+            -x.voter_count_after_voter(voter)
+        ] +
+        [-x.pts_count_after_voter(p, voter) for p in self._unique_points] +
+        [
             x.country,
             x.artist,
             x.song
         ])
+
+    def _find_unique_points(self):
+        votes = set()
+        for entry in self.entries:
+            entry_votes = entry.find_unique_points()
+            votes.update(entry_votes)
+        return votes
 
     def final_results(self):
         return self.results_after_voter(self.num_voters - 1)

@@ -69,3 +69,16 @@ class Entry:
             except ValueError:
                 continue
         return count
+
+    def pts_count(self, points):
+        return self.pts_count_after_voter(points, len(self.votes) - 1)
+
+    def find_unique_points(self):
+        scores = set()
+        for vote in self.votes:
+            try:
+                score = int(float(vote))
+                scores.add(score)
+            except ValueError:
+                continue
+        return scores

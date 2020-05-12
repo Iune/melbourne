@@ -70,6 +70,3 @@ class Contest:
             entry_votes = entry.find_unique_points()
             votes.update(entry_votes)
         return votes
-
-    def final_results(self):
-        return self.results_after_voter(self.num_voters - 1)

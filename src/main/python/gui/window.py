@@ -1,5 +1,4 @@
-from os.path import expanduser
-from os.path import join
+from os.path import expanduser, join, dirname
 
 import qtawesome as qta
 import webcolors
@@ -24,6 +23,8 @@ class MainWindow(QMainWindow):
 
         self.contest = None
         self.thread = None
+
+        self._folder_path = expanduser("~")
 
         self._init_window()
         self._init_layout()
@@ -183,11 +184,11 @@ class MainWindow(QMainWindow):
         about_dialog.exec_()
 
     def _set_input_file(self):
-        home_directory = expanduser('~')
         dialog = QFileDialog()
         dialog.setFileMode(QFileDialog.ExistingFile)
-        path = dialog.getOpenFileName(self, 'Select Excel Spreadsheet', home_directory, 'Excel (*.xls, *.xlsx)')
+        path = dialog.getOpenFileName(self, 'Select Excel Spreadsheet', self._folder_path, 'Excel (*.xls, *.xlsx)')
         if path and len(path[0]) > 0:
+            self._folder_path = dirname(path[0])
             self.input_file_le.setText(path[0])
             self._load_contest()
 
@@ -223,11 +224,11 @@ class MainWindow(QMainWindow):
         alert.exec_()
 
     def _set_output_folder(self):
-        home_directory = expanduser('~')
         dialog = QFileDialog()
         dialog.setFileMode(QFileDialog.DirectoryOnly)
-        path = dialog.getExistingDirectory(self, 'Select Output Folder', home_directory, QFileDialog.ShowDirsOnly)
+        path = dialog.getExistingDirectory(self, 'Select Output Folder', self._folder_path, QFileDialog.ShowDirsOnly)
         if path and len(path) > 0:
+            self._folder_path = dirname(path)
             self.output_folder_le.setText(path)
 
     def _set_main_color(self):

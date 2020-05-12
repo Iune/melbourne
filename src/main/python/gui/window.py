@@ -76,7 +76,7 @@ class MainWindow(QMainWindow):
         self.input_file_le.setMinimumWidth(200)
         self.input_file_le.textChanged.connect(self._check_if_input_file_set)
         self.input_file_le.textChanged.connect(self._check_if_ready)
-        self.reload_input_file_btn = QPushButton(qta.icon('fa5s.redo-alt', color="#212121"), '')
+        self.reload_input_file_btn = QPushButton(qta.icon('fa5s.undo-alt', color="#212121"), '')
         self.reload_input_file_btn.setEnabled(False)
         self.reload_input_file_btn.setDefault(False)
         self.reload_input_file_btn.setAutoDefault(False)

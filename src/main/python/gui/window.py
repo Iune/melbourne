@@ -11,6 +11,7 @@ from contest.contest import Contest
 from gui.thread import ScoreboardThread
 from scoreboard.utilities import ScoreboardDetails
 
+APPLICATION_VERSION = "5.1.0"
 DEFAULT_MAIN_COLOR = "#2F292B"
 DEFAULT_ACCENT_COLOR = "#FCB906"
 
@@ -369,7 +370,7 @@ class AboutDialog(QDialog):
 
         layout.addWidget(title)
         layout.addWidget(logo)
-        layout.addWidget(QLabel("Version 5.0.1"))
+        layout.addWidget(QLabel("Version {}".format(APPLICATION_VERSION)))
         layout.addWidget(QLabel("Copyright © Aditya Duri"))
 
         for i in range(0, layout.count()):

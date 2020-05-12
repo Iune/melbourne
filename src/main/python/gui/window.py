@@ -78,7 +78,7 @@ class MainWindow(QMainWindow):
         self.input_file_le.setMinimumWidth(200)
         self.input_file_le.textChanged.connect(self._check_if_input_file_set)
         self.input_file_le.textChanged.connect(self._check_if_ready)
-        self.reload_input_file_btn = QPushButton(qta.icon('fa5s.undo-alt', color="#212121"), '')
+        self.reload_input_file_btn = QPushButton(qta.icon('fa5s.redo-alt', color="#212121"), '')
         self.reload_input_file_btn.setEnabled(False)
         self.reload_input_file_btn.setDefault(False)
         self.reload_input_file_btn.setAutoDefault(False)
@@ -112,7 +112,7 @@ class MainWindow(QMainWindow):
         self.main_color_btn.setDefault(False)
         self.main_color_btn.setAutoDefault(False)
         self.main_color_btn.clicked.connect(self._set_main_color)
-        self.reset_main_color_btn = QPushButton(qta.icon('fa5s.undo-alt', color="#212121"), '')
+        self.reset_main_color_btn = QPushButton(qta.icon('fa5s.redo-alt', color="#212121"), '')
         self.reset_main_color_btn.setDefault(False)
         self.reset_main_color_btn.setAutoDefault(False)
         self.reset_main_color_btn.clicked.connect(self._reset_main_color)
@@ -123,7 +123,7 @@ class MainWindow(QMainWindow):
         self.accent_color_btn.setDefault(False)
         self.accent_color_btn.setAutoDefault(False)
         self.accent_color_btn.clicked.connect(self._set_accent_color)
-        self.reset_accent_color_btn = QPushButton(qta.icon('fa5s.undo-alt', color="#212121"), '')
+        self.reset_accent_color_btn = QPushButton(qta.icon('fa5s.redo-alt', color="#212121"), '')
         self.reset_accent_color_btn.setDefault(False)
         self.reset_accent_color_btn.setAutoDefault(False)
         self.reset_accent_color_btn.clicked.connect(self._reset_accent_color)
@@ -285,7 +285,7 @@ class MainWindow(QMainWindow):
                 if invalid_flags:
                     self.display_flags_check.setChecked(False)
                     self.flag_borders_check.setVisible(False)
-                    
+
                     alert = QMessageBox()
                     alert.setIcon(QMessageBox.Warning)
                     alert.setText("Invalid flags were specified in the input file.")

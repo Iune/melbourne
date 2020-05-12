@@ -1,11 +1,10 @@
 altgraph==0.16.1
 certifi==2019.6.16
-fbs==0.8.3
+fbs==0.8.6
 macholib==1.11
 pathvalidate==0.29.0
-PyInstaller==3.5
-PySide2==5.12.3
-QtAwesome==0.5.7
+PySide2==5.12.6
+QtAwesome==0.7.0
 QtPy==1.8.0
 sip==4.19.8
 six==1.12.0

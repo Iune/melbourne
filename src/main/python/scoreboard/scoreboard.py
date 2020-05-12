@@ -129,7 +129,7 @@ class Scoreboard:
                                 str(votes_string), self.fonts.awarded_pts, self.colors.accent_text, Qt.AlignHCenter)
 
             # Draw a dividing line between entries
-            if i + 1 != left_col and i + 1 != self.contest.num_entries:
+            if (i + 1) != left_col and (i + 1) != self.contest.num_entries:
                 painter.setPen(QPen(self.colors.grey_text, 0.5 * scaling))
                 painter.drawLine(
                     QPoint(10 * scaling + x_offset, 104.5 * scaling + 35 * scaling * y_offset),

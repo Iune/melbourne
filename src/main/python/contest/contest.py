@@ -35,8 +35,8 @@ class Contest:
             song = str(row[4].value).strip()
             votes = [str(cell.value).strip() for cell in row[6:]]
 
-            # We want to stop reading once we see a blank row
-            if not (country and flag and artist and song):
+            # We want to stop reading once we see a row without these required fields
+            if not (country and artist and song):
                 break
 
             entries.append(
@@ -49,19 +49,6 @@ class Contest:
                 ))
 
         return Contest(entries=entries, voters=voters)
-
-    def final_results(self):
-        return sorted(self.entries, key=lambda x: [
-            -x.sorting_pts[-1],
-            -x.display_pts[-1],
-            -x.num_voters,
-        ] +
-        [-x.pts_count(p) for p in self._unique_points] +
-        [
-            x.country,
-            x.artist,
-            x.song
-        ])
 
     def results_after_voter(self, voter):
         self._validate_voter_num(voter)
@@ -83,3 +70,6 @@ class Contest:
             entry_votes = entry.find_unique_points()
             votes.update(entry_votes)
         return votes
+
+    def final_results(self):
+        return self.results_after_voter(self.num_voters - 1)

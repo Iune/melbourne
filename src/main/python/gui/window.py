@@ -1,17 +1,17 @@
-from os.path import expanduser
-from os.path import join
+from os.path import expanduser, join, dirname
 
 import qtawesome as qta
 import webcolors
 from PySide2.QtCore import Qt
 from PySide2.QtGui import QColor, QKeySequence, QPixmap
-from PySide2.QtWidgets import QGridLayout, QGroupBox, QLineEdit, QPushButton, QLabel, QVBoxLayout, QWidget, \
-    QCheckBox, QProgressBar, QFileDialog, QColorDialog, QMessageBox, QMainWindow, QAction, QDialogButtonBox, QDialog
+from PySide2.QtWidgets import QGridLayout, QGroupBox, QLineEdit, QPushButton, QLabel, QHBoxLayout, QVBoxLayout, QWidget, \
+    QCheckBox, QProgressBar, QFileDialog, QColorDialog, QMessageBox, QMainWindow, QAction, QDialogButtonBox, QDialog, QSizePolicy
 
 from contest.contest import Contest
 from gui.thread import ScoreboardThread
 from scoreboard.utilities import ScoreboardDetails
 
+APPLICATION_VERSION = "5.1.0"
 DEFAULT_MAIN_COLOR = "#2F292B"
 DEFAULT_ACCENT_COLOR = "#FCB906"
 
@@ -24,6 +24,8 @@ class MainWindow(QMainWindow):
 
         self.contest = None
         self.thread = None
+
+        self._folder_path = expanduser("~")
 
         self._init_window()
         self._init_layout()
@@ -67,27 +69,37 @@ class MainWindow(QMainWindow):
         file_details_grid = QGridLayout()
         file_details_grid.setColumnStretch(1, 2)
 
-        self.input_file_btn = QPushButton(qta.icon('fa5.file-excel', color="#2E7D32"), ' Input File')
+        self.input_file_btn = QPushButton(qta.icon('fa5s.file-excel', color="#2E7D32"), ' Input File')
         self.input_file_btn.setDefault(False)
         self.input_file_btn.setAutoDefault(False)
         self.input_file_btn.clicked.connect(self._set_input_file)
         self.input_file_le = QLineEdit()
         self.input_file_le.setReadOnly(True)
+        self.input_file_le.setMinimumWidth(200)
+        self.input_file_le.textChanged.connect(self._check_if_input_file_set)
         self.input_file_le.textChanged.connect(self._check_if_ready)
+        self.reload_input_file_btn = QPushButton(qta.icon('fa5s.redo-alt', color="#212121"), '')
+        self.reload_input_file_btn.setEnabled(False)
+        self.reload_input_file_btn.setDefault(False)
+        self.reload_input_file_btn.setAutoDefault(False)
+        self.reload_input_file_btn.clicked.connect(self._reload_contest)
         self.output_folder_btn = QPushButton(qta.icon('fa5s.folder', color="#0277BD"), ' Output Folder')
         self.output_folder_btn.setDefault(False)
         self.output_folder_btn.setAutoDefault(False)
         self.output_folder_btn.clicked.connect(self._set_output_folder)
         self.output_folder_le = QLineEdit()
+        self.output_folder_le.setMinimumWidth(200)
         self.output_folder_le.setReadOnly(True)
         self.output_folder_le.textChanged.connect(self._check_if_ready)
 
         file_details_grid.addWidget(self.input_file_btn, 0, 0)
-        file_details_grid.addWidget(self.input_file_le, 0, 1)
+        file_details_grid.addWidget(self.input_file_le, 0, 2)
+        file_details_grid.addWidget(self.reload_input_file_btn, 0, 1)
         file_details_grid.addWidget(self.output_folder_btn, 1, 0)
-        file_details_grid.addWidget(self.output_folder_le, 1, 1)
+        file_details_grid.addWidget(self.output_folder_le, 1, 2)
         file_details_group = QGroupBox('File Details')
         file_details_group.setLayout(file_details_grid)
+        file_details_grid.setAlignment(Qt.AlignTop)
 
         # Scoreboard Details Grid
         scoreboard_details_grid = QGridLayout()
@@ -100,7 +112,7 @@ class MainWindow(QMainWindow):
         self.main_color_btn.setDefault(False)
         self.main_color_btn.setAutoDefault(False)
         self.main_color_btn.clicked.connect(self._set_main_color)
-        self.reset_main_color_btn = QPushButton(qta.icon('fa5s.redo-alt', color="#212121"), ' Reset')
+        self.reset_main_color_btn = QPushButton(qta.icon('fa5s.redo-alt', color="#212121"), '')
         self.reset_main_color_btn.setDefault(False)
         self.reset_main_color_btn.setAutoDefault(False)
         self.reset_main_color_btn.clicked.connect(self._reset_main_color)
@@ -111,7 +123,7 @@ class MainWindow(QMainWindow):
         self.accent_color_btn.setDefault(False)
         self.accent_color_btn.setAutoDefault(False)
         self.accent_color_btn.clicked.connect(self._set_accent_color)
-        self.reset_accent_color_btn = QPushButton(qta.icon('fa5s.redo-alt', color="#212121"), ' Reset')
+        self.reset_accent_color_btn = QPushButton(qta.icon('fa5s.redo-alt', color="#212121"), '')
         self.reset_accent_color_btn.setDefault(False)
         self.reset_accent_color_btn.setAutoDefault(False)
         self.reset_accent_color_btn.clicked.connect(self._reset_accent_color)
@@ -121,8 +133,13 @@ class MainWindow(QMainWindow):
         self.display_flags_check = QCheckBox('Display Flags')
         self.display_flags_check.setChecked(False)
         self.display_flags_check.stateChanged.connect(self._validate_flags)
+        self.flag_borders_check = QCheckBox('Display Borders Around Flags')
+        self.flag_borders_check.setChecked(True)
+        self.flag_borders_check.setEnabled(False)
 
-        scoreboard_details_grid.addWidget(QLabel('Scoreboard Title'), 0, 0)
+        scoreboard_title_label = QLabel('Scoreboard Title')
+        scoreboard_title_label.setAlignment(Qt.AlignCenter)
+        scoreboard_details_grid.addWidget(scoreboard_title_label, 0, 0)
         scoreboard_details_grid.addWidget(self.scoreboard_title_le, 0, 1, 1, 2)
         scoreboard_details_grid.addWidget(self.main_color_btn, 1, 0)
         scoreboard_details_grid.addWidget(self.reset_main_color_btn, 1, 1)
@@ -130,7 +147,8 @@ class MainWindow(QMainWindow):
         scoreboard_details_grid.addWidget(self.accent_color_btn, 2, 0)
         scoreboard_details_grid.addWidget(self.reset_accent_color_btn, 2, 1)
         scoreboard_details_grid.addWidget(self.accent_color_le, 2, 2)
-        scoreboard_details_grid.addWidget(self.display_flags_check, 3, 0, 1, 3)
+        scoreboard_details_grid.addWidget(self.display_flags_check, 3, 0)
+        scoreboard_details_grid.addWidget(self.flag_borders_check, 3, 1, 1, 3)
         scoreboard_details_group = QGroupBox('Scoreboard Details')
         scoreboard_details_group.setLayout(scoreboard_details_grid)
 
@@ -171,11 +189,11 @@ class MainWindow(QMainWindow):
         about_dialog.exec_()
 
     def _set_input_file(self):
-        home_directory = expanduser('~')
         dialog = QFileDialog()
         dialog.setFileMode(QFileDialog.ExistingFile)
-        path = dialog.getOpenFileName(self, 'Select Excel Spreadsheet', home_directory, 'Excel (*.xls, *.xlsx)')
+        path = dialog.getOpenFileName(self, 'Select Excel Spreadsheet', self._folder_path, 'Excel (*.xls, *.xlsx)')
         if path and len(path[0]) > 0:
+            self._folder_path = dirname(path[0])
             self.input_file_le.setText(path[0])
             self._load_contest()
 
@@ -211,11 +229,11 @@ class MainWindow(QMainWindow):
         alert.exec_()
 
     def _set_output_folder(self):
-        home_directory = expanduser('~')
         dialog = QFileDialog()
         dialog.setFileMode(QFileDialog.DirectoryOnly)
-        path = dialog.getExistingDirectory(self, 'Select Output Folder', home_directory, QFileDialog.ShowDirsOnly)
+        path = dialog.getExistingDirectory(self, 'Select Output Folder', self._folder_path, QFileDialog.ShowDirsOnly)
         if path and len(path) > 0:
+            self._folder_path = dirname(path)
             self.output_folder_le.setText(path)
 
     def _set_main_color(self):
@@ -260,11 +278,14 @@ class MainWindow(QMainWindow):
                     invalid.append(flag)
             return invalid
 
-        if self.contest:
-            if self.display_flags_check.isChecked():
+        if self.display_flags_check.isChecked():
+            self.flag_borders_check.setEnabled(True)
+            if self.contest:
                 invalid_flags = get_invalid_flags(self)
                 if invalid_flags:
                     self.display_flags_check.setChecked(False)
+                    self.flag_borders_check.setEnabled(False)
+
                     alert = QMessageBox()
                     alert.setIcon(QMessageBox.Warning)
                     alert.setText("Invalid flags were specified in the input file.")
@@ -276,7 +297,15 @@ class MainWindow(QMainWindow):
                     alert.setEscapeButton(QMessageBox.Ok)
                     alert.exec_()
                     return False
+        else:
+            self.flag_borders_check.setEnabled(False)
         return True
+
+    def _check_if_input_file_set(self):
+        if len(self.input_file_le.text()) > 0:
+            self.reload_input_file_btn.setEnabled(True)
+        else:
+            self.reload_input_file_btn.setEnabled(False)
 
     def _check_if_ready(self):
         if self.contest and len(self.output_folder_le.text()) > 0 and len(self.scoreboard_title_le.text()) > 0:
@@ -303,6 +332,7 @@ class MainWindow(QMainWindow):
                 main_color=self.main_color_le.text(),
                 accent_color=self.accent_color_le.text(),
                 display_flags=self.display_flags_check.isChecked(),
+                display_flag_borders=self.display_flags_check.isChecked() and self.flag_borders_check.isChecked(),
                 windows_dpi_scaling=dpi_scaling_factor
             ))
 
@@ -350,7 +380,7 @@ class AboutDialog(QDialog):
 
         layout.addWidget(title)
         layout.addWidget(logo)
-        layout.addWidget(QLabel("Version 5.0.1"))
+        layout.addWidget(QLabel("Version {}".format(APPLICATION_VERSION)))
         layout.addWidget(QLabel("Copyright © Aditya Duri"))
 
         for i in range(0, layout.count()):

@@ -13,7 +13,7 @@ DEFAULT_POINTS_FONT_FAMILY = "Fira Sans"
 
 
 class ScoreboardDetails:
-    def __init__(self, contest, output_dir, title, main_color, accent_color, display_flags=True,
+    def __init__(self, contest, output_dir, title, main_color, accent_color, display_flags=True, display_flag_borders=True,
                  image_scaling=DEFAULT_IMAGE_scaling, windows_dpi_scaling=DEFAULT_WINDOWS_DPI_SCALING):
         self.contest = contest
         self.output_dir = output_dir
@@ -22,6 +22,7 @@ class ScoreboardDetails:
         self.main_color = main_color
         self.accent_color = accent_color
         self.display_flags = display_flags
+        self.display_flag_borders = display_flag_borders
         self.scaling = image_scaling
 
         # On Windows, text is rendered differently depending on the DPI scaling factor which we need to account for

@@ -135,7 +135,7 @@ class MainWindow(QMainWindow):
         self.display_flags_check.stateChanged.connect(self._validate_flags)
         self.flag_borders_check = QCheckBox('Display Borders Around Flags')
         self.flag_borders_check.setChecked(True)
-        self.flag_borders_check.setVisible(False)
+        self.flag_borders_check.setEnabled(False)
 
         scoreboard_title_label = QLabel('Scoreboard Title')
         scoreboard_title_label.setAlignment(Qt.AlignCenter)
@@ -147,7 +147,7 @@ class MainWindow(QMainWindow):
         scoreboard_details_grid.addWidget(self.accent_color_btn, 2, 0)
         scoreboard_details_grid.addWidget(self.reset_accent_color_btn, 2, 1)
         scoreboard_details_grid.addWidget(self.accent_color_le, 2, 2)
-        scoreboard_details_grid.addWidget(self.display_flags_check, 3, 0, 1, 3)
+        scoreboard_details_grid.addWidget(self.display_flags_check, 3, 0)
         scoreboard_details_grid.addWidget(self.flag_borders_check, 3, 1, 1, 3)
         scoreboard_details_group = QGroupBox('Scoreboard Details')
         scoreboard_details_group.setLayout(scoreboard_details_grid)
@@ -279,12 +279,12 @@ class MainWindow(QMainWindow):
             return invalid
 
         if self.display_flags_check.isChecked():
-            self.flag_borders_check.setVisible(True)
+            self.flag_borders_check.setEnabled(True)
             if self.contest:
                 invalid_flags = get_invalid_flags(self)
                 if invalid_flags:
                     self.display_flags_check.setChecked(False)
-                    self.flag_borders_check.setVisible(False)
+                    self.flag_borders_check.setEnabled(False)
 
                     alert = QMessageBox()
                     alert.setIcon(QMessageBox.Warning)
@@ -298,7 +298,7 @@ class MainWindow(QMainWindow):
                     alert.exec_()
                     return False
         else:
-            self.flag_borders_check.setVisible(False)
+            self.flag_borders_check.setEnabled(False)
         return True
 
     def _check_if_input_file_set(self):

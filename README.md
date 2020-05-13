@@ -6,7 +6,7 @@
 
 *Melbourne* is a program that generates scoreboard images for online music song competitions. As a former online competition host, I have found that creating scoreboard images when presenting results is a rather time-consuming activity and repetitive activity. *Melbourne* was consequently born out of a desire to mostly automate this process and make it easier for me to host competitions.
 
-In many ways, this program has been a labor of love for me; this upcoming summer 2019 will mark the seventh anniversary of my starting development of this program and I have definitely learned a lot these past few years developing and improving this application.
+In many ways, this program has been a labor of love for me; this upcoming summer 2020 will mark the eighth anniversary of my starting development of this program and I have definitely learned a lot these past few years developing and improving this application.
 
 ## History
 

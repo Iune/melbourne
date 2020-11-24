@@ -63,7 +63,7 @@ public class Contest {
 
                 // Some rows don't have cell values for the last column, so we need to add
                 // "overhang" cells to make sure that all rows are equal in cell count
-                var numExtraCells = row.getLastCellNum() - rowContents.size();
+                int numExtraCells = row.getLastCellNum() - rowContents.size();
                 for (int i = 0; i < numExtraCells; i++) {
                     rowContents.add("");
                 }
@@ -83,17 +83,6 @@ public class Contest {
             }
 
         }
-    }
-
-    private List<String> getVotersFromRow(Row row) {
-        var voters = new ArrayList<String>();
-        DataFormatter formatter = new DataFormatter();
-        Iterator<Cell> cellIterator = row.cellIterator();
-        while (cellIterator.hasNext()) {
-            Cell cell = cellIterator.next();
-            var voter = formatter.formatCellValue(cell);
-        }
-        return voters;
     }
 
     private void validateVoterNum(int voter) {

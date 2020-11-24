@@ -32,9 +32,9 @@ public class Entry {
     }
 
     private List<Integer> setDisplayPoints() {
-        var displayPoints = new ArrayList<Integer>();
-        var total = 0;
-        for (var vote : this.votes) {
+        List<Integer> displayPoints = new ArrayList<Integer>();
+        int total = 0;
+        for (String vote : this.votes) {
             try {
                 total += Integer.parseInt(vote);
             } catch (NumberFormatException ignored) {
@@ -45,9 +45,9 @@ public class Entry {
     }
 
     private List<Integer> setSortingPoints() {
-        var sortingPoints = new ArrayList<Integer>();
-        var dqStatus = false;
-        for (var i = 0; i < this.votes.size(); i++) {
+        List<Integer> sortingPoints = new ArrayList<Integer>();
+        boolean dqStatus = false;
+        for (int i = 0; i < this.votes.size(); i++) {
             String vote = this.votes.get(i);
             if (!dqStatus && vote.equalsIgnoreCase("dq")) {
                 dqStatus = true;
@@ -62,8 +62,8 @@ public class Entry {
     }
 
     private List<Boolean> setDQStatuses() {
-        var dqStatuses = new ArrayList<Boolean>();
-        var dqStatus = false;
+        List<Boolean> dqStatuses = new ArrayList<Boolean>();
+        boolean dqStatus = false;
         for (String vote : this.votes) {
             if (!dqStatus && vote.equalsIgnoreCase("dq")) {
                 dqStatus = true;
@@ -73,21 +73,16 @@ public class Entry {
         return dqStatuses;
     }
 
-    // Because of issues with the final column number in Excel, the voters array may be off by 1
-    private int getValidVoterNumber(int voter) {
-        if (voter < 0) {
+    private void validateVoterNum(int voter) {
+        if (voter < 0 || voter >= this.votes.size()) {
             throw new IllegalArgumentException(String.format("Voter number %d was invalid", voter));
-        } else if (voter >= this.votes.size()) {
-            return this.votes.size() - 1;
-        } else {
-            return voter;
         }
     }
 
     public Integer voterCountAfterVoter(int voter) {
-        this.getValidVoterNumber(voter);
-        var numVotes = 0;
-        for (var vote : this.votes.subList(0, voter + 1)) {
+        this.validateVoterNum(voter);
+        int numVotes = 0;
+        for (String vote : this.votes.subList(0, voter + 1)) {
             try {
                 Integer.parseInt(vote);
                 numVotes++;
@@ -98,9 +93,9 @@ public class Entry {
     }
 
     public Integer pointsCountAfterVoter(int points, int voter) {
-        this.getValidVoterNumber(voter);
-        var count = 0;
-        for (var vote : this.votes.subList(0, voter + 1)) {
+        this.validateVoterNum(voter);
+        int count = 0;
+        for (String vote : this.votes.subList(0, voter + 1)) {
             try {
                 int currentPoints = Integer.parseInt(vote);
                 if (currentPoints == points) {
@@ -113,8 +108,8 @@ public class Entry {
     }
 
     private Set<Integer> setUniquePoints() {
-        var uniquePoints = new HashSet<Integer>();
-        for (var vote : this.votes) {
+        Set<Integer> uniquePoints = new HashSet<Integer>();
+        for (String vote : this.votes) {
             try {
                 int points = Integer.parseInt(vote);
                 uniquePoints.add(points);
@@ -145,22 +140,22 @@ public class Entry {
     }
 
     public Integer getDisplayPoints(int voter) {
-        this.getValidVoterNumber(voter);
+        this.validateVoterNum(voter);
         return displayPoints.get(voter);
     }
 
     public Integer getSortingPoints(int voter) {
-        this.getValidVoterNumber(voter);
+        this.validateVoterNum(voter);
         return sortingPoints.get(voter);
     }
 
     public Boolean getDqStatuses(int voter) {
-        this.getValidVoterNumber(voter);
+        this.validateVoterNum(voter);
         return dqStatuses.get(voter);
     }
 
     public Integer getNumVoters(int voter) {
-        this.getValidVoterNumber(voter);
+        this.validateVoterNum(voter);
         return numVoters.get(voter);
     }
 

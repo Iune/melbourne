@@ -3,11 +3,11 @@ package org.iune.melbourne.contest;
 import java.util.Comparator;
 import java.util.TreeSet;
 
-public class EntryPointsCountAfterVoterComparator implements Comparator<Entry> {
+public class EntryPointsCountComparator implements Comparator<Entry> {
 
     int voter;
 
-    public EntryPointsCountAfterVoterComparator(int voter) {
+    public EntryPointsCountComparator(int voter) {
         this.voter = voter;
     }
 

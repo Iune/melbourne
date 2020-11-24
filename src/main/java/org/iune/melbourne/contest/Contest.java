@@ -108,7 +108,7 @@ public class Contest {
                 .comparing((Entry entry) -> entry.getSortingPoints(voter)).reversed()
                 .thenComparingInt((Entry entry) -> entry.getDisplayPoints(voter)).reversed()
                 .thenComparingInt((Entry entry) -> entry.voterCountAfterVoter(voter)).reversed()
-                .thenComparing(new EntryPointsCountAfterVoterComparator(voter)).reversed()
+                .thenComparing(new EntryPointsCountComparator(voter)).reversed()
                 .thenComparing(Entry::getCountry)
                 .thenComparing(Entry::getArtist)
                 .thenComparing(Entry::getSong);

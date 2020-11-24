@@ -1,6 +1,5 @@
 package org.iune.melbourne.contest;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -11,7 +10,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class EntryPointsCountAfterVoterComparatorTest {
+class EntryPointsCountComparatorTest {
 
     List<Entry> entries;
 
@@ -29,11 +28,11 @@ class EntryPointsCountAfterVoterComparatorTest {
     @Test
     void testPointsCountSorting() {
         // For the second-to-last-voter, Estonia has more 12 points and should be sorted ahead
-        entries.sort(Collections.reverseOrder(new EntryPointsCountAfterVoterComparator(5)));
+        entries.sort(Collections.reverseOrder(new EntryPointsCountComparator(5)));
         assertEquals(entries.get(0).country, "Estonia");
 
         // At the end, Russia has the same number of 12 points, but more 10 points, and should be sorted ahead
-        entries.sort(Collections.reverseOrder(new EntryPointsCountAfterVoterComparator(6)));
+        entries.sort(Collections.reverseOrder(new EntryPointsCountComparator(6)));
         assertEquals(entries.get(0).country, "Russia");
     }
 }

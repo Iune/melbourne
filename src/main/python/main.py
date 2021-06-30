@@ -1,8 +1,8 @@
 import sys
 from os.path import join
 
-from PySide2.QtGui import QFontDatabase
-from fbs_runtime.application_context.PySide2 import ApplicationContext
+from PyQt5.QtGui import QFontDatabase
+from fbs_runtime.application_context.PyQt5 import ApplicationContext
 
 from gui.window import MainWindow
 

@@ -1,4 +1,4 @@
-from PySide2.QtCore import QThread, Signal, Slot
+from PyQt5.QtCore import QThread, pyqtSignal as Signal, pyqtSlot as Slot
 
 from scoreboard.scoreboard import Scoreboard
 

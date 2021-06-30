@@ -2,9 +2,9 @@ from os.path import expanduser, join, dirname
 
 import qtawesome as qta
 import webcolors
-from PySide2.QtCore import Qt
-from PySide2.QtGui import QColor, QKeySequence, QPixmap
-from PySide2.QtWidgets import QGridLayout, QGroupBox, QLineEdit, QPushButton, QLabel, QHBoxLayout, QVBoxLayout, QWidget, \
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QColor, QKeySequence, QPixmap
+from PyQt5.QtWidgets import QGridLayout, QGroupBox, QLineEdit, QPushButton, QLabel, QHBoxLayout, QVBoxLayout, QWidget, \
     QCheckBox, QProgressBar, QFileDialog, QColorDialog, QMessageBox, QMainWindow, QAction, QDialogButtonBox, QDialog, QSizePolicy
 
 from contest.contest import Contest

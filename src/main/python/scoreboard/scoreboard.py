@@ -1,8 +1,8 @@
 from os import makedirs
 from os.path import isdir, join
 
-from PySide2.QtCore import Qt, QRect, QRectF, QPoint, QPointF, QSizeF
-from PySide2.QtGui import QImage, QPainter, QPen
+from PyQt5.QtCore import Qt, QRect, QRectF, QPoint, QPointF, QSizeF
+from PyQt5.QtGui import QImage, QPainter, QPen
 from pathvalidate import sanitize_filename
 
 from scoreboard.utilities import ScoreboardColors, ScoreboardFonts, ScoreboardSizes

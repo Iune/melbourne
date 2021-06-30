@@ -1,6 +1,6 @@
 import fbs_runtime
 import webcolors
-from PySide2.QtGui import QColor, QFont, QFontMetrics
+from PyQt5.QtGui import QColor, QFont, QFontMetrics
 
 DEFAULT_MAIN_COLOR = "#2F292B"
 DEFAULT_ACCENT_COLOR = "#FCB906"

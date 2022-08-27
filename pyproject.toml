@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "melbourne"
+version = "6.0.0"
+description = "Scoreboard image generator"
+authors = ["Aditya Duri <aditya.duri@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.8,<3.11"
+fastapi = "^0.81.0"
+uvicorn = {extras = ["standard"], version = "^0.18.3"}
+simple-settings = "^1.2.0"
+xlrd = "1.2.0"
+python-multipart = "^0.0.5"
+PySide6 = "^6.3.1"
+webcolors = "^1.12"
+pathvalidate = "^2.5.2"
+
+[tool.poetry.dev-dependencies]
+black = "^22.6.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+

@@ -57,8 +57,8 @@ class Contest:
             -x.display_pts[voter],
             -x.voter_count_after_voter(voter)
         ] +
-        [-x.pts_count_after_voter(p, voter) for p in self._unique_points] +
-        [
+                                                  [-x.get_pts_count(p, voter) for p in self._unique_points] +
+                                                  [
             x.country,
             x.artist,
             x.song

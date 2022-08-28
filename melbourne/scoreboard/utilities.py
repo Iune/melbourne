@@ -7,11 +7,11 @@ from webcolors import hex_to_rgb
 
 from melbourne.contest.contest import Contest
 
-_DEFAULT_IMAGE_SCALING = 2.5
-_DEFAULT_BASE_FONT_FAMILY = "Zilla Slab"
-_DEFAULT_POINTS_FONT_FAMILY = "Fira Sans"
-_DEFAULT_MAIN_COLOR = "#2F292B"
-_DEFAULT_ACCENT_COLOR = "#FCB906"
+DEFAULT_IMAGE_SCALING = 2.5
+DEFAULT_BASE_FONT_FAMILY = "Zilla Slab"
+DEFAULT_POINTS_FONT_FAMILY = "Fira Sans"
+DEFAULT_MAIN_COLOR = "#2F292B"
+DEFAULT_ACCENT_COLOR = "#FCB906"
 
 
 @dataclass
@@ -23,20 +23,20 @@ class ScoreboardDetails:
     display_flags: bool
     display_flag_borders: bool
 
-    main_color: str = _DEFAULT_MAIN_COLOR
-    accent_color: str = _DEFAULT_ACCENT_COLOR
-    scaling: float = _DEFAULT_IMAGE_SCALING
-    base_font_family: str = _DEFAULT_BASE_FONT_FAMILY
-    pts_font_family: str = _DEFAULT_POINTS_FONT_FAMILY
+    main_color: str = DEFAULT_MAIN_COLOR
+    accent_color: str = DEFAULT_ACCENT_COLOR
+    scaling: float = DEFAULT_IMAGE_SCALING
+    base_font_family: str = DEFAULT_BASE_FONT_FAMILY
+    pts_font_family: str = DEFAULT_POINTS_FONT_FAMILY
 
     custom_flags_dir: str = None  # TODO: Add support for custom flags
 
 
 @dataclass
 class ScoreboardFonts:
-    base_font_family: str = _DEFAULT_BASE_FONT_FAMILY
-    pts_font_family: str = _DEFAULT_POINTS_FONT_FAMILY
-    scaling: float = _DEFAULT_IMAGE_SCALING
+    base_font_family: str = DEFAULT_BASE_FONT_FAMILY
+    pts_font_family: str = DEFAULT_POINTS_FONT_FAMILY
+    scaling: float = DEFAULT_IMAGE_SCALING
     font_os_scaling: float = 1.0
 
     voter_header: QFont = field(init=False)
@@ -62,8 +62,8 @@ def _hex_to_rgb(hex_code: str) -> QColor:
 
 @dataclass
 class ScoreboardColors:
-    main_color_hex: _DEFAULT_MAIN_COLOR
-    accent_color_hex: _DEFAULT_ACCENT_COLOR
+    main_color_hex: DEFAULT_MAIN_COLOR
+    accent_color_hex: DEFAULT_ACCENT_COLOR
 
     light_grey: QColor = _hex_to_rgb("#EEEEEE")
     white: QColor = _hex_to_rgb("#FAFAFA")

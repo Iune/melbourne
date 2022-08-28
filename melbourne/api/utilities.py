@@ -13,8 +13,8 @@ def zip_scoreboards(images: List[str], working_dir: str) -> str:
     zip_file_name = f"{uuid.uuid4().hex}.zip"
     zip_file_path = os.path.join(working_dir, zip_file_name)
     with ZipFile(zip_file_path, mode="w", compression=ZIP_DEFLATED) as z:
-        for img in images:
-            z.write(img)
+        for img_file_path in images:
+            z.write(img_file_path, os.path.basename(img_file_path))
     return zip_file_name
 
 

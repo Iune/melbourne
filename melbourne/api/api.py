@@ -63,7 +63,7 @@ async def generate_scoreboards(contest_file: UploadFile, title: str = Form(), di
                 futures.append(e.submit(generator.generate, voter_num))
 
         images = [f.result() for f in futures]
-        zip_file = zip_scoreboards(images, temp_dir)
+        zip_file = zip_scoreboards(images, WORKING_DIR)
         # TODO: Handle errors if zipping fails
         # TODO: Upload zip file to storage location and get path
         # TODO: Figure out how to do this locally

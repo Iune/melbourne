@@ -15,8 +15,8 @@ logger = logging.getLogger(__name__)
 app = FastAPI()
 
 WORKING_DIR = "/Users/aditya/Development/contests/melbourne-api/tmp"
-FONTS_DIR = "/Users/aditya/Development/contests/melbourne-api/src/main/resources/base/fonts"
-FLAGS_DIR = "/Users/aditya/Development/contests/melbourne-api/src/main/resources/base/flags"
+FONTS_DIR = "/Users/aditya/Development/contests/melbourne-api/assets/fonts"
+FLAGS_DIR = "/Users/aditya/Development/contests/melbourne-api/assets/flags"
 MAX_WORKERS = 4
 
 

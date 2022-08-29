@@ -275,3 +275,4 @@ $RECYCLE.BIN/
 # End of https://www.gitignore.io/api/macos,python,windows,intellij+all,visualstudiocode
 
 build/macos.sh
+tmp/

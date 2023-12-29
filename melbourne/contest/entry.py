@@ -45,7 +45,10 @@ class Entry:
 
     @staticmethod
     def _get_sorting_pts(dq_statuses: List[bool], display_pts: List[int]) -> List[int]:
-        return [-1000 if is_dq else points for is_dq, points in zip(dq_statuses, display_pts)]
+        return [
+            -1000 if is_dq else points
+            for is_dq, points in zip(dq_statuses, display_pts)
+        ]
 
     def _validate_voter_num(self, voter: int) -> None:
         if voter < 0 or voter >= len(self.votes):
@@ -54,7 +57,7 @@ class Entry:
     def get_voter_count(self, voter: int) -> int:
         self._validate_voter_num(voter)
         num_votes = 0
-        for vote in self.votes[:voter + 1]:
+        for vote in self.votes[: voter + 1]:
             try:
                 if int(float(vote)):
                     num_votes += 1
@@ -65,7 +68,7 @@ class Entry:
     def get_pts_count(self, points: int, voter: int) -> int:
         self._validate_voter_num(voter)
         count = 0
-        for vote in self.votes[:voter + 1]:
+        for vote in self.votes[: voter + 1]:
             try:
                 current_pts = int(float(vote))
                 if current_pts == points:

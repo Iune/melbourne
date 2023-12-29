@@ -33,10 +33,16 @@ class Contest:
 
     def results_after_voter(self, voter) -> List[Entry]:
         self._validate_voter_num(voter)
-        return sorted(self.entries,
-                      key=lambda x: [-x.sorting_pts[voter], -x.display_pts[voter], -x.get_voter_count(voter)] +
-                                    [-x.get_pts_count(p, voter) for p in self._unique_pts] +
-                                    [x.country, x.artist, x.song])
+        return sorted(
+            self.entries,
+            key=lambda x: [
+                -x.sorting_pts[voter],
+                -x.display_pts[voter],
+                -x.get_voter_count(voter),
+            ]
+            + [-x.get_pts_count(p, voter) for p in self._unique_pts]
+            + [x.country, x.artist, x.song],
+        )
 
 
 def load_contest_from_file(file: Union[str, bytes]) -> Contest:
@@ -63,12 +69,7 @@ def load_contest_from_file(file: Union[str, bytes]) -> Contest:
             break
 
         entries.append(
-            Entry(
-                country=country,
-                flag=flag,
-                artist=artist,
-                song=song,
-                votes=votes
-            ))
+            Entry(country=country, flag=flag, artist=artist, song=song, votes=votes)
+        )
 
     return Contest(entries=entries, voters=voters)

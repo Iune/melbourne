@@ -5,8 +5,21 @@ import os
 from melbourne.contest.contest import Contest
 
 
-def validate_flags(contest: Contest, flags_dir: str, custom_flags_dir: Optional[str] = None) -> Tuple[bool, List[str]]:
-    return True, []
+def validate_flags(
+    contest: Contest, flags_dir: str, custom_flags_dir: Optional[str] = None
+) -> Tuple[bool, List[str]]:
+    invalid_flags = []
+    all_flags_valid = True
+    for entry in contest.entries:
+        if os.path.exists(os.path.join(flags_dir, entry.flag)) or (
+            custom_flags_dir
+            and os.path.exists(os.path.join(custom_flags_dir, entry.flag))
+        ):
+            continue
+        else:
+            all_flags_valid = False
+            invalid_flags.append(entry.flag)
+    return all_flags_valid, invalid_flags
 
 
 def zip_scoreboards(images: List[str], working_dir: str) -> str:

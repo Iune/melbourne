@@ -1,7 +1,8 @@
-from dataclasses import dataclass, field
-import xlrd
-from pathlib import Path
 import logging
+from dataclasses import dataclass, field
+from pathlib import Path
+
+import xlrd
 
 logger = logging.getLogger(__name__)
 

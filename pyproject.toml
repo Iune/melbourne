@@ -8,9 +8,14 @@ dependencies = [
     "click-loglevel>=0.6.0",
     "click>=8.1.8",
     "xlrd==1.2.0",
+    "skia-python>=87.8",
+    "webcolors>=24.11.1",
+    "pathvalidate>=3.2.3",
+    "cachetools>=5.5.2",
 ]
 
 [dependency-groups]
 dev = [
+    "mypy>=1.15.0",
     "ruff>=0.11.8",
 ]

@@ -1,0 +1,95 @@
+{
+    "version": 1,
+    "disable_existing_loggers": false,
+    "formatters": {
+        "color": {
+            "()": "colorlog.ColoredFormatter",
+            "format": "%(log_color)s%(levelname)-8s%(reset)s | %(asctime)s | %(name)s | %(message)s",
+            "datefmt": "%Y-%m-%d %H:%M:%S",
+            "log_colors": {
+                "DEBUG": "cyan",
+                "INFO": "green",
+                "WARNING": "yellow",
+                "ERROR": "red",
+                "CRITICAL": "bold_red"
+            }
+        },
+        "access_color": {
+            "()": "colorlog.ColoredFormatter",
+            "format": "%(log_color)s%(levelname)-8s%(reset)s | %(asctime)s | %(message)s",
+            "datefmt": "%Y-%m-%d %H:%M:%S",
+            "log_colors": {
+                "DEBUG": "cyan",
+                "INFO": "green",
+                "WARNING": "yellow",
+                "ERROR": "red",
+                "CRITICAL": "bold_red"
+            }
+        },
+        "default": {
+            "format": "%(levelname)s | %(asctime)s | %(name)s | %(message)s",
+            "datefmt": "%Y-%m-%d %H:%M:%S"
+        },
+        "access": {
+            "format": "%(levelname)s | %(asctime)s | %(message)s"
+        }
+    },
+    "handlers": {
+        "default": {
+            "formatter": "color",
+            "class": "logging.StreamHandler",
+            "stream": "ext://sys.stdout"
+        },
+        "file": {
+            "formatter": "default",
+            "class": "logging.FileHandler",
+            "filename": "melbourne.log",
+            "mode": "a",
+            "encoding": "utf-8"
+        },
+        "access": {
+            "formatter": "access_color",
+            "class": "logging.StreamHandler",
+            "stream": "ext://sys.stdout"
+        },
+        "access_file": {
+            "formatter": "access",
+            "class": "logging.FileHandler",
+            "filename": "melbourne_access.log",
+            "mode": "a",
+            "encoding": "utf-8"
+        }
+    },
+    "loggers": {
+        "uvicorn": {
+            "handlers": [
+                "default",
+                "file"
+            ],
+            "level": "INFO"
+        },
+        "uvicorn.error": {
+            "handlers": [
+                "default",
+                "file"
+            ],
+            "level": "INFO",
+            "propagate": false
+        },
+        "uvicorn.access": {
+            "handlers": [
+                "access",
+                "access_file"
+            ],
+            "level": "INFO",
+            "propagate": false
+        }
+    },
+    "root": {
+        "level": "INFO",
+        "handlers": [
+            "default",
+            "file"
+        ]
+    }
+}

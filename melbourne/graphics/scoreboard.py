@@ -31,6 +31,7 @@ def _generate_scoreboard(
     voter_idx: int,
 ):
     """Generate a single scoreboard"""
+    logger.info(f"Generating scoreboard for {voter_idx=}")
     sizes = ScoreboardSizes(fonts, config, voter_idx)
     surface = Surface.MakeRasterN32Premul(sizes.width, sizes.height)
     canvas = surface.getCanvas()
@@ -259,13 +260,15 @@ def _generate_scoreboard(
         f"{voter_idx + 1} - {config.contest.voter_names[voter_idx]}.png"
     )
     image.save(str(image_file_path))
+    return image_file_path
 
 
-def generate_scoreboards(config: ScoreboardConfig):
+def generate_contest_scoreboards(config: ScoreboardConfig) -> list[Path]:
     """Generate scoreboards for the contest"""
     fonts = load_fonts(config.fonts_config)
     colors = ScoreboardColors(config.main_color, config.accent_color)
 
     inputs = [(config, fonts, colors, i) for i in range(config.contest.num_voters)]
     with ThreadPool(processes=5) as pool:
-        pool.starmap(_generate_scoreboard, inputs)
+        results = pool.starmap(_generate_scoreboard, inputs)
+    return results

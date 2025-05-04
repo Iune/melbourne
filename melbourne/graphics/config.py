@@ -9,8 +9,9 @@ from melbourne.contest.contest import Contest
 from melbourne.graphics.utilities import get_text_width_height, hex_to_rgb
 
 _DEFAULT_IMAGE_SCALING_RATIO = 2.5
-_DEFAULT_MAIN_COLOR = "#2F292B"
-_DEFAULT_ACCENT_COLOR = "#FCB906"
+
+DEFAULT_MAIN_COLOR = "#2F292B"
+DEFAULT_ACCENT_COLOR = "#FCB906"
 
 
 @dataclass(frozen=True)
@@ -58,8 +59,8 @@ class ScoreboardConfig:
     display_flags: bool = True
     display_flag_borders: bool = True
     append_results_to_title: bool = True
-    main_color: str = _DEFAULT_MAIN_COLOR
-    accent_color: str = _DEFAULT_ACCENT_COLOR
+    main_color: str = DEFAULT_MAIN_COLOR
+    accent_color: str = DEFAULT_ACCENT_COLOR
 
 
 @dataclass

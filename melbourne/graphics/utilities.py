@@ -1,7 +1,8 @@
 from enum import Enum, auto
 from pathlib import Path
-from cachetools import TTLCache, cached
+
 import webcolors
+from cachetools import TTLCache, cached
 from skia import (
     Canvas,
     Color,
@@ -104,7 +105,7 @@ def draw_line(
     canvas.drawLine(x0, y0, x1, y1, paint)
 
 
-@cached(cache=TTLCache(ttl=60))
+@cached(cache=TTLCache(ttl=60, maxsize=1024))
 def load_image(file_path: Path, width: float) -> Image:
     """Load an image. The image is cached for 60 seconds so that subsequent load attempts for the current scoreboard are cached."""
     with open(file_path, "rb") as f:

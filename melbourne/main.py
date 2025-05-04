@@ -7,7 +7,7 @@ from click_loglevel import LogLevel
 from melbourne.contest.contest import get_contest_from_file
 from melbourne.graphics.config import ScoreboardConfig, ScoreboardFontsConfig
 from melbourne.graphics.scoreboard import (
-    generate_scoreboards,
+    generate_contest_scoreboards,
 )
 
 logger = logging.getLogger(__name__)
@@ -69,7 +69,7 @@ def main(
         accent_color="#1976D2",
     )
 
-    generate_scoreboards(config)
+    generate_contest_scoreboards(config)
 
 
 if __name__ == "__main__":

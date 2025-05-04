@@ -1,6 +1,7 @@
 import logging
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Union
 
 import xlrd
 
@@ -149,9 +150,10 @@ class Contest:
             )
 
 
-def get_contest_from_file(file_path: Path, has_count_column: bool):
+def get_contest_from_file(file: Union[Path, bytes], has_count_column: bool):
     """Load contest from Excel file"""
-    excel = xlrd.open_workbook(file_path)
+    kw_name = "file_contents" if isinstance(file, bytes) else "filename"
+    excel = xlrd.open_workbook(**{kw_name: file})
     sheet = excel.sheet_by_index(0)
 
     if has_count_column:

@@ -4,8 +4,10 @@
 
 ### Command Line
 
+For local development, you can run the following command.
+
 ```bash
-uv run python -m uvicorn melbourne.api:app --port 1273 --log-config log_config.json
+uv run uvicorn melbourne.api:app --port 1273 --log-config config/log_config.json
 ```
 
 ### Environment File

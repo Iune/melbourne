@@ -1,4 +1,5 @@
 import logging
+from typing import Any
 import uuid
 from functools import cache
 from pathlib import Path
@@ -21,11 +22,16 @@ from melbourne.graphics.scoreboard import generate_contest_scoreboards
 from contextlib import asynccontextmanager
 from botocore.exceptions import ClientError
 from botocore.client import Config
+import uvicorn
+import json
 
 logger = logging.getLogger(__name__)
 
 
 class Settings(BaseSettings):
+    port: int
+    log_config_path: Path
+
     working_dir: Path
     flags_dir: Path
     base_font_path: Path
@@ -199,3 +205,16 @@ async def generate_scoreboards(
             zip_file = zip_file_path.name
 
     return GenerateScoreboardsResponse(success=True, zip_file=zip_file)
+
+
+def load_log_config() -> dict[str, Any]:
+    with open(settings.log_config_path, "r") as f:
+        return json.load(f)
+
+
+def main():
+    uvicorn.run("melbourne.api:app", port=settings.port, log_config=load_log_config())
+
+
+if __name__ == "__main__":
+    main()

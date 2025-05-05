@@ -1,0 +1,15 @@
+[Unit]
+Description=Melbourne API
+After=network.target
+
+[Service]
+User=melbourne
+WorkingDirectory=<release directory>
+ExecStart=<release directory>/.venv/bin/uvicorn melbourne.api:app --host 0.0.0.0 --port 1273 --log-config <release directory>/config/log_config.json
+
+# Restart settings
+Restart=always
+RestartSec=30
+
+[Install]
+WantedBy=multi-user.target

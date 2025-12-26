@@ -7,4 +7,10 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <PackageReference Include="ExcelDataReader" Version="3.8.0" />
+      <PackageReference Include="ExcelDataReader.DataSet" Version="3.8.0" />
+      <PackageReference Include="System.Text.Encoding.CodePages" Version="10.0.1" />
+    </ItemGroup>
+
 </Project>

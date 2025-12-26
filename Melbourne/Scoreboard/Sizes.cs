@@ -3,10 +3,10 @@ namespace Melbourne;
 using System;
 using System.Linq;
 
-public sealed class ScoreboardSizes
+public sealed class Sizes
 {
-    public ScoreboardFonts Fonts { get; }
-    public ScoreboardConfig Config { get; }
+    public Fonts Fonts { get; }
+    public Config Config { get; }
     public int VoterIndex { get; }
     public float ScalingRatio { get; }
 
@@ -16,11 +16,11 @@ public sealed class ScoreboardSizes
     public float FlagOffset { get; }
     public float EntryDetailsWidth { get; }
 
-    public ScoreboardSizes(
-        ScoreboardFonts fonts,
-        ScoreboardConfig config,
+    public Sizes(
+        Fonts fonts,
+        Config config,
         int voterIndex,
-        float scalingRatio = ScoreboardDefaults.DefaultImageScalingRatio)
+        float scalingRatio = Defaults.DefaultImageScalingRatio)
     {
         Fonts = fonts;
         Config = config;
@@ -32,7 +32,7 @@ public sealed class ScoreboardSizes
             $"({voterIndex + 1}/{config.Contest.NumVoters})";
 
         var (voterHeaderWidth, _) =
-            ScoreboardUtilities.GetTextWidthHeight(
+            Utilities.GetTextWidthHeight(
                 fonts.VoterHeader, voterHeaderText);
 
         var contestHeaderText =
@@ -41,15 +41,15 @@ public sealed class ScoreboardSizes
                 : config.Title;
 
         var (contestHeaderWidth, _) =
-            ScoreboardUtilities.GetTextWidthHeight(
+            Utilities.GetTextWidthHeight(
                 fonts.ContestHeader, contestHeaderText);
 
         var maxCountryWidth = config.Contest.Entries
-            .Max(e => ScoreboardUtilities
+            .Max(e => Utilities
                 .GetTextWidthHeight(fonts.Country, e.Country).Width);
 
         var maxEntryWidth = config.Contest.Entries
-            .Max(e => ScoreboardUtilities.GetTextWidthHeight(
+            .Max(e => Utilities.GetTextWidthHeight(
                 fonts.EntryDetails,
                 $"{e.Artist} – {e.Song}").Width);
 

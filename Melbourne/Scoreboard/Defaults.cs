@@ -1,6 +1,6 @@
 namespace Melbourne;
 
-public static class ScoreboardDefaults
+public static class Defaults
 {
     public const float DefaultImageScalingRatio = 2.5f;
 

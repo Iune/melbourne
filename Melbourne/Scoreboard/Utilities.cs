@@ -5,7 +5,7 @@ using System.IO;
 using Microsoft.Extensions.Caching.Memory;
 using SkiaSharp;
 
-public static class ScoreboardUtilities
+public static class Utilities
 {
     private static readonly MemoryCache ImageCache =
         new(new MemoryCacheOptions { SizeLimit = 1024 });

@@ -1,5 +1,5 @@
 namespace Melbourne;
 
-public sealed record ScoreboardFontsConfig(
+public sealed record FontsConfig(
     string BaseFontPath,
     string PointsFontPath);

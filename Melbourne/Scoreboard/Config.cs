@@ -1,12 +1,12 @@
 namespace Melbourne;
 
-public sealed class ScoreboardConfig
+public sealed class Config
 {
     public Contest Contest { get; }
     public string FlagsDir { get; }
     public string OutputDir { get; }
     public string Title { get; }
-    public ScoreboardFontsConfig FontsConfig { get; }
+    public FontsConfig FontsConfig { get; }
 
     public string? CustomFlagsDir { get; init; }
     public bool DisplayFlags { get; init; } = true;
@@ -14,17 +14,17 @@ public sealed class ScoreboardConfig
     public bool AppendResultsToTitle { get; init; } = true;
 
     public string MainColor { get; init; } =
-        ScoreboardDefaults.DefaultMainColor;
+        Defaults.DefaultMainColor;
 
     public string AccentColor { get; init; } =
-        ScoreboardDefaults.DefaultAccentColor;
+        Defaults.DefaultAccentColor;
 
-    public ScoreboardConfig(
+    public Config(
         Contest contest,
         string flagsDir,
         string outputDir,
         string title,
-        ScoreboardFontsConfig fontsConfig)
+        FontsConfig fontsConfig)
     {
         Contest = contest;
         FlagsDir = flagsDir;

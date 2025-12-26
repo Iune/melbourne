@@ -2,7 +2,7 @@ namespace Melbourne;
 
 using SkiaSharp;
 
-public sealed class ScoreboardColors
+public sealed class Colors
 {
     public SKColor Background { get; }
     public SKColor VoterHeader { get; }
@@ -27,12 +27,12 @@ public sealed class ScoreboardColors
 
     public SKColor DividerLine { get; }
 
-    public ScoreboardColors(
+    public Colors(
         string mainColorHex,
         string accentColorHex)
     {
-        var main = ScoreboardUtilities.HexToRgb(mainColorHex);
-        var accent = ScoreboardUtilities.HexToRgb(accentColorHex);
+        var main = Utilities.HexToRgb(mainColorHex);
+        var accent = Utilities.HexToRgb(accentColorHex);
 
         static SKColor ChooseTextColor(SKColor bg)
         {
@@ -42,11 +42,11 @@ public sealed class ScoreboardColors
                  bg.Blue * 0.114f) / 255f;
 
             return luminance > 0.5f
-                ? ScoreboardUtilities.HexToRgb("#212121")
-                : ScoreboardUtilities.HexToRgb("#FFFFFF");
+                ? Utilities.HexToRgb("#212121")
+                : Utilities.HexToRgb("#FFFFFF");
         }
 
-        Background = ScoreboardUtilities.HexToRgb("#EEEEEE");
+        Background = Utilities.HexToRgb("#EEEEEE");
 
         VoterHeader = main;
         VoterHeaderText = ChooseTextColor(main);
@@ -54,13 +54,13 @@ public sealed class ScoreboardColors
         ContestHeader = accent;
         ContestHeaderText = ChooseTextColor(accent);
 
-        Flag = ScoreboardUtilities.HexToRgb("#FAFAFA");
-        FlagBorder = ScoreboardUtilities.HexToRgb("#C4C4C4");
+        Flag = Utilities.HexToRgb("#FAFAFA");
+        FlagBorder = Utilities.HexToRgb("#C4C4C4");
 
-        EntryDetails = ScoreboardUtilities.HexToRgb("#FAFAFA");
-        EntryDetailsBorder = ScoreboardUtilities.HexToRgb("#C4C4C4");
-        EntryDetailsText = ScoreboardUtilities.HexToRgb("#212121");
-        CountryText = ScoreboardUtilities.HexToRgb("#7E7E7E");
+        EntryDetails = Utilities.HexToRgb("#FAFAFA");
+        EntryDetailsBorder = Utilities.HexToRgb("#C4C4C4");
+        EntryDetailsText = Utilities.HexToRgb("#212121");
+        CountryText = Utilities.HexToRgb("#7E7E7E");
 
         TotalPoints = main;
         TotalPointsText = VoterHeaderText;
@@ -68,9 +68,9 @@ public sealed class ScoreboardColors
         ReceivedPoints = accent;
         ReceivedPointsText = ContestHeaderText;
 
-        DqedPoints = ScoreboardUtilities.HexToRgb("#C4C4C4");
-        DqedPointsText = ScoreboardUtilities.HexToRgb("#212121");
+        DqedPoints = Utilities.HexToRgb("#C4C4C4");
+        DqedPointsText = Utilities.HexToRgb("#212121");
 
-        DividerLine = ScoreboardUtilities.HexToRgb("#C4C4C4");
+        DividerLine = Utilities.HexToRgb("#C4C4C4");
     }
 }

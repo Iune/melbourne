@@ -3,9 +3,9 @@ namespace Melbourne;
 using System.IO;
 using SkiaSharp;
 
-public sealed class ScoreboardFonts
+public sealed class Fonts
 {
-    public ScoreboardFontsConfig Config { get; }
+    public FontsConfig Config { get; }
 
     public SKFont VoterHeader { get; }
     public SKFont ContestHeader { get; }
@@ -14,7 +14,7 @@ public sealed class ScoreboardFonts
     public SKFont TotalPoints { get; }
     public SKFont ReceivedPoints { get; }
 
-    public ScoreboardFonts(ScoreboardFontsConfig config)
+    public Fonts(FontsConfig config)
     {
         Config = config;
 
@@ -29,7 +29,7 @@ public sealed class ScoreboardFonts
         var baseTypeface = SKTypeface.FromFile(config.BaseFontPath);
         var pointsTypeface = SKTypeface.FromFile(config.PointsFontPath);
 
-        var scale = ScoreboardDefaults.DefaultImageScalingRatio;
+        var scale = Defaults.DefaultImageScalingRatio;
 
         VoterHeader = new SKFont(baseTypeface, 14 * scale);
         ContestHeader = new SKFont(baseTypeface, 14 * scale);

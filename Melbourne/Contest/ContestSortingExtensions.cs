@@ -1,4 +1,4 @@
-namespace Melbourne;
+namespace Melbourne.Contest;
 
 public static class ContestSortingExtensions
 {

@@ -1,6 +1,7 @@
-﻿using Melbourne.Scoreboard;
+﻿namespace Melbourne;
 
-namespace Melbourne;
+using Contest;
+using Scoreboard;
 
 class Program
 {

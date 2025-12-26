@@ -1,8 +1,4 @@
-namespace Melbourne;
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
+namespace Melbourne.Contest;
 
 public class Contest
 {

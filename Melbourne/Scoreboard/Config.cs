@@ -2,7 +2,7 @@ namespace Melbourne.Scoreboard;
 
 public sealed class Config
 {
-    public Contest Contest { get; }
+    public Contest.Contest Contest { get; }
     public string FlagsDir { get; }
     public string OutputDir { get; }
     public string Title { get; }
@@ -18,7 +18,7 @@ public sealed class Config
     public string AccentColor { get; init; }
 
     public Config(
-        Contest contest,
+        Contest.Contest contest,
         string flagsDir,
         string outputDir,
         string title,

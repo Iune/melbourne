@@ -1,4 +1,4 @@
-namespace Melbourne;
+namespace Melbourne.Contest;
 
 using System;
 using System.Collections.Generic;

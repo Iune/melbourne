@@ -1,4 +1,4 @@
-namespace Melbourne;
+namespace Melbourne.Scoreboard;
 
 using System;
 using System.Linq;

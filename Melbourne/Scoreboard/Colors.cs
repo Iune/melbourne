@@ -1,6 +1,6 @@
-namespace Melbourne;
-
 using SkiaSharp;
+
+namespace Melbourne.Scoreboard;
 
 public sealed class Colors
 {

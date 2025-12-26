@@ -1,4 +1,4 @@
-namespace Melbourne;
+namespace Melbourne.Scoreboard;
 
 using System;
 using System.IO;
@@ -7,9 +7,6 @@ using SkiaSharp;
 
 public static class Utilities
 {
-    private static readonly MemoryCache ImageCache =
-        new(new MemoryCacheOptions { SizeLimit = 1024 });
-    
     /* -------------------------------------------------------------
      * Text helpers
      * ------------------------------------------------------------- */
@@ -47,9 +44,9 @@ public static class Utilities
 
     public static void DrawRectangle(
         SKCanvas canvas,
-        (int X, int Y) point,
-        int width,
-        int height,
+        (float X, float Y) point,
+        float width,
+        float height,
         SKColor? fillColor = null,
         SKColor? strokeColor = null,
         float? strokeWidth = null)
@@ -138,7 +135,7 @@ public static class Utilities
 
         canvas.DrawLine(start.X, start.Y, end.X, end.Y, paint);
     }
-    
+
     public static void DrawImage(
         SKCanvas canvas,
         SKBitmap image,
@@ -159,8 +156,6 @@ public static class Utilities
             x + image.Width,
             y + image.Height);
 
-        canvas.DrawBitmap(image, rect);
-
         using var paint = new SKPaint
         {
             IsAntialias = true,
@@ -169,43 +164,28 @@ public static class Utilities
             StrokeWidth = strokeWidth.Value
         };
 
+        canvas.DrawBitmap(image, rect, paint);
         canvas.DrawRect(rect, paint);
     }
-    
+
     /* -------------------------------------------------------------
      * Image helpers
      * ------------------------------------------------------------- */
 
-    public static SKBitmap? LoadImage(
+    public static SKBitmap LoadImage(
         string filePath,
         float width)
     {
-        var cacheKey = $"{filePath}:{width}";
-        if (ImageCache.TryGetValue(cacheKey, out SKBitmap? cached))
-        {
-            return cached;
-        }
-
         using var stream = File.OpenRead(filePath);
         using var original = SKBitmap.Decode(stream);
 
         var aspectRatio = (float)original.Height / original.Width;
-        var height = (int)(width * aspectRatio);
+        var newHeight = (int)(width * aspectRatio);
+        var info = new SKImageInfo((int)width, newHeight);
 
-        var resized = original.Resize(
-            new SKImageInfo((int)width, height),
-            SKFilterQuality.High);
-
-        // Cache images for 60 seconds to speed up scoreboard generation for the current run
-        ImageCache.Set(
-            cacheKey,
-            resized,
-            new MemoryCacheEntryOptions
-            {
-                AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(60),
-                Size = 1
-            });
-
+        var resized = new SKBitmap(info);
+        var sampling = new SKSamplingOptions(SKFilterMode.Linear, SKMipmapMode.Linear);
+        original.ScalePixels(resized, sampling);
         return resized;
     }
 }

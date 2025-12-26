@@ -1,4 +1,4 @@
-namespace Melbourne;
+namespace Melbourne.Scoreboard;
 
 public sealed class Config
 {
@@ -9,27 +9,35 @@ public sealed class Config
     public FontsConfig FontsConfig { get; }
 
     public string? CustomFlagsDir { get; init; }
-    public bool DisplayFlags { get; init; } = true;
-    public bool DisplayFlagBorders { get; init; } = true;
-    public bool AppendResultsToTitle { get; init; } = true;
+    public bool DisplayFlags { get; init; }
+    public bool DisplayFlagBorders { get; init; }
+    public bool AppendResultsToTitle { get; init; }
 
-    public string MainColor { get; init; } =
-        Defaults.DefaultMainColor;
+    public string MainColor { get; init; }
 
-    public string AccentColor { get; init; } =
-        Defaults.DefaultAccentColor;
+    public string AccentColor { get; init; }
 
     public Config(
         Contest contest,
         string flagsDir,
         string outputDir,
         string title,
-        FontsConfig fontsConfig)
+        FontsConfig fontsConfig,
+        string? mainColor = null,
+        string? accentColor = null,
+        bool displayFlags = true,
+        bool displayFlagBorders = true,
+        bool appendResultsToTitle = true)
     {
         Contest = contest;
         FlagsDir = flagsDir;
         OutputDir = outputDir;
         Title = title;
         FontsConfig = fontsConfig;
+        MainColor = mainColor ?? Defaults.DefaultMainColor;
+        AccentColor = accentColor ?? Defaults.DefaultAccentColor;
+        DisplayFlags = displayFlags;
+        DisplayFlagBorders = displayFlagBorders;
+        AppendResultsToTitle = appendResultsToTitle;
     }
 }

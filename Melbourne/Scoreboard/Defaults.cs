@@ -1,4 +1,4 @@
-namespace Melbourne;
+namespace Melbourne.Scoreboard;
 
 public static class Defaults
 {

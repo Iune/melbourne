@@ -7,14 +7,11 @@ public sealed class Config
     public string OutputDir { get; }
     public string Title { get; }
     public FontsConfig FontsConfig { get; }
-
-    public string? CustomFlagsDir { get; init; }
     public bool DisplayFlags { get; init; }
     public bool DisplayFlagBorders { get; init; }
     public bool AppendResultsToTitle { get; init; }
 
     public string MainColor { get; init; }
-
     public string AccentColor { get; init; }
 
     public Config(

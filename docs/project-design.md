@@ -397,6 +397,7 @@ Scope:
 - Add ESLint, Prettier, and test tooling configuration.
 - Add Vitest, React Testing Library, and Playwright setup.
 - Add any initial app shell, placeholder page, and static asset structure needed for future work.
+  - UI should just have the header/navbar: "Melbourne" (links to the home page), "Help" (blank link for now) and "Flags" (blank link for now).
 
 Acceptance criteria:
 

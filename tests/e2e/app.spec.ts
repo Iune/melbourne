@@ -1,5 +1,10 @@
 import { expect, test } from '@playwright/test';
 
+import {
+  createTooFewColumnsWorkbookBuffer,
+  createValidContestWorkbookBuffer,
+} from '../../src/test/workbookBuilders';
+
 test('loads the scaffolded app shell', async ({ page }) => {
   await page.goto('/');
 
@@ -24,6 +29,7 @@ test('enables generation after required fields are provided', async ({
   page,
 }) => {
   await page.goto('/');
+  const workbookBuffer = await createValidContestWorkbookBuffer();
 
   const generateButton = page.getByRole('button', { name: 'Generate' });
   await expect(generateButton).toBeDisabled();
@@ -33,7 +39,7 @@ test('enables generation after required fields are provided', async ({
     name: 'contest.xlsx',
     mimeType:
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    buffer: Buffer.from([]),
+    buffer: Buffer.from(workbookBuffer),
   });
 
   await expect(generateButton).toBeEnabled();
@@ -43,13 +49,14 @@ test('switches from generate to cancel and then shows success', async ({
   page,
 }) => {
   await page.goto('/');
+  const workbookBuffer = await createValidContestWorkbookBuffer();
 
   await page.getByLabel('Contest Title').fill('Contest 1988');
   await page.locator('input[type="file"]').setInputFiles({
     name: 'contest.xlsx',
     mimeType:
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    buffer: Buffer.from([]),
+    buffer: Buffer.from(workbookBuffer),
   });
 
   await page.getByRole('button', { name: 'Generate' }).click();
@@ -66,13 +73,14 @@ test('cancel stops the mocked generation flow and returns to idle', async ({
   page,
 }) => {
   await page.goto('/');
+  const workbookBuffer = await createValidContestWorkbookBuffer();
 
   await page.getByLabel('Contest Title').fill('Contest 1988');
   await page.locator('input[type="file"]').setInputFiles({
     name: 'contest.xlsx',
     mimeType:
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    buffer: Buffer.from([]),
+    buffer: Buffer.from(workbookBuffer),
   });
 
   await page.getByRole('button', { name: 'Generate' }).click();
@@ -85,6 +93,27 @@ test('cancel stops the mocked generation flow and returns to idle', async ({
   await expect(page.getByRole('button', { name: 'Download ZIP' })).toHaveCount(
     0,
   );
+});
+
+test('shows validation errors for malformed workbooks', async ({ page }) => {
+  await page.goto('/');
+  const workbookBuffer = await createTooFewColumnsWorkbookBuffer();
+
+  await page.getByLabel('Contest Title').fill('Contest 1988');
+  await page.locator('input[type="file"]').setInputFiles({
+    name: 'contest.xlsx',
+    mimeType:
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    buffer: Buffer.from(workbookBuffer),
+  });
+
+  await page.getByRole('button', { name: 'Generate' }).click();
+
+  await expect(page.getByText('Validation failed')).toBeVisible();
+  await expect(
+    page.getByText('Excel sheet does not have enough columns.'),
+  ).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Cancel' })).toHaveCount(0);
 });
 
 test('disables flag borders without clearing their value', async ({ page }) => {

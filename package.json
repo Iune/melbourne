@@ -19,6 +19,7 @@
     "@mantine/core": "latest",
     "@mantine/hooks": "latest",
     "@tabler/icons-react": "latest",
+    "exceljs": "^4.4.0",
     "react": "latest",
     "react-dom": "latest"
   },

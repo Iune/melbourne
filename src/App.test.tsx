@@ -4,6 +4,13 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { App } from './App';
+import { parseContestWorkbook } from './features/contest/contestParser';
+
+vi.mock('./features/contest/contestParser', () => ({
+  parseContestWorkbook: vi.fn(),
+}));
+
+const mockedParseContestWorkbook = vi.mocked(parseContestWorkbook);
 
 /**
  * Renders the app with providers required by Mantine components.
@@ -43,10 +50,22 @@ afterEach(() => {
     vi.runOnlyPendingTimers();
     vi.useRealTimers();
   }
+
+  mockedParseContestWorkbook.mockReset();
 });
 
 describe('App', () => {
   it('renders the scaffold navigation and form fields', () => {
+    mockedParseContestWorkbook.mockResolvedValue({
+      contest: {
+        entries: [],
+        hasCountColumn: false,
+        numEntries: 0,
+        numVoters: 0,
+        voterNames: [],
+      },
+      ok: true,
+    });
     renderApp();
 
     expect(screen.getByRole('link', { name: 'Melbourne' })).toHaveAttribute(
@@ -95,9 +114,22 @@ describe('App', () => {
     const { container } = renderApp();
     const user = userEvent.setup();
 
+    mockedParseContestWorkbook.mockResolvedValue({
+      contest: {
+        entries: [],
+        hasCountColumn: false,
+        numEntries: 0,
+        numVoters: 0,
+        voterNames: [],
+      },
+      ok: true,
+    });
     await populateRequiredFields(user, container);
     vi.useFakeTimers();
-    fireEvent.click(screen.getByRole('button', { name: 'Generate' }));
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: 'Generate' }));
+      await Promise.resolve();
+    });
 
     expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
     expect(
@@ -121,9 +153,22 @@ describe('App', () => {
     const { container } = renderApp();
     const user = userEvent.setup();
 
+    mockedParseContestWorkbook.mockResolvedValue({
+      contest: {
+        entries: [],
+        hasCountColumn: false,
+        numEntries: 0,
+        numVoters: 0,
+        voterNames: [],
+      },
+      ok: true,
+    });
     await populateRequiredFields(user, container);
     vi.useFakeTimers();
-    fireEvent.click(screen.getByRole('button', { name: 'Generate' }));
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: 'Generate' }));
+      await Promise.resolve();
+    });
 
     await act(async () => {
       vi.advanceTimersByTime(1000);
@@ -146,6 +191,16 @@ describe('App', () => {
 
   it('preserves the flag-border value while flags are disabled', async () => {
     const user = userEvent.setup();
+    mockedParseContestWorkbook.mockResolvedValue({
+      contest: {
+        entries: [],
+        hasCountColumn: false,
+        numEntries: 0,
+        numVoters: 0,
+        voterNames: [],
+      },
+      ok: true,
+    });
     renderApp();
 
     const includeFlags = screen.getByRole('checkbox', {
@@ -165,5 +220,32 @@ describe('App', () => {
 
     expect(drawFlagBorders).toBeChecked();
     expect(drawFlagBorders).toBeEnabled();
+  });
+
+  it('shows blocking validation errors when parsing fails', async () => {
+    const { container } = renderApp();
+    const user = userEvent.setup();
+
+    mockedParseContestWorkbook.mockResolvedValue({
+      errors: [{ message: 'Excel sheet does not have enough columns.' }],
+      ok: false,
+    });
+    await populateRequiredFields(user, container);
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: 'Generate' }));
+      await Promise.resolve();
+    });
+
+    expect(screen.getByText('Validation failed')).toBeInTheDocument();
+    expect(
+      screen.getByRole('columnheader', { name: 'Error' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText('Excel sheet does not have enough columns.'),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Cancel' }),
+    ).not.toBeInTheDocument();
   });
 });

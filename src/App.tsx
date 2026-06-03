@@ -13,6 +13,7 @@ import {
   Progress,
   SimpleGrid,
   Stack,
+  Table,
   Text,
   TextInput,
   Title,
@@ -22,12 +23,15 @@ import { IconCheck, IconDownload, IconRefresh } from '@tabler/icons-react';
 import type { FormEventHandler } from 'react';
 import { useEffect, useState } from 'react';
 
+import { parseContestWorkbook } from './features/contest/contestParser';
+import type { ContestParseError } from './features/contest/contestTypes';
+
 const DEFAULT_MAIN_COLOR = '#2F292B';
 const DEFAULT_ACCENT_COLOR = '#FCB906';
 const MOCK_PROGRESS_STEPS = 10;
 const MOCK_PROGRESS_INTERVAL_MS = 500;
 
-type AppState = 'idle' | 'generating' | 'succeeded';
+type AppState = 'idle' | 'generating' | 'succeeded' | 'validationFailed';
 
 /**
  * Renders the Melbourne app shell and initial scoreboard generation form.
@@ -42,17 +46,36 @@ export function App() {
   const [drawFlagBorders, setDrawFlagBorders] = useState(true);
   const [appState, setAppState] = useState<AppState>('idle');
   const [progressValue, setProgressValue] = useState(0);
+  const [validationErrors, setValidationErrors] = useState<ContestParseError[]>(
+    [],
+  );
 
   const canGenerate = contestName.trim().length > 0 && contestFile !== null;
   const isGenerating = appState === 'generating';
   const hasSucceeded = appState === 'succeeded';
+  const hasValidationFailed = appState === 'validationFailed';
   const progressPercent = (progressValue / MOCK_PROGRESS_STEPS) * 100;
 
   /**
-   * Enters the mocked generation state when the required fields are populated.
+   * Validates the selected workbook and enters the mocked generation state.
    */
-  function handleStartGeneration() {
-    if (!canGenerate || isGenerating) {
+  async function handleStartGeneration() {
+    if (!canGenerate || contestFile === null || isGenerating) {
+      return;
+    }
+
+    setValidationErrors([]);
+    setAppState('idle');
+
+    const parseResult = await parseContestWorkbook(
+      await contestFile.arrayBuffer(),
+      hasCountColumn,
+    );
+
+    if (!parseResult.ok) {
+      setValidationErrors(parseResult.errors);
+      setAppState('validationFailed');
+      setProgressValue(0);
       return;
     }
 
@@ -90,7 +113,7 @@ export function App() {
    */
   const handleSubmit: FormEventHandler<HTMLFormElement> = (event) => {
     event.preventDefault();
-    handleStartGeneration();
+    void handleStartGeneration();
   };
 
   /**
@@ -236,7 +259,13 @@ export function App() {
                   <Button
                     color={isGenerating ? 'red' : undefined}
                     disabled={!isGenerating && !canGenerate}
-                    onClick={isGenerating ? handleCancel : handleStartGeneration}
+                    onClick={
+                      isGenerating
+                        ? handleCancel
+                        : () => {
+                            void handleStartGeneration();
+                          }
+                    }
                     type="button"
                   >
                     {isGenerating ? 'Cancel' : 'Generate'}
@@ -250,7 +279,10 @@ export function App() {
                           {progressValue} of {MOCK_PROGRESS_STEPS} mock
                           scoreboards generated
                         </Text>
-                        <Progress aria-label="Generation progress" value={progressPercent} />
+                        <Progress
+                          aria-label="Generation progress"
+                          value={progressPercent}
+                        />
                       </Stack>
                     </Alert>
                   ) : null}
@@ -274,6 +306,28 @@ export function App() {
                           Download ZIP
                         </Button>
                       </Group>
+                    </Alert>
+                  ) : null}
+                  {hasValidationFailed ? (
+                    <Alert
+                      color="red"
+                      title="Validation failed"
+                      variant="light"
+                    >
+                      <Table highlightOnHover>
+                        <Table.Thead>
+                          <Table.Tr>
+                            <Table.Th>Error</Table.Th>
+                          </Table.Tr>
+                        </Table.Thead>
+                        <Table.Tbody>
+                          {validationErrors.map((error) => (
+                            <Table.Tr key={error.message}>
+                              <Table.Td>{error.message}</Table.Td>
+                            </Table.Tr>
+                          ))}
+                        </Table.Tbody>
+                      </Table>
                     </Alert>
                   ) : null}
                 </Stack>

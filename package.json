@@ -18,6 +18,7 @@
   "dependencies": {
     "@mantine/core": "latest",
     "@mantine/hooks": "latest",
+    "@tabler/icons-react": "latest",
     "react": "latest",
     "react-dom": "latest"
   },

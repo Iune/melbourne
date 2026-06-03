@@ -1,7 +1,7 @@
 import { MantineProvider } from '@mantine/core';
-import { render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { App } from './App';
 
@@ -15,6 +15,35 @@ function renderApp() {
     </MantineProvider>,
   );
 }
+
+/**
+ * Populates the required fields so the mocked generate flow can start.
+ */
+async function populateRequiredFields(
+  user: ReturnType<typeof userEvent.setup>,
+  container: HTMLElement,
+) {
+  const fileInput = container.querySelector('input[type="file"]');
+
+  if (!(fileInput instanceof HTMLInputElement)) {
+    throw new Error('Unable to find contest file input');
+  }
+
+  await user.type(screen.getByLabelText(/Contest Title/), 'Contest 1988');
+  await user.upload(
+    fileInput,
+    new File([''], 'contest.xlsx', {
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    }),
+  );
+}
+
+afterEach(() => {
+  if (vi.isFakeTimers()) {
+    vi.runOnlyPendingTimers();
+    vi.useRealTimers();
+  }
+});
 
 describe('App', () => {
   it('renders the scaffold navigation and form fields', () => {
@@ -62,24 +91,56 @@ describe('App', () => {
     expect(screen.getByRole('button', { name: 'Generate' })).toBeDisabled();
   });
 
-  it('enables generation when contest name and file are present', async () => {
-    const user = userEvent.setup();
+  it('runs the mocked generation flow through success', async () => {
     const { container } = renderApp();
+    const user = userEvent.setup();
 
-    const fileInput = container.querySelector('input[type="file"]');
+    await populateRequiredFields(user, container);
+    vi.useFakeTimers();
+    fireEvent.click(screen.getByRole('button', { name: 'Generate' }));
 
-    if (!(fileInput instanceof HTMLInputElement)) {
-      throw new Error('Unable to find contest file input');
-    }
+    expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
+    expect(
+      screen.getByText('0 of 10 mock scoreboards generated'),
+    ).toBeInTheDocument();
 
-    await user.type(screen.getByLabelText(/Contest Title/), 'Contest 1988');
-    await user.upload(
-      fileInput,
-      new File([''], 'contest.xlsx', {
-        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-      }),
-    );
+    await act(async () => {
+      vi.advanceTimersByTime(5000);
+    });
 
+    expect(
+      screen.getByRole('button', { name: 'Download ZIP' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText('Mock scoreboards are ready for download.'),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Generate' })).toBeEnabled();
+  });
+
+  it('cancels the mocked generation flow and returns to idle', async () => {
+    const { container } = renderApp();
+    const user = userEvent.setup();
+
+    await populateRequiredFields(user, container);
+    vi.useFakeTimers();
+    fireEvent.click(screen.getByRole('button', { name: 'Generate' }));
+
+    await act(async () => {
+      vi.advanceTimersByTime(1000);
+    });
+
+    expect(
+      screen.getByText('2 of 10 mock scoreboards generated'),
+    ).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+
+    expect(
+      screen.queryByRole('button', { name: 'Download ZIP' }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(/mock scoreboards generated/i),
+    ).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Generate' })).toBeEnabled();
   });
 

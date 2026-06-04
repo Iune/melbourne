@@ -4,8 +4,10 @@ import ExcelJS from 'exceljs';
  * Represents options for building a valid contest workbook fixture.
  */
 export interface ContestWorkbookFixtureOptions {
+  firstFlag?: string;
   hasCountColumn?: boolean;
   numVoters?: number;
+  secondFlag?: string;
 }
 
 /**
@@ -27,7 +29,12 @@ function normalizeWorkbookBuffer(buffer: ExcelJS.Buffer): ArrayBuffer {
 export async function createValidContestWorkbookBuffer(
   options: ContestWorkbookFixtureOptions = {},
 ): Promise<ArrayBuffer> {
-  const { hasCountColumn = false, numVoters = 2 } = options;
+  const {
+    firstFlag = 'World/is.png',
+    hasCountColumn = false,
+    numVoters = 2,
+    secondFlag = 'World/se.png',
+  } = options;
   const workbook = new ExcelJS.Workbook();
   const worksheet = workbook.addWorksheet('Contest');
   const voterHeaders = Array.from({ length: numVoters }, (_, index) => {
@@ -55,42 +62,26 @@ export async function createValidContestWorkbookBuffer(
     ? [
         '1',
         'Alpha',
-        'World/aa.png',
+        firstFlag,
         'Artist A',
         'Song A',
         '5',
         '1',
         ...firstEntryVotes,
       ]
-    : [
-        '1',
-        'Alpha',
-        'World/aa.png',
-        'Artist A',
-        'Song A',
-        '5',
-        ...firstEntryVotes,
-      ];
+    : ['1', 'Alpha', firstFlag, 'Artist A', 'Song A', '5', ...firstEntryVotes];
   const secondEntryRow = hasCountColumn
     ? [
         '2',
         'Beta',
-        'World/bb.png',
+        secondFlag,
         'Artist B',
         'Song B',
         '3',
         '1',
         ...secondEntryVotes,
       ]
-    : [
-        '2',
-        'Beta',
-        'World/bb.png',
-        'Artist B',
-        'Song B',
-        '3',
-        ...secondEntryVotes,
-      ];
+    : ['2', 'Beta', secondFlag, 'Artist B', 'Song B', '3', ...secondEntryVotes];
 
   worksheet.addRow(headerRow);
   worksheet.addRow(firstEntryRow);

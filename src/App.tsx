@@ -35,6 +35,7 @@ import type {
 } from './features/contest/contestTypes';
 import type { PlaceholderGenerationController } from './features/export/placeholderGenerationClient';
 import { startPlaceholderGeneration } from './features/export/placeholderGenerationClient';
+import { validateBundledFlags } from './features/flags/flagValidation';
 
 const DEFAULT_MAIN_COLOR = '#2F292B';
 const DEFAULT_ACCENT_COLOR = '#FCB906';
@@ -156,6 +157,17 @@ export function App() {
       setAppState('validationFailed');
       setProgressValue(0);
       return;
+    }
+
+    if (includeFlags) {
+      const flagValidationErrors = validateBundledFlags(parseResult.contest);
+
+      if (flagValidationErrors.length > 0) {
+        setValidationErrors(flagValidationErrors);
+        setAppState('validationFailed');
+        setProgressValue(0);
+        return;
+      }
     }
 
     beginPlaceholderGeneration(parseResult.contest);

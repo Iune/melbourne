@@ -164,6 +164,54 @@ test('shows validation errors for malformed workbooks', async ({ page }) => {
   await expect(page.getByRole('button', { name: 'Cancel' })).toHaveCount(0);
 });
 
+test('shows missing bundled flag errors as blocking validation failures', async ({
+  page,
+}) => {
+  await page.goto('/');
+  const workbookBuffer = await createValidContestWorkbookBuffer({
+    firstFlag: 'World/not-real.png',
+  });
+
+  await page.getByLabel('Contest Title').fill('Contest 1988');
+  await page.locator('input[type="file"]').setInputFiles({
+    name: 'contest.xlsx',
+    mimeType:
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    buffer: Buffer.from(workbookBuffer),
+  });
+
+  await page.getByRole('button', { name: 'Generate' }).click();
+
+  await expect(page.getByText('Validation Failed')).toBeVisible();
+  await expect(
+    page.getByText('Missing bundled flag for Alpha: World/not-real.png'),
+  ).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Cancel' })).toHaveCount(0);
+});
+
+test('rejects unsafe bundled flag references', async ({ page }) => {
+  await page.goto('/');
+  const workbookBuffer = await createValidContestWorkbookBuffer({
+    firstFlag: '../World/is.png',
+  });
+
+  await page.getByLabel('Contest Title').fill('Contest 1988');
+  await page.locator('input[type="file"]').setInputFiles({
+    name: 'contest.xlsx',
+    mimeType:
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    buffer: Buffer.from(workbookBuffer),
+  });
+
+  await page.getByRole('button', { name: 'Generate' }).click();
+
+  await expect(page.getByText('Validation Failed')).toBeVisible();
+  await expect(
+    page.getByText('Invalid flag reference for Alpha: ../World/is.png'),
+  ).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Cancel' })).toHaveCount(0);
+});
+
 test('disables flag borders without clearing their value', async ({ page }) => {
   await page.goto('/');
 

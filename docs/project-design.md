@@ -522,12 +522,12 @@ Goal:
 
 Scope:
 
+- Bundle the flags and font files for the scoreboard generation. Keep in mind that the bundled flags need to be accessed by the program to be loaded by skia/canvaskit. But we only want to actually load files into memory that are actually used (i.e. on demand).
 - Implement exact-match validation for bundled flag references from contest data.
 - Support the existing pack-relative flag reference format such as `ISC/Kaledonii.png`.
 - Reject path traversal or any attempt to escape the bundled flags root.
 - Treat incorrect filenames or extensions as missing flags.
 - Surface flag validation failures in the validation error table as one row per error.
-- Keep in mind that the bundled flags need to be accessed by the program to be loaded by skia/canvaskit. But we only want to actually load files into memory that are actually used.
 
 Acceptance criteria:
 

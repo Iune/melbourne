@@ -62,6 +62,7 @@ describe('parseContestWorkbook', () => {
     expect(result.contest.numVoters).toBe(2);
     expect(result.contest.voterNames).toEqual(['Voter A', 'Voter B']);
     expect(result.contest.entries[0]?.votes).toEqual(['5', '']);
+    expect(result.contest.entries[0]?.flag).toBe('World/is.png');
   });
 
   it('returns a blocking error when the workbook has too few columns', async () => {

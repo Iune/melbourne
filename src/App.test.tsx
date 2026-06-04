@@ -258,4 +258,50 @@ describe('App', () => {
       screen.queryByRole('button', { name: 'Cancel' }),
     ).not.toBeInTheDocument();
   });
+
+  it('shows blocking flag validation errors and does not start generation', async () => {
+    const { container } = renderApp();
+    const user = userEvent.setup();
+
+    mockedParseContestWorkbook.mockResolvedValue({
+      contest: {
+        entries: [
+          {
+            artist: 'Artist A',
+            country: 'Alpha',
+            flag: '../World/is.png',
+            song: 'Song A',
+            votes: [],
+          },
+          {
+            artist: 'Artist B',
+            country: 'Beta',
+            flag: 'World/not-real.png',
+            song: 'Song B',
+            votes: [],
+          },
+        ],
+        hasCountColumn: false,
+        numEntries: 2,
+        numVoters: 2,
+        voterNames: ['Voter A', 'Voter B'],
+      },
+      ok: true,
+    });
+    await populateRequiredFields(user, container);
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: 'Generate' }));
+      await Promise.resolve();
+    });
+
+    expect(screen.getByText('Validation Failed')).toBeInTheDocument();
+    expect(
+      screen.getByText('Invalid flag reference for Alpha: ../World/is.png'),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText('Missing bundled flag for Beta: World/not-real.png'),
+    ).toBeInTheDocument();
+    expect(mockedStartPlaceholderGeneration).not.toHaveBeenCalled();
+  });
 });

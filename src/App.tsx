@@ -301,7 +301,10 @@ export function App() {
                   <span>Flags</span>
                 </Group>
               </Anchor>
-              <Anchor href="https://github.com/Iune/melbourne" underline="hover">
+              <Anchor
+                href="https://github.com/Iune/melbourne"
+                underline="hover"
+              >
                 <Group gap={4} wrap="nowrap">
                   <IconBrandGithub size={16} />
                   <span>GitHub</span>

@@ -76,4 +76,27 @@ describe('renderScoreboardPng', () => {
     expect(readUint32(bytes, 16)).toBeGreaterThan(0);
     expect(readUint32(bytes, 20)).toBeGreaterThan(0);
   });
+
+  it('renders wider scoreboards when bundled flags are displayed', async () => {
+    const rankedContest = buildRankedContest(SAMPLE_CONTEST);
+    const withoutFlags = await renderScoreboardPng(
+      rankedContest,
+      SAMPLE_RENDER_CONFIG,
+      1,
+    );
+    const withFlags = await renderScoreboardPng(
+      rankedContest,
+      {
+        ...SAMPLE_RENDER_CONFIG,
+        displayFlagBorders: true,
+        displayFlags: true,
+      },
+      1,
+    );
+
+    expect(readUint32(withFlags, 16)).toBeGreaterThan(
+      readUint32(withoutFlags, 16),
+    );
+    expect(readUint32(withFlags, 20)).toBe(readUint32(withoutFlags, 20));
+  });
 });

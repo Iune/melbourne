@@ -7,6 +7,10 @@ import {
   parseVoteValue,
   type RankedContestData,
 } from '../contest/contestResults';
+import {
+  getBundledFlagAssetUrl,
+  normalizeFlagReference,
+} from '../flags/flagAssets';
 
 const DEFAULT_IMAGE_SCALING_RATIO = 2.5;
 const TEXT_LAYOUT_WIDTH = 4096;
@@ -93,6 +97,7 @@ interface ScoreboardSizes {
 let cachedCanvasKit: Promise<CanvasKitModule> | null = null;
 let cachedBaseFontBytes: Promise<ArrayBuffer> | null = null;
 let cachedPointsFontBytes: Promise<ArrayBuffer> | null = null;
+const cachedFlagBytes = new Map<string, Promise<ArrayBuffer>>();
 
 /**
  * Loads the CanvasKit runtime once for reuse across all renders.
@@ -162,6 +167,57 @@ async function loadPointsFontBytes(): Promise<ArrayBuffer> {
   }
 
   return cachedPointsFontBytes;
+}
+
+/**
+ * Loads the encoded bytes for one bundled flag reference.
+ */
+async function loadFlagBytes(flagReference: string): Promise<ArrayBuffer> {
+  const normalizedReference = normalizeFlagReference(flagReference);
+
+  if (normalizedReference === null) {
+    throw new Error(`Invalid bundled flag reference: ${flagReference}`);
+  }
+
+  const existingBytes = cachedFlagBytes.get(normalizedReference);
+
+  if (existingBytes !== undefined) {
+    return existingBytes;
+  }
+
+  const bytesPromise = (async () => {
+    if (isNodeRuntime) {
+      const { readFile } = await import('node:fs/promises');
+      const fileBuffer = await readFile(
+        `${process.cwd()}/assets/flags/${normalizedReference}`,
+      );
+
+      return fileBuffer.buffer.slice(
+        fileBuffer.byteOffset,
+        fileBuffer.byteOffset + fileBuffer.byteLength,
+      );
+    }
+
+    const assetUrl = getBundledFlagAssetUrl(normalizedReference);
+
+    if (assetUrl === null) {
+      throw new Error(`Missing bundled flag asset: ${normalizedReference}`);
+    }
+
+    const response = await fetch(assetUrl);
+
+    if (!response.ok) {
+      throw new Error(
+        `Unable to load bundled flag data for ${normalizedReference}.`,
+      );
+    }
+
+    return response.arrayBuffer();
+  })();
+
+  cachedFlagBytes.set(normalizedReference, bytesPromise);
+
+  return bytesPromise;
 }
 
 /**
@@ -399,6 +455,66 @@ function drawLine(
 }
 
 /**
+ * Draws one bundled flag scaled to the Melbourne row slot.
+ */
+async function drawFlag(
+  CanvasKit: CanvasKitModule,
+  canvas: Canvas,
+  entryFlagReference: string,
+  xOffset: number,
+  yOffset: number,
+  scalingRatio: number,
+  drawBorder: boolean,
+  borderColor: Float32Array,
+): Promise<void> {
+  const imageBytes = await loadFlagBytes(entryFlagReference);
+  const image = CanvasKit.MakeImageFromEncoded(imageBytes);
+
+  if (image === null) {
+    throw new Error(
+      `Unable to decode bundled flag image: ${entryFlagReference}`,
+    );
+  }
+
+  const targetWidth = 20 * scalingRatio;
+  const aspectRatio = image.height() / image.width();
+  const targetHeight = targetWidth * aspectRatio;
+  const left = 27 * scalingRatio - targetWidth / 2 + xOffset;
+  const top =
+    87 * scalingRatio - targetHeight / 2 + 35 * scalingRatio * yOffset;
+  const sourceRect = CanvasKit.XYWHRect(0, 0, image.width(), image.height());
+  const destinationRect = CanvasKit.XYWHRect(
+    left,
+    top,
+    targetWidth,
+    targetHeight,
+  );
+
+  canvas.drawImageRectOptions(
+    image,
+    sourceRect,
+    destinationRect,
+    CanvasKit.FilterMode.Linear,
+    CanvasKit.MipmapMode.None,
+  );
+
+  if (drawBorder) {
+    drawStrokedRectangle(
+      CanvasKit,
+      canvas,
+      left,
+      top,
+      targetWidth,
+      targetHeight,
+      borderColor,
+      1,
+    );
+  }
+
+  image.delete();
+}
+
+/**
  * Returns the displayed contest header text for one render.
  */
 function getContestHeaderText(config: ScoreboardRenderConfig): string {
@@ -624,11 +740,24 @@ export async function renderScoreboardPng(
 
   const entries = getResultsAfterVoter(contest, voterIndex);
 
-  entries.forEach((entry, index) => {
+  for (const [index, entry] of entries.entries()) {
     const xOffset =
       index < numLeft ? 0 : 10 * sizes.scalingRatio + sizes.rectangle;
     const yOffset = index < numLeft ? index : index - numLeft;
     const baseX = 20 * sizes.scalingRatio + xOffset + sizes.flagOffset;
+
+    if (config.displayFlags) {
+      await drawFlag(
+        CanvasKit,
+        canvas,
+        entry.flag,
+        xOffset,
+        yOffset,
+        sizes.scalingRatio,
+        config.displayFlagBorders,
+        colors.entryDetailsBorder,
+      );
+    }
 
     drawText(
       CanvasKit,
@@ -730,7 +859,7 @@ export async function renderScoreboardPng(
       colors.dividerLine,
       0.5 * sizes.scalingRatio,
     );
-  });
+  }
 
   const image = surface.makeImageSnapshot();
   const encodedBytes = image.encodeToBytes();

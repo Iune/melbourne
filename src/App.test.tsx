@@ -74,7 +74,7 @@ describe('App', () => {
     });
     renderApp();
 
-    expect(screen.getByRole('link', { name: 'Melbourne' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'Melbourne Scoreboard Generator' })).toHaveAttribute(
       'href',
       '/',
     );

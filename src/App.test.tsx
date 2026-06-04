@@ -5,17 +5,17 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { App } from './App';
 import { parseContestWorkbook } from './features/contest/contestParser';
-import { startPlaceholderGeneration } from './features/export/placeholderGenerationClient';
+import { startScoreboardGeneration } from './features/export/scoreboardGenerationClient';
 
 vi.mock('./features/contest/contestParser', () => ({
   parseContestWorkbook: vi.fn(),
 }));
-vi.mock('./features/export/placeholderGenerationClient', () => ({
-  startPlaceholderGeneration: vi.fn(),
+vi.mock('./features/export/scoreboardGenerationClient', () => ({
+  startScoreboardGeneration: vi.fn(),
 }));
 
 const mockedParseContestWorkbook = vi.mocked(parseContestWorkbook);
-const mockedStartPlaceholderGeneration = vi.mocked(startPlaceholderGeneration);
+const mockedStartScoreboardGeneration = vi.mocked(startScoreboardGeneration);
 
 /**
  * Renders the app with providers required by Mantine components.
@@ -57,7 +57,7 @@ afterEach(() => {
   }
 
   mockedParseContestWorkbook.mockReset();
-  mockedStartPlaceholderGeneration.mockReset();
+  mockedStartScoreboardGeneration.mockReset();
 });
 
 describe('App', () => {
@@ -74,10 +74,9 @@ describe('App', () => {
     });
     renderApp();
 
-    expect(screen.getByRole('link', { name: 'Melbourne Scoreboard Generator' })).toHaveAttribute(
-      'href',
-      '/',
-    );
+    expect(
+      screen.getByRole('link', { name: 'Melbourne Scoreboard Generator' }),
+    ).toHaveAttribute('href', '/');
     expect(screen.getByRole('link', { name: 'Help' })).toHaveAttribute(
       'href',
       '#',
@@ -161,7 +160,7 @@ describe('App', () => {
       },
       ok: true,
     });
-    mockedStartPlaceholderGeneration.mockImplementation(
+    mockedStartScoreboardGeneration.mockImplementation(
       (_contest, _generationAssets, _renderConfig, callbacks) => {
         callbacks.onProgress(0, 2);
         callbacks.onProgress(1, 2);
@@ -200,7 +199,7 @@ describe('App', () => {
       },
       ok: true,
     });
-    mockedStartPlaceholderGeneration.mockImplementation(
+    mockedStartScoreboardGeneration.mockImplementation(
       (_contest, _generationAssets, _renderConfig, callbacks) => {
         callbacks.onProgress(0, 2);
 
@@ -364,6 +363,6 @@ describe('App', () => {
     expect(
       screen.getByText('Missing bundled flag for Beta: World/not-real.png'),
     ).toBeInTheDocument();
-    expect(mockedStartPlaceholderGeneration).not.toHaveBeenCalled();
+    expect(mockedStartScoreboardGeneration).not.toHaveBeenCalled();
   });
 });

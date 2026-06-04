@@ -1,5 +1,7 @@
 import CanvasKitInit from 'canvaskit-wasm/bin/full/canvaskit.js';
 import canvasKitWasmUrl from 'canvaskit-wasm/bin/full/canvaskit.wasm?url';
+import baseFontUrl from '../../assets/fonts/ZillaSlab-Regular.otf?url';
+import pointsFontUrl from '../../assets/fonts/FiraSans-Regular.otf?url';
 import type { Canvas, TypefaceFontProvider } from 'canvaskit-wasm';
 
 import type {
@@ -22,16 +24,6 @@ const DEFAULT_BASE_FONT_FAMILY = 'Zilla Slab';
 const DEFAULT_POINTS_FONT_FAMILY = 'Fira Sans';
 const CUSTOM_BASE_FONT_FAMILY = 'Melbourne Custom Base Font';
 const CUSTOM_POINTS_FONT_FAMILY = 'Melbourne Custom Points Font';
-const isNodeRuntime =
-  typeof process !== 'undefined' && process.versions.node !== undefined;
-const baseFontUrl = new URL(
-  '../../../assets/fonts/ZillaSlab-Regular.otf',
-  import.meta.url,
-);
-const pointsFontUrl = new URL(
-  '../../../assets/fonts/FiraSans-Regular.otf',
-  import.meta.url,
-);
 
 type CanvasKitModule = Awaited<ReturnType<typeof CanvasKitInit>>;
 
@@ -114,6 +106,11 @@ let cachedCanvasKit: Promise<CanvasKitModule> | null = null;
 let cachedBaseFontBytes: Promise<ArrayBuffer> | null = null;
 let cachedPointsFontBytes: Promise<ArrayBuffer> | null = null;
 const cachedFlagBytes = new Map<string, Promise<ArrayBuffer>>();
+const canvasKitWasmLocatePath =
+  typeof process !== 'undefined' &&
+  canvasKitWasmUrl.startsWith('/node_modules/')
+    ? `${process.cwd()}${canvasKitWasmUrl}`
+    : canvasKitWasmUrl;
 
 /**
  * Loads the CanvasKit runtime once for reuse across all renders.
@@ -121,11 +118,7 @@ const cachedFlagBytes = new Map<string, Promise<ArrayBuffer>>();
 async function loadCanvasKit(): Promise<CanvasKitModule> {
   if (cachedCanvasKit === null) {
     cachedCanvasKit = CanvasKitInit({
-      locateFile: () => {
-        return isNodeRuntime
-          ? `${process.cwd()}/node_modules/canvaskit-wasm/bin/full/canvaskit.wasm`
-          : canvasKitWasmUrl;
-      },
+      locateFile: () => canvasKitWasmLocatePath,
     });
   }
 
@@ -136,21 +129,9 @@ async function loadCanvasKit(): Promise<CanvasKitModule> {
  * Loads bundled font bytes once and reuses them across renders.
  */
 async function loadFontBytes(
-  fontUrl: URL,
+  fontUrl: string,
   fileName: string,
 ): Promise<ArrayBuffer> {
-  if (isNodeRuntime) {
-    const { readFile } = await import('node:fs/promises');
-    const fileBuffer = await readFile(
-      `${process.cwd()}/assets/fonts/${fileName}`,
-    );
-
-    return fileBuffer.buffer.slice(
-      fileBuffer.byteOffset,
-      fileBuffer.byteOffset + fileBuffer.byteLength,
-    );
-  }
-
   const response = await fetch(fontUrl);
 
   if (!response.ok) {
@@ -255,18 +236,6 @@ async function loadFlagBytes(flagReference: string): Promise<ArrayBuffer> {
   }
 
   const bytesPromise = (async () => {
-    if (isNodeRuntime) {
-      const { readFile } = await import('node:fs/promises');
-      const fileBuffer = await readFile(
-        `${process.cwd()}/assets/flags/${normalizedReference}`,
-      );
-
-      return fileBuffer.buffer.slice(
-        fileBuffer.byteOffset,
-        fileBuffer.byteOffset + fileBuffer.byteLength,
-      );
-    }
-
     const assetUrl = getBundledFlagAssetUrl(normalizedReference);
 
     if (assetUrl === null) {

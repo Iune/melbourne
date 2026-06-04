@@ -1,9 +1,9 @@
 /// <reference lib="webworker" />
 
-import { buildPlaceholderArchive } from './placeholderArchive';
+import { buildScoreboardArchive } from './scoreboardArchive';
 import type {
-  PlaceholderGenerationRequest,
-  PlaceholderGenerationWorkerMessage,
+  ScoreboardGenerationRequest,
+  ScoreboardGenerationWorkerMessage,
 } from './generationWorkerTypes';
 
 let wasCancelled = false;
@@ -11,12 +11,12 @@ let wasCancelled = false;
 /**
  * Posts a typed message back to the main thread.
  */
-function postWorkerMessage(message: PlaceholderGenerationWorkerMessage): void {
+function postWorkerMessage(message: ScoreboardGenerationWorkerMessage): void {
   self.postMessage(message);
 }
 
 self.onmessage = async (
-  event: MessageEvent<PlaceholderGenerationRequest | 'cancel'>,
+  event: MessageEvent<ScoreboardGenerationRequest | 'cancel'>,
 ) => {
   if (event.data === 'cancel') {
     wasCancelled = true;
@@ -26,7 +26,7 @@ self.onmessage = async (
   wasCancelled = false;
 
   try {
-    const archive = await buildPlaceholderArchive(
+    const archive = await buildScoreboardArchive(
       event.data.contest,
       event.data.generationAssets,
       event.data.renderConfig,

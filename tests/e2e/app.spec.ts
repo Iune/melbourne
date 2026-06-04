@@ -169,10 +169,10 @@ test('generates successfully with uploaded custom fonts', async ({ page }) => {
   const workbookBuffer = await createValidContestWorkbookBuffer();
   const [baseFontBuffer, pointsFontBuffer] = await Promise.all([
     readFile(
-      '/Users/aditya/Development/contests/melbourne-canvas/canvas/assets/fonts/ZillaSlab-Regular.otf',
+      '/Users/aditya/Development/contests/melbourne-canvas/canvas/src/assets/fonts/ZillaSlab-Regular.otf',
     ),
     readFile(
-      '/Users/aditya/Development/contests/melbourne-canvas/canvas/assets/fonts/FiraSans-Regular.otf',
+      '/Users/aditya/Development/contests/melbourne-canvas/canvas/src/assets/fonts/FiraSans-Regular.otf',
     ),
   ]);
 

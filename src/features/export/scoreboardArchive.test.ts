@@ -3,7 +3,7 @@ import JSZip from 'jszip';
 import { describe, expect, it } from 'vitest';
 
 import type { ContestData } from '../contest/contestTypes';
-import { buildPlaceholderArchive } from './placeholderArchive';
+import { buildScoreboardArchive } from './scoreboardArchive';
 import type { ScoreboardRenderConfig } from '../render/scoreboardRenderer';
 
 const PNG_SIGNATURE = [137, 80, 78, 71, 13, 10, 26, 10];
@@ -60,10 +60,10 @@ function hasPngSignature(bytes: Uint8Array): boolean {
   });
 }
 
-describe('buildPlaceholderArchive', () => {
+describe('buildScoreboardArchive', () => {
   it('creates one scoreboard png file per voter in a zip archive', async () => {
     const progressUpdates: Array<[number, number]> = [];
-    const archive = await buildPlaceholderArchive(
+    const archive = await buildScoreboardArchive(
       SAMPLE_CONTEST,
       EMPTY_GENERATION_ASSETS,
       SAMPLE_RENDER_CONFIG,
@@ -103,7 +103,7 @@ describe('buildPlaceholderArchive', () => {
     let shouldCancel = false;
 
     await expect(
-      buildPlaceholderArchive(
+      buildScoreboardArchive(
         SAMPLE_CONTEST,
         EMPTY_GENERATION_ASSETS,
         SAMPLE_RENDER_CONFIG,

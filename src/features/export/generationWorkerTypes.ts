@@ -5,7 +5,7 @@ import type { ScoreboardRenderConfig } from '../render/scoreboardRenderer';
 /**
  * Represents a scoreboard export job sent from the UI to the worker.
  */
-export interface PlaceholderGenerationRequest {
+export interface ScoreboardGenerationRequest {
   contest: ContestData;
   generationAssets: GenerationAssets;
   renderConfig: ScoreboardRenderConfig;
@@ -14,7 +14,7 @@ export interface PlaceholderGenerationRequest {
 /**
  * Represents a progress update from the generation worker.
  */
-export interface PlaceholderGenerationProgressMessage {
+export interface ScoreboardGenerationProgressMessage {
   completed: number;
   total: number;
   type: 'progress';
@@ -23,7 +23,7 @@ export interface PlaceholderGenerationProgressMessage {
 /**
  * Represents a successful generation result from the worker.
  */
-export interface PlaceholderGenerationSuccessMessage {
+export interface ScoreboardGenerationSuccessMessage {
   archiveBytes: Uint8Array;
   type: 'success';
   zipFileName: string;
@@ -32,7 +32,7 @@ export interface PlaceholderGenerationSuccessMessage {
 /**
  * Represents a worker failure.
  */
-export interface PlaceholderGenerationErrorMessage {
+export interface ScoreboardGenerationErrorMessage {
   message: string;
   type: 'error';
 }
@@ -40,7 +40,7 @@ export interface PlaceholderGenerationErrorMessage {
 /**
  * Represents any message posted from the generation worker.
  */
-export type PlaceholderGenerationWorkerMessage =
-  | PlaceholderGenerationErrorMessage
-  | PlaceholderGenerationProgressMessage
-  | PlaceholderGenerationSuccessMessage;
+export type ScoreboardGenerationWorkerMessage =
+  | ScoreboardGenerationErrorMessage
+  | ScoreboardGenerationProgressMessage
+  | ScoreboardGenerationSuccessMessage;

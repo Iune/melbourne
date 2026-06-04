@@ -2,14 +2,14 @@ import type { GenerationAssets } from '../assets/generationAssets';
 import type { ContestData } from '../contest/contestTypes';
 import type { ScoreboardRenderConfig } from '../render/scoreboardRenderer';
 import type {
-  PlaceholderGenerationRequest,
-  PlaceholderGenerationWorkerMessage,
+  ScoreboardGenerationRequest,
+  ScoreboardGenerationWorkerMessage,
 } from './generationWorkerTypes';
 
 /**
  * Represents callbacks used while the worker is generating exports.
  */
-export interface PlaceholderGenerationCallbacks {
+export interface ScoreboardGenerationCallbacks {
   onError: (message: string) => void;
   onProgress: (completed: number, total: number) => void;
   onSuccess: (archiveBytes: Uint8Array, zipFileName: string) => void;
@@ -18,26 +18,26 @@ export interface PlaceholderGenerationCallbacks {
 /**
  * Represents the running worker controller for one generation job.
  */
-export interface PlaceholderGenerationController {
+export interface ScoreboardGenerationController {
   cancel: () => void;
 }
 
 /**
  * Starts scoreboard export generation inside a dedicated worker.
  */
-export function startPlaceholderGeneration(
+export function startScoreboardGeneration(
   contest: ContestData,
   generationAssets: GenerationAssets,
   renderConfig: ScoreboardRenderConfig,
-  callbacks: PlaceholderGenerationCallbacks,
-): PlaceholderGenerationController {
+  callbacks: ScoreboardGenerationCallbacks,
+): ScoreboardGenerationController {
   const worker = new Worker(
-    new URL('./placeholderGenerationWorker.ts', import.meta.url),
+    new URL('./scoreboardGenerationWorker.ts', import.meta.url),
     { type: 'module' },
   );
 
   worker.onmessage = (
-    event: MessageEvent<PlaceholderGenerationWorkerMessage>,
+    event: MessageEvent<ScoreboardGenerationWorkerMessage>,
   ) => {
     if (event.data.type === 'progress') {
       callbacks.onProgress(event.data.completed, event.data.total);
@@ -59,7 +59,7 @@ export function startPlaceholderGeneration(
     worker.terminate();
   };
 
-  const request: PlaceholderGenerationRequest = {
+  const request: ScoreboardGenerationRequest = {
     contest,
     generationAssets,
     renderConfig,

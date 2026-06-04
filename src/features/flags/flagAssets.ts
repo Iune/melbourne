@@ -1,8 +1,8 @@
-const BUNDLED_FLAG_ASSET_URLS = import.meta.glob('/assets/flags/**/*', {
+const BUNDLED_FLAG_ASSET_URLS = import.meta.glob('/src/assets/flags/**/*', {
   eager: true,
   import: 'default',
 }) as Record<string, string>;
-const FLAG_ASSET_ROOT = '/assets/flags/';
+const FLAG_ASSET_ROOT = '/src/assets/flags/';
 const BUNDLED_FLAG_REFERENCE_TO_URL = new Map(
   Object.entries(BUNDLED_FLAG_ASSET_URLS).map(([assetPath, assetUrl]) => {
     return [assetPath.slice(FLAG_ASSET_ROOT.length), assetUrl];

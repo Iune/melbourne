@@ -59,9 +59,9 @@ export function createZipFileName(contestName: string): string {
 }
 
 /**
- * Builds one placeholder export file name for a voter.
+ * Builds one scoreboard export file name for a voter.
  */
-export function createPlaceholderFileName(
+export function createScoreboardFileName(
   voterName: string,
   voterIndex: number,
   totalVoters: number,

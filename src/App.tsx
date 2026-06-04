@@ -41,8 +41,8 @@ import type {
   ContestData,
   ContestParseError,
 } from './features/contest/contestTypes';
-import type { PlaceholderGenerationController } from './features/export/placeholderGenerationClient';
-import { startPlaceholderGeneration } from './features/export/placeholderGenerationClient';
+import type { ScoreboardGenerationController } from './features/export/scoreboardGenerationClient';
+import { startScoreboardGeneration } from './features/export/scoreboardGenerationClient';
 import { validateFlagReferences } from './features/flags/flagValidation';
 import type { ScoreboardRenderConfig } from './features/render/scoreboardRenderer';
 
@@ -78,8 +78,9 @@ export function App() {
   const [validationErrors, setValidationErrors] = useState<ContestParseError[]>(
     [],
   );
-  const generationControllerRef =
-    useRef<PlaceholderGenerationController | null>(null);
+  const generationControllerRef = useRef<ScoreboardGenerationController | null>(
+    null,
+  );
 
   const canGenerate = contestName.trim().length > 0 && contestFile !== null;
   const isGenerating = appState === 'generating';
@@ -109,7 +110,7 @@ export function App() {
   /**
    * Starts worker-based scoreboard generation after validation succeeds.
    */
-  function beginPlaceholderGeneration(
+  function beginScoreboardGeneration(
     contest: ContestData,
     customGenerationAssets: Awaited<ReturnType<typeof buildGenerationAssets>>,
   ): void {
@@ -128,7 +129,7 @@ export function App() {
       title: contestName,
     };
 
-    generationControllerRef.current = startPlaceholderGeneration(
+    generationControllerRef.current = startScoreboardGeneration(
       contest,
       customGenerationAssets,
       renderConfig,
@@ -232,7 +233,7 @@ export function App() {
       return;
     }
 
-    beginPlaceholderGeneration(parseResult.contest, customGenerationAssets);
+    beginScoreboardGeneration(parseResult.contest, customGenerationAssets);
   }
 
   useEffect(() => {

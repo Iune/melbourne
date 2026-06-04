@@ -527,6 +527,7 @@ Scope:
 - Reject path traversal or any attempt to escape the bundled flags root.
 - Treat incorrect filenames or extensions as missing flags.
 - Surface flag validation failures in the validation error table as one row per error.
+- Keep in mind that the bundled flags need to be accessed by the program to be loaded by skia/canvaskit. But we only want to actually load files into memory that are actually used.
 
 Acceptance criteria:
 

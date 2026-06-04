@@ -19,17 +19,25 @@ import {
   Title,
   Tooltip,
 } from '@mantine/core';
-import { IconCheck, IconDownload, IconRefresh } from '@tabler/icons-react';
+import {
+  IconCheck,
+  IconDownload,
+  IconLoader2,
+  IconRefresh,
+} from '@tabler/icons-react';
 import type { FormEventHandler } from 'react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { parseContestWorkbook } from './features/contest/contestParser';
-import type { ContestParseError } from './features/contest/contestTypes';
+import type {
+  ContestData,
+  ContestParseError,
+} from './features/contest/contestTypes';
+import type { PlaceholderGenerationController } from './features/export/placeholderGenerationClient';
+import { startPlaceholderGeneration } from './features/export/placeholderGenerationClient';
 
 const DEFAULT_MAIN_COLOR = '#2F292B';
 const DEFAULT_ACCENT_COLOR = '#FCB906';
-const MOCK_PROGRESS_STEPS = 10;
-const MOCK_PROGRESS_INTERVAL_MS = 500;
 
 type AppState = 'idle' | 'generating' | 'succeeded' | 'validationFailed';
 
@@ -46,26 +54,97 @@ export function App() {
   const [drawFlagBorders, setDrawFlagBorders] = useState(true);
   const [appState, setAppState] = useState<AppState>('idle');
   const [progressValue, setProgressValue] = useState(0);
+  const [progressTotal, setProgressTotal] = useState(0);
+  const [generatedArchiveUrl, setGeneratedArchiveUrl] = useState<string | null>(
+    null,
+  );
+  const [generatedZipFileName, setGeneratedZipFileName] = useState('');
+  const [generationErrorMessage, setGenerationErrorMessage] = useState('');
   const [validationErrors, setValidationErrors] = useState<ContestParseError[]>(
     [],
   );
+  const generationControllerRef =
+    useRef<PlaceholderGenerationController | null>(null);
 
   const canGenerate = contestName.trim().length > 0 && contestFile !== null;
   const isGenerating = appState === 'generating';
   const hasSucceeded = appState === 'succeeded';
   const hasValidationFailed = appState === 'validationFailed';
-  const progressPercent = (progressValue / MOCK_PROGRESS_STEPS) * 100;
+  const progressPercent =
+    progressTotal === 0 ? 0 : (progressValue / progressTotal) * 100;
 
   /**
-   * Validates the selected workbook and enters the mocked generation state.
+   * Clears any generated download artifact from the previous run.
+   */
+  function clearGeneratedArchive(): void {
+    if (generatedArchiveUrl !== null) {
+      URL.revokeObjectURL(generatedArchiveUrl);
+    }
+
+    setGeneratedArchiveUrl(null);
+    setGeneratedZipFileName('');
+  }
+
+  /**
+   * Starts worker-based placeholder generation after validation succeeds.
+   */
+  function beginPlaceholderGeneration(contest: ContestData): void {
+    clearGeneratedArchive();
+    setGenerationErrorMessage('');
+    setProgressValue(0);
+    setProgressTotal(contest.numVoters);
+    setAppState('generating');
+
+    generationControllerRef.current = startPlaceholderGeneration(
+      contestName,
+      contest,
+      {
+        onError: (message) => {
+          generationControllerRef.current = null;
+          setGenerationErrorMessage(message);
+          setAppState('idle');
+          setProgressValue(0);
+          setProgressTotal(0);
+        },
+        onProgress: (completed, total) => {
+          setProgressValue(completed);
+          setProgressTotal(total);
+        },
+        onSuccess: (archiveBytes, zipFileName) => {
+          generationControllerRef.current = null;
+          const normalizedArchiveBytes = new Uint8Array(
+            archiveBytes.byteLength,
+          );
+
+          normalizedArchiveBytes.set(archiveBytes);
+
+          const archiveBlob = new Blob([normalizedArchiveBytes], {
+            type: 'application/zip',
+          });
+          const archiveUrl = URL.createObjectURL(archiveBlob);
+
+          setGeneratedArchiveUrl(archiveUrl);
+          setGeneratedZipFileName(zipFileName);
+          setAppState('succeeded');
+        },
+      },
+    );
+  }
+
+  /**
+   * Validates the selected workbook and starts generation when it succeeds.
    */
   async function handleStartGeneration() {
     if (!canGenerate || contestFile === null || isGenerating) {
       return;
     }
 
+    clearGeneratedArchive();
     setValidationErrors([]);
+    setGenerationErrorMessage('');
     setAppState('idle');
+    setProgressValue(0);
+    setProgressTotal(0);
 
     const parseResult = await parseContestWorkbook(
       await contestFile.arrayBuffer(),
@@ -79,37 +158,21 @@ export function App() {
       return;
     }
 
-    setProgressValue(0);
-    setAppState('generating');
+    beginPlaceholderGeneration(parseResult.contest);
   }
 
   useEffect(() => {
-    if (!isGenerating) {
-      return undefined;
-    }
+    return () => {
+      generationControllerRef.current?.cancel();
 
-    const intervalId = window.setInterval(() => {
-      setProgressValue((currentValue) => {
-        if (currentValue >= MOCK_PROGRESS_STEPS) {
-          return currentValue;
-        }
-
-        const nextValue = currentValue + 1;
-
-        if (nextValue >= MOCK_PROGRESS_STEPS) {
-          window.clearInterval(intervalId);
-          setAppState('succeeded');
-        }
-
-        return nextValue;
-      });
-    }, MOCK_PROGRESS_INTERVAL_MS);
-
-    return () => window.clearInterval(intervalId);
-  }, [isGenerating]);
+      if (generatedArchiveUrl !== null) {
+        URL.revokeObjectURL(generatedArchiveUrl);
+      }
+    };
+  }, [generatedArchiveUrl]);
 
   /**
-   * Starts the mocked generation flow used during the UI state prototype.
+   * Starts generation from form submission when the enter key is used.
    */
   const handleSubmit: FormEventHandler<HTMLFormElement> = (event) => {
     event.preventDefault();
@@ -117,11 +180,16 @@ export function App() {
   };
 
   /**
-   * Cancels the in-progress mock generation flow and returns to editable state.
+   * Cancels the current generation job and returns to editable state.
    */
   function handleCancel() {
+    generationControllerRef.current?.cancel();
+    generationControllerRef.current = null;
     setAppState('idle');
     setProgressValue(0);
+    setProgressTotal(0);
+    clearGeneratedArchive();
+    setGenerationErrorMessage('');
   }
 
   return (
@@ -273,11 +341,15 @@ export function App() {
                 </Group>
                 <Stack aria-live="polite" gap="sm">
                   {isGenerating ? (
-                    <Alert title="Generating" variant="light">
+                    <Alert
+                      icon={<IconLoader2 size={16} />}
+                      title="Generating Scoreboards"
+                      variant="default"
+                    >
                       <Stack gap="xs">
                         <Text size="sm">
-                          {progressValue} of {MOCK_PROGRESS_STEPS} mock
-                          scoreboards generated
+                          {progressValue} of {progressTotal} placeholder exports
+                          generated
                         </Text>
                         <Progress
                           aria-label="Generation progress"
@@ -288,32 +360,39 @@ export function App() {
                   ) : null}
                   {hasSucceeded ? (
                     <Alert
-                      color="green"
                       icon={<IconCheck size={16} />}
-                      title="Generation complete"
-                      variant="light"
+                      title="Generating Scoreboards"
+                      variant="default"
                     >
-                      <Group justify="space-between">
+                      <Stack gap="xs">
                         <Text size="sm">
-                          Mock scoreboards are ready for download.
+                          Placeholder exports are ready for download.
                         </Text>
-                        <Button
-                          color="green"
-                          leftSection={<IconDownload size={16} />}
-                          type="button"
-                          variant="light"
-                        >
-                          Download ZIP
-                        </Button>
-                      </Group>
+                        <Progress
+                          size="xl"
+                          aria-label="Generation progress"
+                          value={progressPercent}
+                        />
+                        <Group justify="flex-start">
+                          <Button
+                            component="a"
+                            download={generatedZipFileName}
+                            href={generatedArchiveUrl ?? undefined}
+                            leftSection={<IconDownload size={16} />}
+                          >
+                            Download ZIP
+                          </Button>
+                        </Group>
+                      </Stack>
                     </Alert>
                   ) : null}
-                  {hasValidationFailed ? (
-                    <Alert
-                      color="red"
-                      title="Validation failed"
-                      variant="light"
-                    >
+                  {generationErrorMessage.length > 0 ? (
+                    <Alert title="Generation Failed" variant="default">
+                      <Text size="sm">{generationErrorMessage}</Text>
+                    </Alert>
+                  ) : null}
+                  {hasValidationFailed && validationErrors.length > 0 ? (
+                    <Alert title="Validation Failed" variant="default">
                       <Table highlightOnHover>
                         <Table.Thead>
                           <Table.Tr>

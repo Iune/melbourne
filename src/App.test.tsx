@@ -5,12 +5,17 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { App } from './App';
 import { parseContestWorkbook } from './features/contest/contestParser';
+import { startPlaceholderGeneration } from './features/export/placeholderGenerationClient';
 
 vi.mock('./features/contest/contestParser', () => ({
   parseContestWorkbook: vi.fn(),
 }));
+vi.mock('./features/export/placeholderGenerationClient', () => ({
+  startPlaceholderGeneration: vi.fn(),
+}));
 
 const mockedParseContestWorkbook = vi.mocked(parseContestWorkbook);
+const mockedStartPlaceholderGeneration = vi.mocked(startPlaceholderGeneration);
 
 /**
  * Renders the app with providers required by Mantine components.
@@ -52,6 +57,7 @@ afterEach(() => {
   }
 
   mockedParseContestWorkbook.mockReset();
+  mockedStartPlaceholderGeneration.mockReset();
 });
 
 describe('App', () => {
@@ -119,72 +125,76 @@ describe('App', () => {
         entries: [],
         hasCountColumn: false,
         numEntries: 0,
-        numVoters: 0,
-        voterNames: [],
+        numVoters: 2,
+        voterNames: ['Denmark', 'Sweden'],
       },
       ok: true,
     });
+    mockedStartPlaceholderGeneration.mockImplementation(
+      (_contestName, _contest, callbacks) => {
+        callbacks.onProgress(0, 2);
+        callbacks.onProgress(1, 2);
+        callbacks.onSuccess(new Uint8Array([1, 2, 3]), 'Contest 1988.zip');
+
+        return { cancel: vi.fn() };
+      },
+    );
     await populateRequiredFields(user, container);
-    vi.useFakeTimers();
+
     await act(async () => {
       fireEvent.click(screen.getByRole('button', { name: 'Generate' }));
-      await Promise.resolve();
-    });
-
-    expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
-    expect(
-      screen.getByText('0 of 10 mock scoreboards generated'),
-    ).toBeInTheDocument();
-
-    await act(async () => {
-      vi.advanceTimersByTime(5000);
     });
 
     expect(
-      screen.getByRole('button', { name: 'Download ZIP' }),
+      screen.getByRole('link', { name: 'Download ZIP' }),
     ).toBeInTheDocument();
     expect(
-      screen.getByText('Mock scoreboards are ready for download.'),
+      screen.getByText('Placeholder exports are ready for download.'),
     ).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Generate' })).toBeEnabled();
   });
 
-  it('cancels the mocked generation flow and returns to idle', async () => {
+  it('cancels the placeholder generation flow and returns to idle', async () => {
     const { container } = renderApp();
     const user = userEvent.setup();
+    const cancelSpy = vi.fn();
 
     mockedParseContestWorkbook.mockResolvedValue({
       contest: {
         entries: [],
         hasCountColumn: false,
         numEntries: 0,
-        numVoters: 0,
-        voterNames: [],
+        numVoters: 2,
+        voterNames: ['Denmark', 'Sweden'],
       },
       ok: true,
     });
+    mockedStartPlaceholderGeneration.mockImplementation(
+      (_contestName, _contest, callbacks) => {
+        callbacks.onProgress(0, 2);
+
+        return { cancel: cancelSpy };
+      },
+    );
     await populateRequiredFields(user, container);
-    vi.useFakeTimers();
+
     await act(async () => {
       fireEvent.click(screen.getByRole('button', { name: 'Generate' }));
-      await Promise.resolve();
     });
 
-    await act(async () => {
-      vi.advanceTimersByTime(1000);
-    });
-
+    expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
     expect(
-      screen.getByText('2 of 10 mock scoreboards generated'),
+      screen.getByText('0 of 2 placeholder exports generated'),
     ).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
 
+    expect(cancelSpy).toHaveBeenCalledOnce();
     expect(
       screen.queryByRole('button', { name: 'Download ZIP' }),
     ).not.toBeInTheDocument();
     expect(
-      screen.queryByText(/mock scoreboards generated/i),
+      screen.queryByText(/placeholder exports generated/i),
     ).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Generate' })).toBeEnabled();
   });
@@ -237,7 +247,7 @@ describe('App', () => {
       await Promise.resolve();
     });
 
-    expect(screen.getByText('Validation failed')).toBeInTheDocument();
+    expect(screen.getByText('Validation Failed')).toBeInTheDocument();
     expect(
       screen.getByRole('columnheader', { name: 'Error' }),
     ).toBeInTheDocument();

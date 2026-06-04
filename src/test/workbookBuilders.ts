@@ -5,6 +5,7 @@ import ExcelJS from 'exceljs';
  */
 export interface ContestWorkbookFixtureOptions {
   hasCountColumn?: boolean;
+  numVoters?: number;
 }
 
 /**
@@ -26,9 +27,18 @@ function normalizeWorkbookBuffer(buffer: ExcelJS.Buffer): ArrayBuffer {
 export async function createValidContestWorkbookBuffer(
   options: ContestWorkbookFixtureOptions = {},
 ): Promise<ArrayBuffer> {
-  const { hasCountColumn = false } = options;
+  const { hasCountColumn = false, numVoters = 2 } = options;
   const workbook = new ExcelJS.Workbook();
   const worksheet = workbook.addWorksheet('Contest');
+  const voterHeaders = Array.from({ length: numVoters }, (_, index) => {
+    return `Voter ${String.fromCharCode(65 + index)}`;
+  });
+  const firstEntryVotes = Array.from({ length: numVoters }, (_, index) => {
+    return index === 0 ? '5' : '';
+  });
+  const secondEntryVotes = Array.from({ length: numVoters }, (_, index) => {
+    return index === 1 ? '3' : '';
+  });
   const headerRow = hasCountColumn
     ? [
         '#',
@@ -38,16 +48,49 @@ export async function createValidContestWorkbookBuffer(
         'Song',
         'Total',
         '# Voters',
-        'Voter A',
-        'Voter B',
+        ...voterHeaders,
       ]
-    : ['#', 'Country', 'Flag', 'Artist', 'Song', 'Total', 'Voter A', 'Voter B'];
+    : ['#', 'Country', 'Flag', 'Artist', 'Song', 'Total', ...voterHeaders];
   const firstEntryRow = hasCountColumn
-    ? ['1', 'Alpha', 'World/aa.png', 'Artist A', 'Song A', '5', '2', '5', '']
-    : ['1', 'Alpha', 'World/aa.png', 'Artist A', 'Song A', '5', '5', ''];
+    ? [
+        '1',
+        'Alpha',
+        'World/aa.png',
+        'Artist A',
+        'Song A',
+        '5',
+        '1',
+        ...firstEntryVotes,
+      ]
+    : [
+        '1',
+        'Alpha',
+        'World/aa.png',
+        'Artist A',
+        'Song A',
+        '5',
+        ...firstEntryVotes,
+      ];
   const secondEntryRow = hasCountColumn
-    ? ['2', 'Beta', 'World/bb.png', 'Artist B', 'Song B', '3', '1', '', '3']
-    : ['2', 'Beta', 'World/bb.png', 'Artist B', 'Song B', '3', '', '3'];
+    ? [
+        '2',
+        'Beta',
+        'World/bb.png',
+        'Artist B',
+        'Song B',
+        '3',
+        '1',
+        ...secondEntryVotes,
+      ]
+    : [
+        '2',
+        'Beta',
+        'World/bb.png',
+        'Artist B',
+        'Song B',
+        '3',
+        ...secondEntryVotes,
+      ];
 
   worksheet.addRow(headerRow);
   worksheet.addRow(firstEntryRow);

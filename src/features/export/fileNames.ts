@@ -69,5 +69,5 @@ export function createPlaceholderFileName(
   const indexWidth = Math.max(2, String(totalVoters).length);
   const paddedIndex = String(voterIndex + 1).padStart(indexWidth, '0');
 
-  return `${paddedIndex} - ${sanitizeFileName(voterName)}.txt`;
+  return `${paddedIndex} - ${sanitizeFileName(voterName)}.png`;
 }

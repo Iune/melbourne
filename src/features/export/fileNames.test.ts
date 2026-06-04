@@ -19,10 +19,10 @@ describe('fileNames', () => {
 
   it('builds placeholder file names with padded indexes', () => {
     expect(createPlaceholderFileName('Denmark', 0, 12)).toBe(
-      '01 - Denmark.txt',
+      '01 - Denmark.png',
     );
     expect(createPlaceholderFileName('United/Kingdom', 11, 12)).toBe(
-      '12 - United_Kingdom.txt',
+      '12 - United_Kingdom.png',
     );
   });
 

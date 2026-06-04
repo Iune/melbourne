@@ -4,6 +4,8 @@ import { describe, expect, it } from 'vitest';
 import type { ContestData } from '../contest/contestTypes';
 import { buildPlaceholderArchive } from './placeholderArchive';
 
+const PNG_SIGNATURE = [137, 80, 78, 71, 13, 10, 26, 10];
+
 const SAMPLE_CONTEST: ContestData = {
   entries: [],
   hasCountColumn: false,
@@ -12,8 +14,17 @@ const SAMPLE_CONTEST: ContestData = {
   voterNames: ['Denmark', 'United Kingdom', 'Sweden'],
 };
 
+/**
+ * Returns true when the provided byte array starts with the PNG signature.
+ */
+function hasPngSignature(bytes: Uint8Array): boolean {
+  return PNG_SIGNATURE.every((signatureByte, index) => {
+    return bytes[index] === signatureByte;
+  });
+}
+
 describe('buildPlaceholderArchive', () => {
-  it('creates one placeholder text file per voter in a zip archive', async () => {
+  it('creates one placeholder png file per voter in a zip archive', async () => {
     const progressUpdates: Array<[number, number]> = [];
     const archive = await buildPlaceholderArchive('FSC 281', SAMPLE_CONTEST, {
       isCancelled: () => false,
@@ -33,10 +44,17 @@ describe('buildPlaceholderArchive', () => {
     const zip = await JSZip.loadAsync(archive.archiveBytes);
 
     expect(Object.keys(zip.files).sort()).toEqual([
-      '01 - Denmark.txt',
-      '02 - United Kingdom.txt',
-      '03 - Sweden.txt',
+      '01 - Denmark.png',
+      '02 - United Kingdom.png',
+      '03 - Sweden.png',
     ]);
+
+    const firstImageBytes = await zip
+      .file('01 - Denmark.png')
+      ?.async('uint8array');
+
+    expect(firstImageBytes).toBeDefined();
+    expect(hasPngSignature(firstImageBytes ?? new Uint8Array())).toBe(true);
   });
 
   it('stops generation when cancellation is requested', async () => {

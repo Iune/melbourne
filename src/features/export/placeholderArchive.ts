@@ -2,6 +2,7 @@ import JSZip from 'jszip';
 
 import type { ContestData } from '../contest/contestTypes';
 import { createPlaceholderFileName, createZipFileName } from './fileNames';
+import { renderHelloWorldPng } from '../render/helloWorldRenderer';
 
 /**
  * Represents the generated placeholder ZIP archive.
@@ -30,7 +31,7 @@ function waitForNextTask(): Promise<void> {
 }
 
 /**
- * Generates placeholder text files and packages them into a ZIP archive.
+ * Generates placeholder PNG files and packages them into a ZIP archive.
  */
 export async function buildPlaceholderArchive(
   contestName: string,
@@ -39,6 +40,7 @@ export async function buildPlaceholderArchive(
 ): Promise<PlaceholderArchiveResult> {
   const zip = new JSZip();
   const totalVoters = contest.voterNames.length;
+  const renderedImageBytes = await renderHelloWorldPng();
 
   for (let voterIndex = 0; voterIndex < totalVoters; voterIndex += 1) {
     if (callbacks.isCancelled()) {
@@ -51,7 +53,7 @@ export async function buildPlaceholderArchive(
       totalVoters,
     );
 
-    zip.file(fileName, '');
+    zip.file(fileName, renderedImageBytes);
     callbacks.onProgress?.(voterIndex + 1, totalVoters);
 
     await waitForNextTask();

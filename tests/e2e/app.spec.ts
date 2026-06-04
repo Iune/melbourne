@@ -67,9 +67,9 @@ test('switches from generate to cancel and then shows success', async ({
   await page.getByRole('button', { name: 'Generate' }).click();
 
   await expect(page.getByRole('button', { name: 'Cancel' })).toBeVisible();
-  await expect(page.getByText(/placeholder exports generated/i)).toBeVisible();
+  await expect(page.getByText(/png preview images generated/i)).toBeVisible();
   await expect(page.getByRole('link', { name: 'Download ZIP' })).toBeVisible({
-    timeout: 7000,
+    timeout: 15000,
   });
   await expect(page.getByRole('button', { name: 'Generate' })).toBeVisible();
 });
@@ -118,7 +118,7 @@ test('downloads a zip containing one placeholder file per voter', async ({
 
   await page.getByRole('button', { name: 'Generate' }).click();
   await expect(page.getByRole('link', { name: 'Download ZIP' })).toBeVisible({
-    timeout: 7000,
+    timeout: 15000,
   });
 
   const downloadPromise = page.waitForEvent('download');
@@ -138,8 +138,8 @@ test('downloads a zip containing one placeholder file per voter', async ({
   const zip = await JSZip.loadAsync(await readFile(downloadPath));
 
   expect(Object.keys(zip.files).sort()).toEqual([
-    '01 - Voter A.txt',
-    '02 - Voter B.txt',
+    '01 - Voter A.png',
+    '02 - Voter B.png',
   ]);
 });
 

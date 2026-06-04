@@ -360,7 +360,7 @@ export function App() {
                     >
                       <Stack gap="xs">
                         <Text size="sm">
-                          {progressValue} of {progressTotal} placeholder exports
+                          {progressValue} of {progressTotal} PNG preview images
                           generated
                         </Text>
                         <Progress
@@ -378,7 +378,7 @@ export function App() {
                     >
                       <Stack gap="xs">
                         <Text size="sm">
-                          Placeholder exports are ready for download.
+                          PNG preview images are ready for download.
                         </Text>
                         <Progress
                           size="xl"

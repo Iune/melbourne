@@ -1,3 +1,4 @@
+import type { GenerationAssets } from '../assets/generationAssets';
 import type { ContestData } from '../contest/contestTypes';
 import type { ScoreboardRenderConfig } from '../render/scoreboardRenderer';
 
@@ -6,6 +7,7 @@ import type { ScoreboardRenderConfig } from '../render/scoreboardRenderer';
  */
 export interface PlaceholderGenerationRequest {
   contest: ContestData;
+  generationAssets: GenerationAssets;
   renderConfig: ScoreboardRenderConfig;
 }
 

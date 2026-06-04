@@ -1,6 +1,10 @@
 import '@mantine/core/styles.css';
 
-import { createTheme, MantineProvider } from '@mantine/core';
+import {
+  createTheme,
+  localStorageColorSchemeManager,
+  MantineProvider,
+} from '@mantine/core';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 
@@ -12,6 +16,9 @@ const theme = createTheme({
     fontFamily: '"Google Sans Flex", "Google Sans", Arial, sans-serif',
   },
 });
+const colorSchemeManager = localStorageColorSchemeManager({
+  key: 'melbourne-color-scheme',
+});
 
 const rootElement = document.getElementById('root');
 
@@ -21,7 +28,11 @@ if (!rootElement) {
 
 createRoot(rootElement).render(
   <StrictMode>
-    <MantineProvider theme={theme}>
+    <MantineProvider
+      colorSchemeManager={colorSchemeManager}
+      defaultColorScheme="light"
+      theme={theme}
+    >
       <App />
     </MantineProvider>
   </StrictMode>,

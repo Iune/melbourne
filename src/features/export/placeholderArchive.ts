@@ -1,5 +1,6 @@
 import JSZip from 'jszip';
 
+import type { GenerationAssets } from '../assets/generationAssets';
 import { buildRankedContest } from '../contest/contestResults';
 import type { ContestData } from '../contest/contestTypes';
 import { createPlaceholderFileName, createZipFileName } from './fileNames';
@@ -39,6 +40,7 @@ function waitForNextTask(): Promise<void> {
  */
 export async function buildPlaceholderArchive(
   contest: ContestData,
+  generationAssets: GenerationAssets,
   renderConfig: ScoreboardRenderConfig,
   callbacks: PlaceholderArchiveCallbacks,
 ): Promise<PlaceholderArchiveResult> {
@@ -55,6 +57,7 @@ export async function buildPlaceholderArchive(
       rankedContest,
       renderConfig,
       voterIndex,
+      generationAssets,
     );
     const fileName = createPlaceholderFileName(
       contest.voterNames[voterIndex] ?? '',

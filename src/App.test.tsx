@@ -87,6 +87,9 @@ describe('App', () => {
       '#',
     );
     expect(
+      screen.getByRole('button', { name: 'Switch to dark mode' }),
+    ).toBeInTheDocument();
+    expect(
       screen.getByRole('heading', { name: 'Generate Scoreboards' }),
     ).toBeInTheDocument();
     expect(screen.getByLabelText(/Contest Title/)).toBeInTheDocument();
@@ -104,6 +107,8 @@ describe('App', () => {
     ).toBeInTheDocument();
     expect(screen.getByLabelText('Main color')).toHaveValue('#2F292B');
     expect(screen.getByLabelText('Accent color')).toHaveValue('#FCB906');
+    expect(screen.getByLabelText(/Base Font/)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Points Font/)).toBeInTheDocument();
     expect(
       screen.getByRole('checkbox', { name: 'Include flags' }),
     ).toBeChecked();
@@ -113,7 +118,33 @@ describe('App', () => {
     expect(
       screen.getByRole('checkbox', { name: 'Draw flag borders' }),
     ).toBeChecked();
+    expect(screen.getByLabelText(/Flag Files/)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Generate' })).toBeDisabled();
+  });
+
+  it('toggles between light and dark mode from the header control', async () => {
+    const user = userEvent.setup();
+    mockedParseContestWorkbook.mockResolvedValue({
+      contest: {
+        entries: [],
+        hasCountColumn: false,
+        numEntries: 0,
+        numVoters: 0,
+        voterNames: [],
+      },
+      ok: true,
+    });
+    renderApp();
+
+    const colorSchemeToggle = screen.getByRole('button', {
+      name: 'Switch to dark mode',
+    });
+
+    await user.click(colorSchemeToggle);
+
+    expect(
+      screen.getByRole('button', { name: 'Switch to light mode' }),
+    ).toBeInTheDocument();
   });
 
   it('runs the mocked generation flow through success', async () => {
@@ -131,7 +162,7 @@ describe('App', () => {
       ok: true,
     });
     mockedStartPlaceholderGeneration.mockImplementation(
-      (_contestName, _contest, callbacks) => {
+      (_contest, _generationAssets, _renderConfig, callbacks) => {
         callbacks.onProgress(0, 2);
         callbacks.onProgress(1, 2);
         callbacks.onSuccess(new Uint8Array([1, 2, 3]), 'Contest 1988.zip');
@@ -170,7 +201,7 @@ describe('App', () => {
       ok: true,
     });
     mockedStartPlaceholderGeneration.mockImplementation(
-      (_contestName, _contest, callbacks) => {
+      (_contest, _generationAssets, _renderConfig, callbacks) => {
         callbacks.onProgress(0, 2);
 
         return { cancel: cancelSpy };
@@ -230,6 +261,37 @@ describe('App', () => {
 
     expect(drawFlagBorders).toBeChecked();
     expect(drawFlagBorders).toBeEnabled();
+  });
+
+  it('disables custom flag uploads while preserving the current selection state', async () => {
+    const user = userEvent.setup();
+    mockedParseContestWorkbook.mockResolvedValue({
+      contest: {
+        entries: [],
+        hasCountColumn: false,
+        numEntries: 0,
+        numVoters: 0,
+        voterNames: [],
+      },
+      ok: true,
+    });
+    renderApp();
+
+    const includeFlags = screen.getByRole('checkbox', {
+      name: 'Include flags',
+    });
+    const customFlagFiles = screen.getByLabelText(/Flag Files/);
+
+    expect(customFlagFiles).toBeEnabled();
+
+    await user.click(includeFlags);
+
+    expect(includeFlags).not.toBeChecked();
+    expect(customFlagFiles).toBeDisabled();
+
+    await user.click(includeFlags);
+
+    expect(customFlagFiles).toBeEnabled();
   });
 
   it('shows blocking validation errors when parsing fails', async () => {

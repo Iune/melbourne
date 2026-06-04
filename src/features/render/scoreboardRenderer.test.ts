@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import type { GenerationAssets } from '../assets/generationAssets';
 import { buildRankedContest } from '../contest/contestResults';
 import type { ContestData } from '../contest/contestTypes';
 import {
@@ -45,6 +46,11 @@ const SAMPLE_RENDER_CONFIG: ScoreboardRenderConfig = {
   mainColor: '#2F292B',
   title: 'FSC 281',
 };
+const EMPTY_GENERATION_ASSETS: GenerationAssets = {
+  customBaseFont: null,
+  customFlags: {},
+  customPointsFont: null,
+};
 
 /**
  * Reads a big-endian 32-bit integer from PNG bytes.
@@ -65,6 +71,7 @@ describe('renderScoreboardPng', () => {
       buildRankedContest(SAMPLE_CONTEST),
       SAMPLE_RENDER_CONFIG,
       1,
+      EMPTY_GENERATION_ASSETS,
     );
 
     expect(bytes.length).toBeGreaterThan(0);
@@ -83,6 +90,7 @@ describe('renderScoreboardPng', () => {
       rankedContest,
       SAMPLE_RENDER_CONFIG,
       1,
+      EMPTY_GENERATION_ASSETS,
     );
     const withFlags = await renderScoreboardPng(
       rankedContest,
@@ -92,6 +100,7 @@ describe('renderScoreboardPng', () => {
         displayFlags: true,
       },
       1,
+      EMPTY_GENERATION_ASSETS,
     );
 
     expect(readUint32(withFlags, 16)).toBeGreaterThan(

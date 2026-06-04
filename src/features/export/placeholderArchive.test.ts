@@ -1,3 +1,4 @@
+import type { GenerationAssets } from '../assets/generationAssets';
 import JSZip from 'jszip';
 import { describe, expect, it } from 'vitest';
 
@@ -44,6 +45,11 @@ const SAMPLE_RENDER_CONFIG: ScoreboardRenderConfig = {
   mainColor: '#2F292B',
   title: 'FSC 281',
 };
+const EMPTY_GENERATION_ASSETS: GenerationAssets = {
+  customBaseFont: null,
+  customFlags: {},
+  customPointsFont: null,
+};
 
 /**
  * Returns true when the provided byte array starts with the PNG signature.
@@ -59,6 +65,7 @@ describe('buildPlaceholderArchive', () => {
     const progressUpdates: Array<[number, number]> = [];
     const archive = await buildPlaceholderArchive(
       SAMPLE_CONTEST,
+      EMPTY_GENERATION_ASSETS,
       SAMPLE_RENDER_CONFIG,
       {
         isCancelled: () => false,
@@ -96,14 +103,19 @@ describe('buildPlaceholderArchive', () => {
     let shouldCancel = false;
 
     await expect(
-      buildPlaceholderArchive(SAMPLE_CONTEST, SAMPLE_RENDER_CONFIG, {
-        isCancelled: () => shouldCancel,
-        onProgress: (completed) => {
-          if (completed === 1) {
-            shouldCancel = true;
-          }
+      buildPlaceholderArchive(
+        SAMPLE_CONTEST,
+        EMPTY_GENERATION_ASSETS,
+        SAMPLE_RENDER_CONFIG,
+        {
+          isCancelled: () => shouldCancel,
+          onProgress: (completed) => {
+            if (completed === 1) {
+              shouldCancel = true;
+            }
+          },
         },
-      }),
+      ),
     ).rejects.toThrow('Generation was cancelled.');
   });
 });

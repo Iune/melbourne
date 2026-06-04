@@ -28,6 +28,7 @@ self.onmessage = async (
   try {
     const archive = await buildPlaceholderArchive(
       event.data.contest,
+      event.data.generationAssets,
       event.data.renderConfig,
       {
         isCancelled: () => wasCancelled,

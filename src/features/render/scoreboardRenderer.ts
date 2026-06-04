@@ -2,6 +2,10 @@ import CanvasKitInit from 'canvaskit-wasm/bin/full/canvaskit.js';
 import canvasKitWasmUrl from 'canvaskit-wasm/bin/full/canvaskit.wasm?url';
 import type { Canvas, TypefaceFontProvider } from 'canvaskit-wasm';
 
+import type {
+  GenerationAssets,
+  GenerationFontAsset,
+} from '../assets/generationAssets';
 import {
   getResultsAfterVoter,
   parseVoteValue,
@@ -14,8 +18,10 @@ import {
 
 const DEFAULT_IMAGE_SCALING_RATIO = 2.5;
 const TEXT_LAYOUT_WIDTH = 4096;
-const BASE_FONT_FAMILY = 'Zilla Slab';
-const POINTS_FONT_FAMILY = 'Fira Sans';
+const DEFAULT_BASE_FONT_FAMILY = 'Zilla Slab';
+const DEFAULT_POINTS_FONT_FAMILY = 'Fira Sans';
+const CUSTOM_BASE_FONT_FAMILY = 'Melbourne Custom Base Font';
+const CUSTOM_POINTS_FONT_FAMILY = 'Melbourne Custom Points Font';
 const isNodeRuntime =
   typeof process !== 'undefined' && process.versions.node !== undefined;
 const baseFontUrl = new URL(
@@ -94,6 +100,16 @@ interface ScoreboardSizes {
   width: number;
 }
 
+/**
+ * Represents the resolved font families and bytes used during one render.
+ */
+interface ResolvedRenderFonts {
+  baseFontBytes: ArrayBuffer;
+  baseFontFamily: string;
+  pointsFontBytes: ArrayBuffer;
+  pointsFontFamily: string;
+}
+
 let cachedCanvasKit: Promise<CanvasKitModule> | null = null;
 let cachedBaseFontBytes: Promise<ArrayBuffer> | null = null;
 let cachedPointsFontBytes: Promise<ArrayBuffer> | null = null;
@@ -170,6 +186,59 @@ async function loadPointsFontBytes(): Promise<ArrayBuffer> {
 }
 
 /**
+ * Returns the correct font family name and bytes for one optional custom font.
+ */
+function resolveFontAsset(
+  customFont: GenerationFontAsset | null,
+  customFamilyName: string,
+  fallbackFamilyName: string,
+  fallbackBytes: ArrayBuffer,
+): { bytes: ArrayBuffer; familyName: string } {
+  if (customFont === null) {
+    return {
+      bytes: fallbackBytes,
+      familyName: fallbackFamilyName,
+    };
+  }
+
+  return {
+    bytes: customFont.bytes,
+    familyName: customFamilyName,
+  };
+}
+
+/**
+ * Resolves bundled or custom font assets for one render.
+ */
+async function resolveRenderFonts(
+  generationAssets: GenerationAssets,
+): Promise<ResolvedRenderFonts> {
+  const [defaultBaseFontBytes, defaultPointsFontBytes] = await Promise.all([
+    loadBaseFontBytes(),
+    loadPointsFontBytes(),
+  ]);
+  const baseFont = resolveFontAsset(
+    generationAssets.customBaseFont,
+    CUSTOM_BASE_FONT_FAMILY,
+    DEFAULT_BASE_FONT_FAMILY,
+    defaultBaseFontBytes,
+  );
+  const pointsFont = resolveFontAsset(
+    generationAssets.customPointsFont,
+    CUSTOM_POINTS_FONT_FAMILY,
+    DEFAULT_POINTS_FONT_FAMILY,
+    defaultPointsFontBytes,
+  );
+
+  return {
+    baseFontBytes: baseFont.bytes,
+    baseFontFamily: baseFont.familyName,
+    pointsFontBytes: pointsFont.bytes,
+    pointsFontFamily: pointsFont.familyName,
+  };
+}
+
+/**
  * Loads the encoded bytes for one bundled flag reference.
  */
 async function loadFlagBytes(flagReference: string): Promise<ArrayBuffer> {
@@ -218,6 +287,28 @@ async function loadFlagBytes(flagReference: string): Promise<ArrayBuffer> {
   cachedFlagBytes.set(normalizedReference, bytesPromise);
 
   return bytesPromise;
+}
+
+/**
+ * Resolves one flag image from uploaded custom assets or bundled assets.
+ */
+async function loadResolvedFlagBytes(
+  flagReference: string,
+  generationAssets: GenerationAssets,
+): Promise<ArrayBuffer> {
+  const normalizedReference = normalizeFlagReference(flagReference);
+
+  if (normalizedReference === null) {
+    throw new Error(`Invalid bundled flag reference: ${flagReference}`);
+  }
+
+  const customFlagBytes = generationAssets.customFlags[normalizedReference];
+
+  if (customFlagBytes !== undefined) {
+    return customFlagBytes;
+  }
+
+  return loadFlagBytes(normalizedReference);
 }
 
 /**
@@ -461,13 +552,17 @@ async function drawFlag(
   CanvasKit: CanvasKitModule,
   canvas: Canvas,
   entryFlagReference: string,
+  generationAssets: GenerationAssets,
   xOffset: number,
   yOffset: number,
   scalingRatio: number,
   drawBorder: boolean,
   borderColor: Float32Array,
 ): Promise<void> {
-  const imageBytes = await loadFlagBytes(entryFlagReference);
+  const imageBytes = await loadResolvedFlagBytes(
+    entryFlagReference,
+    generationAssets,
+  );
   const image = CanvasKit.MakeImageFromEncoded(imageBytes);
 
   if (image === null) {
@@ -544,6 +639,7 @@ function formatReceivedVoteText(vote: string): string {
 function calculateScoreboardSizes(
   CanvasKit: CanvasKitModule,
   fontProvider: TypefaceFontProvider,
+  baseFontFamily: string,
   contest: RankedContestData,
   config: ScoreboardRenderConfig,
   voterIndex: number,
@@ -557,7 +653,7 @@ function calculateScoreboardSizes(
       return measureText(
         CanvasKit,
         fontProvider,
-        BASE_FONT_FAMILY,
+        baseFontFamily,
         fonts.countrySize,
         entry.country,
       ).width;
@@ -568,7 +664,7 @@ function calculateScoreboardSizes(
       return measureText(
         CanvasKit,
         fontProvider,
-        BASE_FONT_FAMILY,
+        baseFontFamily,
         fonts.entryDetailsSize,
         `${entry.artist} – ${entry.song}`,
       ).width;
@@ -577,14 +673,14 @@ function calculateScoreboardSizes(
   const voterHeaderWidth = measureText(
     CanvasKit,
     fontProvider,
-    BASE_FONT_FAMILY,
+    baseFontFamily,
     fonts.voterHeaderSize,
     voterHeaderText,
   ).width;
   const contestHeaderWidth = measureText(
     CanvasKit,
     fontProvider,
-    BASE_FONT_FAMILY,
+    baseFontFamily,
     fonts.contestHeaderSize,
     contestHeaderText,
   ).width;
@@ -623,21 +719,28 @@ export async function renderScoreboardPng(
   contest: RankedContestData,
   config: ScoreboardRenderConfig,
   voterIndex: number,
+  generationAssets: GenerationAssets,
 ): Promise<Uint8Array> {
-  const [CanvasKit, baseFontBytes, pointsFontBytes] = await Promise.all([
+  const [CanvasKit, renderFonts] = await Promise.all([
     loadCanvasKit(),
-    loadBaseFontBytes(),
-    loadPointsFontBytes(),
+    resolveRenderFonts(generationAssets),
   ]);
   const fontProvider = CanvasKit.TypefaceFontProvider.Make();
 
-  fontProvider.registerFont(baseFontBytes, BASE_FONT_FAMILY);
-  fontProvider.registerFont(pointsFontBytes, POINTS_FONT_FAMILY);
+  fontProvider.registerFont(
+    renderFonts.baseFontBytes,
+    renderFonts.baseFontFamily,
+  );
+  fontProvider.registerFont(
+    renderFonts.pointsFontBytes,
+    renderFonts.pointsFontFamily,
+  );
 
   const colors = createScoreboardColors(config);
   const sizes = calculateScoreboardSizes(
     CanvasKit,
     fontProvider,
+    renderFonts.baseFontFamily,
     contest,
     config,
     voterIndex,
@@ -667,7 +770,7 @@ export async function renderScoreboardPng(
     CanvasKit,
     canvas,
     fontProvider,
-    BASE_FONT_FAMILY,
+    renderFonts.baseFontFamily,
     fonts.voterHeaderSize,
     colors.voterHeaderText,
     `Now Voting: ${contest.voterNames[voterIndex]} (${String(voterIndex + 1)}/${String(contest.numVoters)})`,
@@ -688,7 +791,7 @@ export async function renderScoreboardPng(
     CanvasKit,
     canvas,
     fontProvider,
-    BASE_FONT_FAMILY,
+    renderFonts.baseFontFamily,
     fonts.contestHeaderSize,
     colors.contestHeaderText,
     getContestHeaderText(config),
@@ -751,6 +854,7 @@ export async function renderScoreboardPng(
         CanvasKit,
         canvas,
         entry.flag,
+        generationAssets,
         xOffset,
         yOffset,
         sizes.scalingRatio,
@@ -763,7 +867,7 @@ export async function renderScoreboardPng(
       CanvasKit,
       canvas,
       fontProvider,
-      BASE_FONT_FAMILY,
+      renderFonts.baseFontFamily,
       fonts.countrySize,
       colors.countryText,
       entry.country,
@@ -774,7 +878,7 @@ export async function renderScoreboardPng(
       CanvasKit,
       canvas,
       fontProvider,
-      BASE_FONT_FAMILY,
+      renderFonts.baseFontFamily,
       fonts.entryDetailsSize,
       colors.entryDetailsText,
       `${entry.artist} – ${entry.song}`,
@@ -805,7 +909,7 @@ export async function renderScoreboardPng(
       CanvasKit,
       canvas,
       fontProvider,
-      POINTS_FONT_FAMILY,
+      renderFonts.pointsFontFamily,
       fonts.pointsSize,
       totalPointsTextColor,
       String(entry.displayPoints[voterIndex]),
@@ -836,7 +940,7 @@ export async function renderScoreboardPng(
         CanvasKit,
         canvas,
         fontProvider,
-        POINTS_FONT_FAMILY,
+        renderFonts.pointsFontFamily,
         fonts.pointsSize,
         colors.receivedPointsText,
         formatReceivedVoteText(receivedVote),

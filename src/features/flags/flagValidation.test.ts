@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import type { ContestData } from '../contest/contestTypes';
-import { validateBundledFlags } from './flagValidation';
+import { validateFlagReferences } from './flagValidation';
 
 /**
  * Creates a minimal contest object for flag validation tests.
@@ -24,9 +24,16 @@ function createContestWithFlags(flagReferences: string[]): ContestData {
   };
 }
 
-describe('validateBundledFlags', () => {
+/**
+ * Creates an uploaded custom flag file for validation tests.
+ */
+function createCustomFlagFile(fileName: string): File {
+  return new File(['flag'], fileName, { type: 'image/png' });
+}
+
+describe('validateFlagReferences', () => {
   it('accepts valid bundled flag references', () => {
-    const errors = validateBundledFlags(
+    const errors = validateFlagReferences(
       createContestWithFlags(['World/is.png', 'ISC/Kaledonii.png']),
     );
 
@@ -34,7 +41,7 @@ describe('validateBundledFlags', () => {
   });
 
   it('reports missing bundled flags as blocking errors', () => {
-    const errors = validateBundledFlags(
+    const errors = validateFlagReferences(
       createContestWithFlags(['World/not-real.png']),
     );
 
@@ -46,7 +53,7 @@ describe('validateBundledFlags', () => {
   });
 
   it('rejects escaping or otherwise unsafe flag references', () => {
-    const errors = validateBundledFlags(
+    const errors = validateFlagReferences(
       createContestWithFlags([
         '../World/is.png',
         'World\\is.png',
@@ -63,6 +70,53 @@ describe('validateBundledFlags', () => {
       },
       {
         message: 'Invalid flag reference for Country 3: /World/is.png',
+      },
+    ]);
+  });
+
+  it('accepts valid uploaded custom flag references', () => {
+    const errors = validateFlagReferences(
+      createContestWithFlags(['Custom/A.png']),
+      [createCustomFlagFile('A.png')],
+    );
+
+    expect(errors).toEqual([]);
+  });
+
+  it('reports missing uploaded custom flags as blocking errors', () => {
+    const errors = validateFlagReferences(
+      createContestWithFlags(['Custom/A.png']),
+    );
+
+    expect(errors).toEqual([
+      {
+        message: 'Missing custom flag for Country 1: Custom/A.png',
+      },
+    ]);
+  });
+
+  it('uses only the current uploaded custom flag selection', () => {
+    const errors = validateFlagReferences(
+      createContestWithFlags(['Custom/A.png']),
+      [createCustomFlagFile('B.png')],
+    );
+
+    expect(errors).toEqual([
+      {
+        message: 'Missing custom flag for Country 1: Custom/A.png',
+      },
+    ]);
+  });
+
+  it('reports duplicate uploaded custom flag names as blocking errors', () => {
+    const errors = validateFlagReferences(createContestWithFlags([]), [
+      createCustomFlagFile('A.png'),
+      createCustomFlagFile('A.png'),
+    ]);
+
+    expect(errors).toEqual([
+      {
+        message: 'Duplicate uploaded custom flag file: Custom/A.png',
       },
     ]);
   });

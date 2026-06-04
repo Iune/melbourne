@@ -89,8 +89,11 @@ The initial web form should include:
 - Checkbox for whether the contest file contains a `Count` / `# Voters` column
 - Main color
 - Accent color
+- Base font
+- Points font
 - Checkbox to include flags, default `yes`
 - Checkbox to draw flag borders, default `yes`
+- Custom flag file upload
 
 ### Field specification
 
@@ -127,6 +130,20 @@ The initial web form should include:
   - Required for generation: always has a value
   - Default value: checked / `true`
 
+- `Base font`
+  - Control type: file picker
+  - Required for generation: no
+  - Supported file types in V1: `.ttf`, `.otf`
+  - Behavior: when specified, overrides the bundled default base font for scoreboard generation
+  - Fallback: when not specified, use the bundled default base font
+
+- `Points font`
+  - Control type: file picker
+  - Required for generation: no
+  - Supported file types in V1: `.ttf`, `.otf`
+  - Behavior: when specified, overrides the bundled default points font for scoreboard generation
+  - Fallback: when not specified, use the bundled default points font
+
 - `Draw flag borders`
   - Control type: checkbox
   - Required for generation: always has a value
@@ -134,11 +151,12 @@ The initial web form should include:
   - Behavior: when `Include flags` is unchecked, this control becomes disabled but retains its current value
   - Note: while flags are disabled, the flag border setting is a no-op
 
-- `Custom flag groups`
-  - Control type: not present in the V1 UI
+- `Custom flag file upload`
+  - Control type: multi-file picker
   - Required for generation: no
-  - Default value: not shown in the V1 UI
-  - Future intent: allow user-provided custom flag packs in a later version
+  - Supported file types in V1: `.png`, `.jpg`
+  - Behavior: uploaded files become available as the in-memory `Custom` flag pack for the current session
+  - Spreadsheet reference model: if `A.png` is uploaded, it is referenced in the spreadsheet as `Custom/A.png`
 
 ### Form readiness
 
@@ -153,7 +171,8 @@ The initial web form should include:
 - Each field should be presented on its own line rather than using side-by-side multi-column field layout.
 - The main color reset control should appear next to the main color picker.
 - The accent color reset control should appear next to the accent color picker.
-- The custom flag group section should be hidden for now rather than shown in a disabled state.
+- Font controls should appear in a `Fonts` section.
+- Flag controls, including custom flag file upload, should appear in the existing `Flags` section.
 - The primary action button should appear below all form fields.
 - The state-specific output region should appear below the primary action button.
 - That output region should display the progress bar, validation error table, or success/download area depending on the current state.
@@ -206,17 +225,24 @@ The web version should preserve the existing Melbourne spreadsheet format and sc
 - The app should bundle default fonts and flag assets with the program.
 - The existing `Assets/flags` structure in `melbourne/` is the reference model.
 - Flag references in spreadsheets use pack-relative paths such as `ISC/Kaledonii.png`.
+- The bundled default fonts remain the fallback when no custom fonts are provided.
 
 ### Custom assets
 
-- V1 will not show custom flag group upload controls in the UI.
-- Full support for user-uploaded custom flags is planned for a later iteration.
+- Users can provide custom base and points fonts through the form.
+- Users can provide multiple custom flag images through the form.
+- Custom assets remain client-side only and in memory for the current browser session.
+- Uploaded custom flags are treated as the `Custom` pack and referenced from spreadsheets as `Custom/<file name>`.
+- Custom font and flag uploads do not modify bundled assets.
 
 ### Secure flag resolution
 
 - Spreadsheet flag references must be treated as logical asset identifiers, not trusted file paths.
 - Flag path handling must prevent path traversal or escaping the bundled flags root.
 - If a referenced flag filename or extension does not match an existing bundled file exactly, it is treated as missing.
+- The same secure reference rules apply to the in-memory `Custom` flag pack.
+- Custom flag name matching is exact, including extension.
+- If duplicate custom flag filenames are uploaded within the same run, generation should stop with a blocking validation error rather than guessing which file to use.
 
 ## Output Requirements
 
@@ -293,7 +319,7 @@ The web version should preserve the existing Melbourne spreadsheet format and sc
 
 - XLSX spreadsheet parsing should happen client-side in the browser.
 - A browser-compatible TypeScript-friendly spreadsheet parsing library should be used.
-- SheetJS is the leading candidate for V1.
+- ExcelJS is the selected spreadsheet parsing library for V1.
 
 ### ZIP creation
 
@@ -600,6 +626,47 @@ Acceptance criteria:
 - When flag borders are enabled, borders render correctly around flags.
 - When flags are disabled, scoreboards render correctly without flags.
 - Flag rendering integrates cleanly with the existing scoreboard layout and output flow.
+
+### Milestone 10: Custom Fonts and Custom Flag Pack
+
+Goal:
+
+- Add support for user-provided fonts and a user-provided `Custom` flag pack while preserving the existing bundled asset model.
+
+Scope:
+
+- Add a `Fonts` section to the form with file pickers for custom base and points fonts.
+- Accept `.ttf` and `.otf` files for both custom font inputs.
+- Use uploaded custom fonts for scoreboard generation when provided.
+- Fall back to the bundled default fonts when custom fonts are not provided.
+- Extend the existing `Flags` section with a multi-file upload control for custom flag images.
+- Accept `.png` and `.jpg` files for custom flag uploads.
+- Load uploaded custom flag images into an in-memory `Custom` pack for the current browser session only.
+- Support spreadsheet references like `Custom/A.png` for uploaded custom flag files.
+- Apply the same exact-match and path-safety rules to `Custom/...` references as the bundled packs.
+- Treat duplicate uploaded custom flag filenames as blocking validation errors.
+
+Acceptance criteria:
+
+- The form includes custom base font and points font file pickers in a `Fonts` section.
+- The form includes a multi-file custom flag upload control in the existing `Flags` section.
+- When custom fonts are provided, generated scoreboards use those fonts.
+- When custom fonts are not provided, generated scoreboards continue using the bundled defaults.
+- When valid custom flag files are uploaded, spreadsheet references in the form `Custom/<file name>` resolve correctly during validation and rendering.
+- When no matching custom flag exists, the app reports a blocking missing-flag validation error.
+- When duplicate custom flag filenames are uploaded, the app reports a blocking validation error.
+- All custom assets remain client-side only and are not uploaded to a backend.
+
+Tests:
+
+- Unit tests for custom font selection and fallback behavior where practical.
+- Unit tests for custom flag reference normalization, exact-match lookup, and duplicate-name detection.
+- Component tests covering the new font and custom flag form controls.
+- End-to-end browser tests covering:
+  - successful generation with custom fonts
+  - successful generation with `Custom/...` flag references
+  - blocking validation for missing custom flags
+  - blocking validation for duplicate custom flag filenames
 
 ## Existing Reference
 

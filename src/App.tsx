@@ -18,16 +18,24 @@ import {
   TextInput,
   Title,
   Tooltip,
+  useComputedColorScheme,
+  useMantineColorScheme,
 } from '@mantine/core';
 import {
+  IconBrandGithub,
   IconCheck,
   IconDownload,
+  IconFlag,
+  IconHelp,
   IconLoader2,
+  IconMoon,
   IconRefresh,
+  IconSun,
 } from '@tabler/icons-react';
 import type { FormEventHandler } from 'react';
 import { useEffect, useRef, useState } from 'react';
 
+import { buildGenerationAssets } from './features/assets/generationAssets';
 import { parseContestWorkbook } from './features/contest/contestParser';
 import type {
   ContestData,
@@ -35,7 +43,7 @@ import type {
 } from './features/contest/contestTypes';
 import type { PlaceholderGenerationController } from './features/export/placeholderGenerationClient';
 import { startPlaceholderGeneration } from './features/export/placeholderGenerationClient';
-import { validateBundledFlags } from './features/flags/flagValidation';
+import { validateFlagReferences } from './features/flags/flagValidation';
 import type { ScoreboardRenderConfig } from './features/render/scoreboardRenderer';
 
 const DEFAULT_MAIN_COLOR = '#2F292B';
@@ -47,13 +55,18 @@ type AppState = 'idle' | 'generating' | 'succeeded' | 'validationFailed';
  * Renders the Melbourne app shell and initial scoreboard generation form.
  */
 export function App() {
+  const { setColorScheme } = useMantineColorScheme();
+  const computedColorScheme = useComputedColorScheme('dark');
   const [contestName, setContestName] = useState('');
   const [contestFile, setContestFile] = useState<File | null>(null);
   const [hasCountColumn, setHasCountColumn] = useState(false);
   const [mainColor, setMainColor] = useState(DEFAULT_MAIN_COLOR);
   const [accentColor, setAccentColor] = useState(DEFAULT_ACCENT_COLOR);
+  const [baseFontFile, setBaseFontFile] = useState<File | null>(null);
+  const [pointsFontFile, setPointsFontFile] = useState<File | null>(null);
   const [includeFlags, setIncludeFlags] = useState(true);
   const [drawFlagBorders, setDrawFlagBorders] = useState(true);
+  const [customFlagFiles, setCustomFlagFiles] = useState<File[]>([]);
   const [appState, setAppState] = useState<AppState>('idle');
   const [progressValue, setProgressValue] = useState(0);
   const [progressTotal, setProgressTotal] = useState(0);
@@ -74,6 +87,12 @@ export function App() {
   const hasValidationFailed = appState === 'validationFailed';
   const progressPercent =
     progressTotal === 0 ? 0 : (progressValue / progressTotal) * 100;
+  const hasStatusContent =
+    isGenerating ||
+    hasSucceeded ||
+    generationErrorMessage.length > 0 ||
+    (hasValidationFailed && validationErrors.length > 0);
+  const isDarkMode = computedColorScheme === 'dark';
 
   /**
    * Clears any generated download artifact from the previous run.
@@ -90,7 +109,10 @@ export function App() {
   /**
    * Starts worker-based scoreboard generation after validation succeeds.
    */
-  function beginPlaceholderGeneration(contest: ContestData): void {
+  function beginPlaceholderGeneration(
+    contest: ContestData,
+    customGenerationAssets: Awaited<ReturnType<typeof buildGenerationAssets>>,
+  ): void {
     clearGeneratedArchive();
     setGenerationErrorMessage('');
     setProgressValue(0);
@@ -108,6 +130,7 @@ export function App() {
 
     generationControllerRef.current = startPlaceholderGeneration(
       contest,
+      customGenerationAssets,
       renderConfig,
       {
         onError: (message) => {
@@ -169,8 +192,13 @@ export function App() {
       return;
     }
 
+    const activeCustomFlagFiles = includeFlags ? customFlagFiles : [];
+
     if (includeFlags) {
-      const flagValidationErrors = validateBundledFlags(parseResult.contest);
+      const flagValidationErrors = validateFlagReferences(
+        parseResult.contest,
+        activeCustomFlagFiles,
+      );
 
       if (flagValidationErrors.length > 0) {
         setValidationErrors(flagValidationErrors);
@@ -180,7 +208,31 @@ export function App() {
       }
     }
 
-    beginPlaceholderGeneration(parseResult.contest);
+    let customGenerationAssets: Awaited<
+      ReturnType<typeof buildGenerationAssets>
+    >;
+
+    try {
+      customGenerationAssets = await buildGenerationAssets({
+        baseFontFile,
+        customFlagFiles: activeCustomFlagFiles,
+        pointsFontFile,
+      });
+    } catch (error) {
+      setValidationErrors([
+        {
+          message:
+            error instanceof Error
+              ? error.message
+              : 'Unable to load the selected custom assets.',
+        },
+      ]);
+      setAppState('validationFailed');
+      setProgressValue(0);
+      return;
+    }
+
+    beginPlaceholderGeneration(parseResult.contest, customGenerationAssets);
   }
 
   useEffect(() => {
@@ -214,21 +266,67 @@ export function App() {
     setGenerationErrorMessage('');
   }
 
+  /**
+   * Toggles the Mantine color scheme between light and dark modes.
+   */
+  function handleToggleColorScheme(): void {
+    setColorScheme(isDarkMode ? 'light' : 'dark');
+  }
+
   return (
     <AppShell header={{ height: 64 }} padding="md">
       <AppShell.Header>
         <Container h="100%" size="lg">
           <Group h="100%" justify="space-between">
-            <Anchor fw={700} href="/" size="lg" underline="hover">
-              Melbourne
+            <Anchor
+              fw={700}
+              href="/"
+              size="xl"
+              underline="never"
+              variant="gradient"
+              gradient={{ from: '#ff5e3a', to: '#ff2a68' }}
+            >
+              Melbourne Scoreboard Generator
             </Anchor>
             <Group gap="lg">
               <Anchor href="#" underline="hover">
-                Help
+                <Group gap={4} wrap="nowrap">
+                  <IconHelp size={16} />
+                  <span>Help</span>
+                </Group>
               </Anchor>
               <Anchor href="#" underline="hover">
-                Flags
+                <Group gap={4} wrap="nowrap">
+                  <IconFlag size={16} />
+                  <span>Flags</span>
+                </Group>
               </Anchor>
+              <Anchor href="https://github.com/Iune/melbourne" underline="hover">
+                <Group gap={4} wrap="nowrap">
+                  <IconBrandGithub size={16} />
+                  <span>GitHub</span>
+                </Group>
+              </Anchor>
+              <Tooltip
+                label={
+                  isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'
+                }
+              >
+                <ActionIcon
+                  aria-label={
+                    isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'
+                  }
+                  onClick={handleToggleColorScheme}
+                  size="lg"
+                  variant="subtle"
+                >
+                  {isDarkMode ? (
+                    <IconSun size={18} stroke={1.8} />
+                  ) : (
+                    <IconMoon size={18} stroke={1.8} />
+                  )}
+                </ActionIcon>
+              </Tooltip>
             </Group>
           </Group>
         </Container>
@@ -238,113 +336,160 @@ export function App() {
         <Container size="lg">
           <Stack gap="lg" py="xl">
             <Title order={1}>Generate Scoreboards</Title>
-            <form onSubmit={handleSubmit} style={{ maxWidth: '40rem' }}>
+            <form onSubmit={handleSubmit}>
               <Stack gap="md">
-                <Fieldset legend="Contest Details">
+                <SimpleGrid
+                  cols={{ base: 1, md: 2 }}
+                  spacing="md"
+                  verticalSpacing="md"
+                >
                   <Stack gap="md">
-                    <TextInput
-                      disabled={isGenerating}
-                      label="Contest Title"
-                      onChange={(event) =>
-                        setContestName(event.currentTarget.value)
-                      }
-                      value={contestName}
-                    />
-                    <FileInput
-                      accept=".xlsx"
-                      clearable
-                      disabled={isGenerating}
-                      label="Contest File"
-                      onChange={setContestFile}
-                      placeholder="Select .xlsx file"
-                      value={contestFile}
-                    />
-                    <Checkbox
-                      checked={hasCountColumn}
-                      disabled={isGenerating}
-                      label="Contest file contains ‘Count’ column"
-                      onChange={(event) =>
-                        setHasCountColumn(event.currentTarget.checked)
-                      }
-                    />
+                    <Fieldset legend="Contest Details">
+                      <Stack gap="md">
+                        <TextInput
+                          disabled={isGenerating}
+                          label="Contest Title"
+                          onChange={(event) =>
+                            setContestName(event.currentTarget.value)
+                          }
+                          placeholder="Contest Results"
+                          value={contestName}
+                        />
+                        <FileInput
+                          accept=".xlsx"
+                          clearable
+                          disabled={isGenerating}
+                          label="Contest File"
+                          onChange={setContestFile}
+                          placeholder="Select .xlsx file"
+                          value={contestFile}
+                        />
+                        <Checkbox
+                          checked={hasCountColumn}
+                          disabled={isGenerating}
+                          label="Contest file contains ‘Count’ column"
+                          onChange={(event) =>
+                            setHasCountColumn(event.currentTarget.checked)
+                          }
+                        />
+                      </Stack>
+                    </Fieldset>
+                    <Fieldset legend="Colors">
+                      <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
+                        <ColorInput
+                          aria-label="Main color"
+                          disabled={isGenerating}
+                          format="hex"
+                          label="Main Color"
+                          onChange={setMainColor}
+                          rightSection={
+                            <Tooltip label="Reset main color">
+                              <ActionIcon
+                                aria-label="Reset main color"
+                                disabled={isGenerating}
+                                onClick={() => setMainColor(DEFAULT_MAIN_COLOR)}
+                                size="sm"
+                                type="button"
+                                variant="subtle"
+                              >
+                                <IconRefresh size={16} stroke={1.8} />
+                              </ActionIcon>
+                            </Tooltip>
+                          }
+                          rightSectionPointerEvents="all"
+                          rightSectionWidth={36}
+                          swatches={[DEFAULT_MAIN_COLOR]}
+                          value={mainColor}
+                          w="100%"
+                        />
+                        <ColorInput
+                          aria-label="Accent color"
+                          disabled={isGenerating}
+                          format="hex"
+                          label="Accent Color"
+                          onChange={setAccentColor}
+                          rightSection={
+                            <Tooltip label="Reset accent color">
+                              <ActionIcon
+                                aria-label="Reset accent color"
+                                disabled={isGenerating}
+                                onClick={() =>
+                                  setAccentColor(DEFAULT_ACCENT_COLOR)
+                                }
+                                size="sm"
+                                type="button"
+                                variant="subtle"
+                              >
+                                <IconRefresh size={16} stroke={1.8} />
+                              </ActionIcon>
+                            </Tooltip>
+                          }
+                          rightSectionPointerEvents="all"
+                          rightSectionWidth={36}
+                          swatches={[DEFAULT_ACCENT_COLOR]}
+                          value={accentColor}
+                          w="100%"
+                        />
+                      </SimpleGrid>
+                    </Fieldset>
                   </Stack>
-                </Fieldset>
-                <Fieldset legend="Colors">
-                  <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
-                    <ColorInput
-                      aria-label="Main color"
-                      disabled={isGenerating}
-                      format="hex"
-                      label="Main Color"
-                      onChange={setMainColor}
-                      rightSection={
-                        <Tooltip label="Reset main color">
-                          <ActionIcon
-                            aria-label="Reset main color"
+                  <Stack gap="md">
+                    <Fieldset legend="Flags">
+                      <Stack gap="md">
+                        <Group gap="xl" wrap="wrap">
+                          <Checkbox
+                            checked={includeFlags}
                             disabled={isGenerating}
-                            onClick={() => setMainColor(DEFAULT_MAIN_COLOR)}
-                            size="sm"
-                            type="button"
-                            variant="subtle"
-                          >
-                            <IconRefresh size={16} stroke={1.8} />
-                          </ActionIcon>
-                        </Tooltip>
-                      }
-                      rightSectionPointerEvents="all"
-                      rightSectionWidth={36}
-                      swatches={[DEFAULT_MAIN_COLOR]}
-                      value={mainColor}
-                      w="100%"
-                    />
-                    <ColorInput
-                      aria-label="Accent color"
-                      disabled={isGenerating}
-                      format="hex"
-                      label="Accent Color"
-                      onChange={setAccentColor}
-                      rightSection={
-                        <Tooltip label="Reset accent color">
-                          <ActionIcon
-                            aria-label="Reset accent color"
-                            disabled={isGenerating}
-                            onClick={() => setAccentColor(DEFAULT_ACCENT_COLOR)}
-                            size="sm"
-                            type="button"
-                            variant="subtle"
-                          >
-                            <IconRefresh size={16} stroke={1.8} />
-                          </ActionIcon>
-                        </Tooltip>
-                      }
-                      rightSectionPointerEvents="all"
-                      rightSectionWidth={36}
-                      swatches={[DEFAULT_ACCENT_COLOR]}
-                      value={accentColor}
-                      w="100%"
-                    />
-                  </SimpleGrid>
-                </Fieldset>
-                <Fieldset legend="Flags">
-                  <Group gap="xl" wrap="wrap">
-                    <Checkbox
-                      checked={includeFlags}
-                      disabled={isGenerating}
-                      label="Include flags"
-                      onChange={(event) =>
-                        setIncludeFlags(event.currentTarget.checked)
-                      }
-                    />
-                    <Checkbox
-                      checked={drawFlagBorders}
-                      disabled={!includeFlags || isGenerating}
-                      label="Draw flag borders"
-                      onChange={(event) =>
-                        setDrawFlagBorders(event.currentTarget.checked)
-                      }
-                    />
-                  </Group>
-                </Fieldset>
+                            label="Include flags"
+                            onChange={(event) =>
+                              setIncludeFlags(event.currentTarget.checked)
+                            }
+                          />
+                          <Checkbox
+                            checked={drawFlagBorders}
+                            disabled={!includeFlags || isGenerating}
+                            label="Draw flag borders"
+                            onChange={(event) =>
+                              setDrawFlagBorders(event.currentTarget.checked)
+                            }
+                          />
+                        </Group>
+                        <FileInput
+                          accept=".png,.jpg"
+                          clearable
+                          disabled={!includeFlags || isGenerating}
+                          label="Custom Flag Files"
+                          multiple
+                          onChange={(files) => setCustomFlagFiles(files ?? [])}
+                          placeholder="Select .png or .jpg file(s)"
+                          value={customFlagFiles}
+                        />
+                      </Stack>
+                    </Fieldset>
+                    <Fieldset legend="Custom Fonts">
+                      <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
+                        <FileInput
+                          accept=".ttf,.otf"
+                          clearable
+                          disabled={isGenerating}
+                          label="Base Font"
+                          onChange={setBaseFontFile}
+                          placeholder="Select .ttf or .otf file"
+                          value={baseFontFile}
+                        />
+                        <FileInput
+                          accept=".ttf,.otf"
+                          clearable
+                          disabled={isGenerating}
+                          label="Points Font"
+                          onChange={setPointsFontFile}
+                          placeholder="Select .ttf or .otf file"
+                          value={pointsFontFile}
+                        />
+                      </SimpleGrid>
+                    </Fieldset>
+                  </Stack>
+                </SimpleGrid>
                 <Group justify="flex-start">
                   <Button
                     color={isGenerating ? 'red' : undefined}
@@ -362,9 +507,10 @@ export function App() {
                   </Button>
                 </Group>
                 <Stack aria-live="polite" gap="sm">
+                  {hasStatusContent ? <Title order={3}>Status</Title> : null}
                   {isGenerating ? (
                     <Alert
-                      icon={<IconLoader2 size={16} />}
+                      icon={<IconLoader2 size={18} />}
                       title="Generating Scoreboards"
                       variant="default"
                     >
@@ -374,6 +520,7 @@ export function App() {
                           generated
                         </Text>
                         <Progress
+                          size="xl"
                           aria-label="Generation progress"
                           value={progressPercent}
                         />
@@ -382,8 +529,8 @@ export function App() {
                   ) : null}
                   {hasSucceeded ? (
                     <Alert
-                      icon={<IconCheck size={16} />}
-                      title="Generating Scoreboards"
+                      icon={<IconCheck size={18} />}
+                      title="Generation Complete"
                       variant="default"
                     >
                       <Stack gap="xs">

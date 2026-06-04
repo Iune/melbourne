@@ -1,3 +1,4 @@
+import type { GenerationAssets } from '../assets/generationAssets';
 import type { ContestData } from '../contest/contestTypes';
 import type { ScoreboardRenderConfig } from '../render/scoreboardRenderer';
 import type {
@@ -26,6 +27,7 @@ export interface PlaceholderGenerationController {
  */
 export function startPlaceholderGeneration(
   contest: ContestData,
+  generationAssets: GenerationAssets,
   renderConfig: ScoreboardRenderConfig,
   callbacks: PlaceholderGenerationCallbacks,
 ): PlaceholderGenerationController {
@@ -59,6 +61,7 @@ export function startPlaceholderGeneration(
 
   const request: PlaceholderGenerationRequest = {
     contest,
+    generationAssets,
     renderConfig,
   };
 

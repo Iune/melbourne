@@ -67,7 +67,7 @@ test('switches from generate to cancel and then shows success', async ({
   await page.getByRole('button', { name: 'Generate' }).click();
 
   await expect(page.getByRole('button', { name: 'Cancel' })).toBeVisible();
-  await expect(page.getByText(/png preview images generated/i)).toBeVisible();
+  await expect(page.getByText(/scoreboards generated/i)).toBeVisible();
   await expect(page.getByRole('link', { name: 'Download ZIP' })).toBeVisible({
     timeout: 15000,
   });
@@ -102,7 +102,7 @@ test('cancel stops the generation flow and returns to idle', async ({
   );
 });
 
-test('downloads a zip containing one placeholder file per voter', async ({
+test('downloads a zip containing one scoreboard png per voter', async ({
   page,
 }) => {
   await page.goto('/');

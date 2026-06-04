@@ -27,8 +27,8 @@ self.onmessage = async (
 
   try {
     const archive = await buildPlaceholderArchive(
-      event.data.contestName,
       event.data.contest,
+      event.data.renderConfig,
       {
         isCancelled: () => wasCancelled,
         onProgress: (completed, total) => {
@@ -59,7 +59,7 @@ self.onmessage = async (
       message:
         error instanceof Error
           ? error.message
-          : 'Unable to generate placeholder exports.',
+          : 'Unable to generate scoreboard exports.',
       type: 'error',
     });
   }

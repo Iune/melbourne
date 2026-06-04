@@ -1,8 +1,12 @@
 import JSZip from 'jszip';
 
+import { buildRankedContest } from '../contest/contestResults';
 import type { ContestData } from '../contest/contestTypes';
 import { createPlaceholderFileName, createZipFileName } from './fileNames';
-import { renderHelloWorldPng } from '../render/helloWorldRenderer';
+import {
+  renderScoreboardPng,
+  type ScoreboardRenderConfig,
+} from '../render/scoreboardRenderer';
 
 /**
  * Represents the generated placeholder ZIP archive.
@@ -31,22 +35,27 @@ function waitForNextTask(): Promise<void> {
 }
 
 /**
- * Generates placeholder PNG files and packages them into a ZIP archive.
+ * Generates scoreboard PNG files and packages them into a ZIP archive.
  */
 export async function buildPlaceholderArchive(
-  contestName: string,
   contest: ContestData,
+  renderConfig: ScoreboardRenderConfig,
   callbacks: PlaceholderArchiveCallbacks,
 ): Promise<PlaceholderArchiveResult> {
   const zip = new JSZip();
   const totalVoters = contest.voterNames.length;
-  const renderedImageBytes = await renderHelloWorldPng();
+  const rankedContest = buildRankedContest(contest);
 
   for (let voterIndex = 0; voterIndex < totalVoters; voterIndex += 1) {
     if (callbacks.isCancelled()) {
       throw new Error('Generation was cancelled.');
     }
 
+    const renderedImageBytes = await renderScoreboardPng(
+      rankedContest,
+      renderConfig,
+      voterIndex,
+    );
     const fileName = createPlaceholderFileName(
       contest.voterNames[voterIndex] ?? '',
       voterIndex,
@@ -66,6 +75,6 @@ export async function buildPlaceholderArchive(
   return {
     archiveBytes: await zip.generateAsync({ type: 'uint8array' }),
     generatedCount: totalVoters,
-    zipFileName: createZipFileName(contestName),
+    zipFileName: createZipFileName(renderConfig.title),
   };
 }

@@ -3,15 +3,46 @@ import { describe, expect, it } from 'vitest';
 
 import type { ContestData } from '../contest/contestTypes';
 import { buildPlaceholderArchive } from './placeholderArchive';
+import type { ScoreboardRenderConfig } from '../render/scoreboardRenderer';
 
 const PNG_SIGNATURE = [137, 80, 78, 71, 13, 10, 26, 10];
 
 const SAMPLE_CONTEST: ContestData = {
-  entries: [],
+  entries: [
+    {
+      artist: 'Artist A',
+      country: 'Alpha',
+      flag: 'World/is.png',
+      song: 'Song A',
+      votes: ['12', '', ''],
+    },
+    {
+      artist: 'Artist B',
+      country: 'Beta',
+      flag: 'World/se.png',
+      song: 'Song B',
+      votes: ['', '10', ''],
+    },
+    {
+      artist: 'Artist C',
+      country: 'Gamma',
+      flag: 'World/no.png',
+      song: 'Song C',
+      votes: ['8', '12', 'dq'],
+    },
+  ],
   hasCountColumn: false,
-  numEntries: 0,
+  numEntries: 3,
   numVoters: 3,
   voterNames: ['Denmark', 'United Kingdom', 'Sweden'],
+};
+const SAMPLE_RENDER_CONFIG: ScoreboardRenderConfig = {
+  accentColor: '#FCB906',
+  appendResultsToTitle: true,
+  displayFlagBorders: false,
+  displayFlags: false,
+  mainColor: '#2F292B',
+  title: 'FSC 281',
 };
 
 /**
@@ -24,14 +55,18 @@ function hasPngSignature(bytes: Uint8Array): boolean {
 }
 
 describe('buildPlaceholderArchive', () => {
-  it('creates one placeholder png file per voter in a zip archive', async () => {
+  it('creates one scoreboard png file per voter in a zip archive', async () => {
     const progressUpdates: Array<[number, number]> = [];
-    const archive = await buildPlaceholderArchive('FSC 281', SAMPLE_CONTEST, {
-      isCancelled: () => false,
-      onProgress: (completed, total) => {
-        progressUpdates.push([completed, total]);
+    const archive = await buildPlaceholderArchive(
+      SAMPLE_CONTEST,
+      SAMPLE_RENDER_CONFIG,
+      {
+        isCancelled: () => false,
+        onProgress: (completed, total) => {
+          progressUpdates.push([completed, total]);
+        },
       },
-    });
+    );
 
     expect(archive.generatedCount).toBe(3);
     expect(archive.zipFileName).toBe('FSC 281.zip');
@@ -61,7 +96,7 @@ describe('buildPlaceholderArchive', () => {
     let shouldCancel = false;
 
     await expect(
-      buildPlaceholderArchive('FSC 281', SAMPLE_CONTEST, {
+      buildPlaceholderArchive(SAMPLE_CONTEST, SAMPLE_RENDER_CONFIG, {
         isCancelled: () => shouldCancel,
         onProgress: (completed) => {
           if (completed === 1) {

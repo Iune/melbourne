@@ -36,6 +36,7 @@ import type {
 import type { PlaceholderGenerationController } from './features/export/placeholderGenerationClient';
 import { startPlaceholderGeneration } from './features/export/placeholderGenerationClient';
 import { validateBundledFlags } from './features/flags/flagValidation';
+import type { ScoreboardRenderConfig } from './features/render/scoreboardRenderer';
 
 const DEFAULT_MAIN_COLOR = '#2F292B';
 const DEFAULT_ACCENT_COLOR = '#FCB906';
@@ -87,7 +88,7 @@ export function App() {
   }
 
   /**
-   * Starts worker-based placeholder generation after validation succeeds.
+   * Starts worker-based scoreboard generation after validation succeeds.
    */
   function beginPlaceholderGeneration(contest: ContestData): void {
     clearGeneratedArchive();
@@ -96,9 +97,18 @@ export function App() {
     setProgressTotal(contest.numVoters);
     setAppState('generating');
 
+    const renderConfig: ScoreboardRenderConfig = {
+      accentColor,
+      appendResultsToTitle: true,
+      displayFlagBorders: drawFlagBorders,
+      displayFlags: includeFlags,
+      mainColor,
+      title: contestName,
+    };
+
     generationControllerRef.current = startPlaceholderGeneration(
-      contestName,
       contest,
+      renderConfig,
       {
         onError: (message) => {
           generationControllerRef.current = null;
@@ -360,7 +370,7 @@ export function App() {
                     >
                       <Stack gap="xs">
                         <Text size="sm">
-                          {progressValue} of {progressTotal} PNG preview images
+                          {progressValue} of {progressTotal} scoreboards
                           generated
                         </Text>
                         <Progress
@@ -378,7 +388,7 @@ export function App() {
                     >
                       <Stack gap="xs">
                         <Text size="sm">
-                          PNG preview images are ready for download.
+                          Scoreboards are ready for download.
                         </Text>
                         <Progress
                           size="xl"

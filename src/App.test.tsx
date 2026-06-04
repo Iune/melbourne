@@ -149,7 +149,7 @@ describe('App', () => {
       screen.getByRole('link', { name: 'Download ZIP' }),
     ).toBeInTheDocument();
     expect(
-      screen.getByText('PNG preview images are ready for download.'),
+      screen.getByText('Scoreboards are ready for download.'),
     ).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Generate' })).toBeEnabled();
   });
@@ -184,7 +184,7 @@ describe('App', () => {
 
     expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
     expect(
-      screen.getByText('0 of 2 PNG preview images generated'),
+      screen.getByText('0 of 2 scoreboards generated'),
     ).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
@@ -194,7 +194,7 @@ describe('App', () => {
       screen.queryByRole('button', { name: 'Download ZIP' }),
     ).not.toBeInTheDocument();
     expect(
-      screen.queryByText(/png preview images generated/i),
+      screen.queryByText(/scoreboards generated/i),
     ).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Generate' })).toBeEnabled();
   });

@@ -566,6 +566,7 @@ Goal:
 
 Scope:
 
+- The existing scoreboard generation code used SkiaSharp, while we are using Skia/CanvasKit. While the former is in C# and our code is in Typescript, the functions should generally be similar since both are wrappers to Skia.
 - Use parsed contest data to generate scoreboard PNGs for each voter.
 - Recreate the scoreboard layout structure without drawing flags.
 - Implement title, voter header, entry ordering, point totals, and awarded-points display.

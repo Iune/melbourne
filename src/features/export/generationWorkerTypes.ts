@@ -1,11 +1,12 @@
 import type { ContestData } from '../contest/contestTypes';
+import type { ScoreboardRenderConfig } from '../render/scoreboardRenderer';
 
 /**
- * Represents a placeholder export job sent from the UI to the worker.
+ * Represents a scoreboard export job sent from the UI to the worker.
  */
 export interface PlaceholderGenerationRequest {
   contest: ContestData;
-  contestName: string;
+  renderConfig: ScoreboardRenderConfig;
 }
 
 /**

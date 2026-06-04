@@ -1,4 +1,5 @@
 import type { ContestData } from '../contest/contestTypes';
+import type { ScoreboardRenderConfig } from '../render/scoreboardRenderer';
 import type {
   PlaceholderGenerationRequest,
   PlaceholderGenerationWorkerMessage,
@@ -21,11 +22,11 @@ export interface PlaceholderGenerationController {
 }
 
 /**
- * Starts placeholder export generation inside a dedicated worker.
+ * Starts scoreboard export generation inside a dedicated worker.
  */
 export function startPlaceholderGeneration(
-  contestName: string,
   contest: ContestData,
+  renderConfig: ScoreboardRenderConfig,
   callbacks: PlaceholderGenerationCallbacks,
 ): PlaceholderGenerationController {
   const worker = new Worker(
@@ -52,13 +53,13 @@ export function startPlaceholderGeneration(
   };
 
   worker.onerror = () => {
-    callbacks.onError('Unable to generate placeholder exports.');
+    callbacks.onError('Unable to generate scoreboard exports.');
     worker.terminate();
   };
 
   const request: PlaceholderGenerationRequest = {
     contest,
-    contestName,
+    renderConfig,
   };
 
   worker.postMessage(request);

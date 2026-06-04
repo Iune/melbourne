@@ -83,7 +83,7 @@ describe('App', () => {
     );
     expect(screen.getByRole('link', { name: 'Flags' })).toHaveAttribute(
       'href',
-      '#',
+      '#flags',
     );
     expect(
       screen.getByRole('button', { name: 'Switch to dark mode' }),
@@ -144,6 +144,33 @@ describe('App', () => {
     expect(
       screen.getByRole('button', { name: 'Switch to light mode' }),
     ).toBeInTheDocument();
+  });
+
+  it('shows the bundled flags view from the navbar', async () => {
+    const user = userEvent.setup();
+    mockedParseContestWorkbook.mockResolvedValue({
+      contest: {
+        entries: [],
+        hasCountColumn: false,
+        numEntries: 0,
+        numVoters: 0,
+        voterNames: [],
+      },
+      ok: true,
+    });
+    renderApp();
+
+    await user.click(screen.getByRole('link', { name: 'Flags' }));
+
+    expect(
+      screen.getByRole('heading', { name: 'Bundled Flags' }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /ISC \(\d+\)/ })).toBeVisible();
+    expect(screen.getByRole('button', { name: /Rect \(\d+\)/ })).toBeVisible();
+    expect(screen.getByRole('button', { name: /World \(\d+\)/ })).toBeVisible();
+    expect(
+      screen.queryByRole('heading', { name: 'Generate Scoreboards' }),
+    ).not.toBeInTheDocument();
   });
 
   it('runs the mocked generation flow through success', async () => {

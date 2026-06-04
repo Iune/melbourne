@@ -45,13 +45,30 @@ test('loads the scaffolded app shell', async ({ page }) => {
   );
   await expect(page.getByRole('link', { name: 'Flags' })).toHaveAttribute(
     'href',
-    '#',
+    '#flags',
   );
   await expect(
     page.getByRole('heading', { name: 'Generate Scoreboards' }),
   ).toBeVisible();
   await expect(
     page.getByRole('button', { name: 'Switch to dark mode' }),
+  ).toBeVisible();
+});
+
+test('shows the bundled flags view from the navbar', async ({ page }) => {
+  await page.goto('/');
+
+  await page.getByRole('link', { name: 'Flags' }).click();
+
+  await expect(
+    page.getByRole('heading', { name: 'Bundled Flags' }),
+  ).toBeVisible();
+  await expect(page.getByRole('button', { name: /ISC \(\d+\)/ })).toBeVisible();
+  await expect(
+    page.getByRole('button', { name: /Rect \(\d+\)/ }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole('button', { name: /World \(\d+\)/ }),
   ).toBeVisible();
 });
 

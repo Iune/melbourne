@@ -7,10 +7,12 @@ import {
   Button,
   Checkbox,
   ColorInput,
+  Code,
   Container,
   Fieldset,
   FileInput,
   Group,
+  List,
   Progress,
   SimpleGrid,
   Stack,
@@ -33,7 +35,7 @@ import {
   IconRefresh,
   IconSun,
 } from '@tabler/icons-react';
-import type { FormEventHandler } from 'react';
+import type { FormEventHandler, ReactNode } from 'react';
 import { useEffect, useRef, useState } from 'react';
 
 import { buildGenerationAssets } from './features/assets/generationAssets';
@@ -44,15 +46,16 @@ import type {
 } from './features/contest/contestTypes';
 import type { ScoreboardGenerationController } from './features/export/scoreboardGenerationClient';
 import { startScoreboardGeneration } from './features/export/scoreboardGenerationClient';
-import { validateFlagReferences } from './features/flags/flagValidation';
 import { getBundledFlagAssetEntriesByPack } from './features/flags/flagAssets';
+import { validateFlagReferences } from './features/flags/flagValidation';
+import { HELP_SECTIONS, type HelpRichText } from './helpContent';
 import type { ScoreboardRenderConfig } from './features/render/scoreboardRenderer';
 
 const DEFAULT_MAIN_COLOR = '#2F292B';
 const DEFAULT_ACCENT_COLOR = '#FCB906';
 
 type AppState = 'idle' | 'generating' | 'succeeded' | 'validationFailed';
-type AppView = 'generator' | 'flags';
+type AppView = 'generator' | 'flags' | 'help';
 
 /**
  * Renders the Melbourne app shell and initial scoreboard generation form.
@@ -279,6 +282,41 @@ export function App() {
     setColorScheme(isDarkMode ? 'light' : 'dark');
   }
 
+  /**
+   * Renders one structured help paragraph or list item.
+   */
+  function renderHelpRichText(content: HelpRichText): ReactNode {
+    return content.map((fragment, index) => {
+      const key = `${fragment.type}-${fragment.text}-${index}`;
+
+      if (fragment.type === 'bold') {
+        return (
+          <Text component="span" fw={700} key={key}>
+            {fragment.text}
+          </Text>
+        );
+      }
+
+      if (fragment.type === 'code') {
+        return <Code key={key}>{fragment.text}</Code>;
+      }
+
+      if (fragment.type === 'link') {
+        return (
+          <Anchor href={fragment.href} key={key} underline="hover">
+            {fragment.text}
+          </Anchor>
+        );
+      }
+
+      return (
+        <Text component="span" key={key}>
+          {fragment.text}
+        </Text>
+      );
+    });
+  }
+
   return (
     <AppShell header={{ height: 64 }} padding="md">
       <AppShell.Header>
@@ -299,7 +337,14 @@ export function App() {
               Melbourne Scoreboard Generator
             </Anchor>
             <Group gap="lg">
-              <Anchor href="#" underline="hover">
+              <Anchor
+                href="#help"
+                onClick={(event) => {
+                  event.preventDefault();
+                  setCurrentView('help');
+                }}
+                underline="hover"
+              >
                 <Group gap={4} wrap="nowrap">
                   <IconHelp size={16} />
                   <span>Help</span>
@@ -607,7 +652,7 @@ export function App() {
                 </Stack>
               </form>
             </Stack>
-          ) : (
+          ) : currentView === 'flags' ? (
             <Stack gap="lg" py="xl">
               <Title order={1}>Bundled Flags</Title>
               <Text c="dimmed" size="sm">
@@ -643,6 +688,33 @@ export function App() {
                   ),
                 )}
               </Accordion>
+            </Stack>
+          ) : (
+            <Stack gap="lg" py="xl">
+              <Title order={1}>Help</Title>
+              {HELP_SECTIONS.map((section) => (
+                <Stack gap="sm" key={section.title}>
+                  <Title order={section.titleLevel}>{section.title}</Title>
+                  {section.body?.map((paragraph) => (
+                    <Text
+                      key={paragraph.map((fragment) => fragment.text).join('')}
+                    >
+                      {renderHelpRichText(paragraph)}
+                    </Text>
+                  ))}
+                  {section.items !== undefined ? (
+                    <List spacing="xs">
+                      {section.items.map((item) => (
+                        <List.Item
+                          key={item.map((fragment) => fragment.text).join('')}
+                        >
+                          {renderHelpRichText(item)}
+                        </List.Item>
+                      ))}
+                    </List>
+                  ) : null}
+                </Stack>
+              ))}
             </Stack>
           )}
         </Container>

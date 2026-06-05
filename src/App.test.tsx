@@ -79,7 +79,7 @@ describe('App', () => {
     ).toHaveAttribute('href', '/');
     expect(screen.getByRole('link', { name: 'Help' })).toHaveAttribute(
       'href',
-      '#',
+      '#help',
     );
     expect(screen.getByRole('link', { name: 'Flags' })).toHaveAttribute(
       'href',
@@ -171,6 +171,36 @@ describe('App', () => {
     expect(
       screen.queryByRole('heading', { name: 'Generate Scoreboards' }),
     ).not.toBeInTheDocument();
+  });
+
+  it('shows the help view from the navbar', async () => {
+    const user = userEvent.setup();
+    mockedParseContestWorkbook.mockResolvedValue({
+      contest: {
+        entries: [],
+        hasCountColumn: false,
+        numEntries: 0,
+        numVoters: 0,
+        voterNames: [],
+      },
+      ok: true,
+    });
+    renderApp();
+
+    await user.click(screen.getByRole('link', { name: 'Help' }));
+
+    expect(screen.getByRole('heading', { name: 'Help' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: 'Input File Format' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: 'Running the Program' }),
+    ).toBeInTheDocument();
+    expect(screen.getByText('DQ')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: '1988.xlsx' })).toHaveAttribute(
+      'href',
+      '/1988.xlsx',
+    );
   });
 
   it('runs the mocked generation flow through success', async () => {

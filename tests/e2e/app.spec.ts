@@ -41,7 +41,7 @@ test('loads the scaffolded app shell', async ({ page }) => {
   );
   await expect(page.getByRole('link', { name: 'Help' })).toHaveAttribute(
     'href',
-    '#',
+    '#help',
   );
   await expect(page.getByRole('link', { name: 'Flags' })).toHaveAttribute(
     'href',
@@ -69,6 +69,20 @@ test('shows the bundled flags view from the navbar', async ({ page }) => {
   ).toBeVisible();
   await expect(
     page.getByRole('button', { name: /World \(\d+\)/ }),
+  ).toBeVisible();
+});
+
+test('shows the help view from the navbar', async ({ page }) => {
+  await page.goto('/');
+
+  await page.getByRole('link', { name: 'Help' }).click();
+
+  await expect(page.getByRole('heading', { name: 'Help' })).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'Input File Format' }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'Running the Program' }),
   ).toBeVisible();
 });
 

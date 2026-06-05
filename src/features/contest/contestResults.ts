@@ -1,7 +1,7 @@
 import type { ContestData, ContestEntry } from './contestTypes';
 
 /**
- * Represents one contest entry enriched with cumulative scoring details.
+ * Represents one parsed contest entry enriched with cumulative scoring metadata.
  */
 export interface RankedContestEntry extends ContestEntry {
   displayPoints: number[];
@@ -10,7 +10,7 @@ export interface RankedContestEntry extends ContestEntry {
 }
 
 /**
- * Represents contest data enriched with ranking metadata.
+ * Represents contest data enriched with the metadata needed for per-voter ranking and rendering.
  */
 export interface RankedContestData {
   entries: RankedContestEntry[];
@@ -21,14 +21,20 @@ export interface RankedContestData {
 }
 
 /**
- * Returns true when the vote marks the entry as disqualified.
+ * Checks whether a raw vote cell marks the entry as disqualified.
+ *
+ * @param vote The raw vote cell text from the workbook.
+ * @returns `true` when the vote text represents a disqualification marker.
  */
 function isDqVote(vote: string): boolean {
   return vote.trim().toLowerCase() === 'dq';
 }
 
 /**
- * Parses one vote cell into an integer score when it is numeric.
+ * Parses a raw vote cell into an integer score when the value is numeric.
+ *
+ * @param vote The raw vote cell text from the workbook.
+ * @returns The truncated numeric vote value, or `null` when the cell is blank or non-numeric.
  */
 export function parseVoteValue(vote: string): number | null {
   const trimmedVote = vote.trim();
@@ -47,7 +53,10 @@ export function parseVoteValue(vote: string): number | null {
 }
 
 /**
- * Computes cumulative display points for one entry across all voters.
+ * Computes the cumulative display-point total for one entry after each voter reveal.
+ *
+ * @param votes The raw vote values for a single entry, in voter order.
+ * @returns An array whose `n`th element is the running score shown after voter `n`.
  */
 function calculateDisplayPoints(votes: string[]): number[] {
   let runningTotal = 0;
@@ -64,7 +73,11 @@ function calculateDisplayPoints(votes: string[]): number[] {
 }
 
 /**
- * Computes the cumulative DQ status for one entry across all voters.
+ * Computes whether an entry should be treated as disqualified after each voter reveal.
+ *
+ * @param votes The raw vote values for a single entry, in voter order.
+ * @returns An array whose `n`th element indicates whether the entry is disqualified after voter
+ * `n`.
  */
 function calculateDqStatuses(votes: string[]): boolean[] {
   let isDisqualified = false;
@@ -79,7 +92,12 @@ function calculateDqStatuses(votes: string[]): boolean[] {
 }
 
 /**
- * Computes sorting points, replacing totals with -1000 after disqualification.
+ * Computes the score values used for sorting standings after each voter reveal.
+ *
+ * @param displayPoints The cumulative visible point totals for one entry after each voter.
+ * @param dqStatuses The cumulative disqualification status for the same entry after each voter.
+ * @returns A per-voter score array suitable for ranking, where disqualified states are forced to a
+ * low sentinel value so they sort below non-disqualified entries.
  */
 function calculateSortingPoints(
   displayPoints: number[],
@@ -91,7 +109,11 @@ function calculateSortingPoints(
 }
 
 /**
- * Builds one ranked contest entry from parsed spreadsheet data.
+ * Enriches one parsed contest entry with cumulative scoring metadata.
+ *
+ * @param entry The parsed contest entry row from the workbook.
+ * @returns A `RankedContestEntry` containing running totals, disqualification state, and sorting
+ * scores.
  */
 function buildRankedEntry(entry: ContestEntry): RankedContestEntry {
   const displayPoints = calculateDisplayPoints(entry.votes);
@@ -106,7 +128,11 @@ function buildRankedEntry(entry: ContestEntry): RankedContestEntry {
 }
 
 /**
- * Counts how many non-zero numeric votes an entry has received up to one voter.
+ * Counts how many non-zero numeric votes an entry has received up to a given voter reveal.
+ *
+ * @param entry The ranked contest entry whose vote history should be examined.
+ * @param voterIndex The zero-based voter index up to which votes should be counted.
+ * @returns The number of non-zero numeric votes received through the specified voter.
  */
 export function getVoterCountAfterVoter(
   entry: RankedContestEntry,
@@ -126,7 +152,12 @@ export function getVoterCountAfterVoter(
 }
 
 /**
- * Counts how many times an entry received one exact score up to one voter.
+ * Counts how many times an entry received one exact numeric score up to a given voter reveal.
+ *
+ * @param entry The ranked contest entry whose vote history should be examined.
+ * @param points The exact numeric score to count.
+ * @param voterIndex The zero-based voter index up to which votes should be counted.
+ * @returns The number of occurrences of the requested score through the specified voter.
  */
 export function getPointsCountAfterVoter(
   entry: RankedContestEntry,
@@ -145,7 +176,11 @@ export function getPointsCountAfterVoter(
 }
 
 /**
- * Returns the set of unique numeric vote values used by one entry.
+ * Collects the unique numeric vote values used by one entry.
+ *
+ * @param entry The parsed contest entry whose vote values should be examined.
+ * @returns A set of distinct numeric vote values used by the entry, excluding blanks and
+ * non-numeric values.
  */
 function getUniquePoints(entry: ContestEntry): Set<number> {
   const uniquePoints = new Set<number>();
@@ -162,7 +197,11 @@ function getUniquePoints(entry: ContestEntry): Set<number> {
 }
 
 /**
- * Compares two text fields using deterministic ascending ordering.
+ * Compares two strings using deterministic ascending ordering.
+ *
+ * @param left The left-hand string being compared.
+ * @param right The right-hand string being compared.
+ * @returns A negative number, zero, or a positive number according to standard ascending order.
  */
 function compareTextAscending(left: string, right: string): number {
   if (left < right) {
@@ -177,7 +216,11 @@ function compareTextAscending(left: string, right: string): number {
 }
 
 /**
- * Builds the ranked contest model used by the renderer.
+ * Builds the ranked contest model used by rendering and export code.
+ *
+ * @param contest The parsed contest workbook data before cumulative ranking metadata is added.
+ * @returns A `RankedContestData` object containing enriched entries and the unique point values
+ * needed for tie-break sorting.
  */
 export function buildRankedContest(contest: ContestData): RankedContestData {
   const entries = contest.entries.map(buildRankedEntry);
@@ -201,7 +244,12 @@ export function buildRankedContest(contest: ContestData): RankedContestData {
 }
 
 /**
- * Returns the sorted standings after one voter using Melbourne tie-break rules.
+ * Returns the sorted standings after a specific voter reveal.
+ *
+ * @param contest The ranked contest data containing cumulative scoring metadata and tie-break
+ * inputs.
+ * @param voterIndex The zero-based voter index whose post-vote standings should be produced.
+ * @returns A newly sorted array of ranked entries in standing order after the specified voter.
  */
 export function getResultsAfterVoter(
   contest: RankedContestData,

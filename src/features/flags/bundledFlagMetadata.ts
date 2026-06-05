@@ -1,7 +1,7 @@
 /* eslint-disable sort-keys */
 
 /**
- * Represents one manually maintained bundled flag metadata entry.
+ * Represents one manually maintained metadata row for a bundled flag asset.
  */
 export interface BundledFlagMetadataEntry {
   details: string;
@@ -9,7 +9,11 @@ export interface BundledFlagMetadataEntry {
 }
 
 /**
- * Stores bundled flag metadata grouped by flag pack.
+ * Stores the curated bundled-flag metadata grouped by pack name.
+ *
+ * The keys are logical pack names such as `ISC`, `Rect`, and `World`, and each value lists the
+ * bundled files that belong to that pack along with the human-facing detail text shown in the
+ * Flags view.
  */
 export const BUNDLED_FLAG_METADATA: Record<string, BundledFlagMetadataEntry[]> =
   {

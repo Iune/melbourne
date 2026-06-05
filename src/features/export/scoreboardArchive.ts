@@ -10,7 +10,7 @@ import {
 } from '../render/scoreboardRenderer';
 
 /**
- * Represents the generated scoreboard ZIP archive.
+ * Represents the completed ZIP archive produced by one export run.
  */
 export interface ScoreboardArchiveResult {
   archiveBytes: Uint8Array;
@@ -19,7 +19,7 @@ export interface ScoreboardArchiveResult {
 }
 
 /**
- * Represents callbacks used while generating scoreboard exports.
+ * Represents callbacks consulted while generating scoreboard exports.
  */
 export interface ScoreboardArchiveCallbacks {
   isCancelled: () => boolean;
@@ -27,7 +27,9 @@ export interface ScoreboardArchiveCallbacks {
 }
 
 /**
- * Waits one task turn so worker progress can be observed incrementally.
+ * Yields to the event loop so progress updates can be observed between generated images.
+ *
+ * @returns A promise that resolves on the next task turn.
  */
 function waitForNextTask(): Promise<void> {
   return new Promise((resolve) => {
@@ -36,7 +38,16 @@ function waitForNextTask(): Promise<void> {
 }
 
 /**
- * Generates scoreboard PNG files and packages them into a ZIP archive.
+ * Generates one scoreboard image per voter and packages the results into a ZIP archive.
+ *
+ * @param contest The parsed contest data whose voters and entries should be rendered.
+ * @param generationAssets The in-memory asset bundle for the current export run, including any
+ * uploaded custom flags or fonts.
+ * @param renderConfig The rendering options controlling title text, colors, and flag display.
+ * @param callbacks The cancellation and progress callbacks used to coordinate with the worker or
+ * UI layer.
+ * @returns The generated ZIP archive bytes, the number of generated images, and the final ZIP file
+ * name.
  */
 export async function buildScoreboardArchive(
   contest: ContestData,

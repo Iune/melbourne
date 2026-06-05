@@ -7,7 +7,7 @@ import type {
 } from './generationWorkerTypes';
 
 /**
- * Represents callbacks used while the worker is generating exports.
+ * Represents the callbacks used by the UI while a worker is generating exports.
  */
 export interface ScoreboardGenerationCallbacks {
   onError: (message: string) => void;
@@ -16,14 +16,22 @@ export interface ScoreboardGenerationCallbacks {
 }
 
 /**
- * Represents the running worker controller for one generation job.
+ * Represents the running worker controller returned for one generation job.
  */
 export interface ScoreboardGenerationController {
   cancel: () => void;
 }
 
 /**
- * Starts scoreboard export generation inside a dedicated worker.
+ * Starts a scoreboard export job inside a dedicated worker and wires its messages back to the UI.
+ *
+ * @param contest The parsed contest data whose scoreboards should be generated.
+ * @param generationAssets The in-memory asset bundle for the current export run, including any
+ * uploaded custom flags or fonts.
+ * @param renderConfig The rendering options controlling title text, colors, and flag display.
+ * @param callbacks The UI callbacks that should receive progress, success, and error updates from
+ * the worker.
+ * @returns A controller that can cancel the active worker job.
  */
 export function startScoreboardGeneration(
   contest: ContestData,

@@ -3,7 +3,7 @@ import type { ContestData } from '../contest/contestTypes';
 import type { ScoreboardRenderConfig } from '../render/scoreboardRenderer';
 
 /**
- * Represents a scoreboard export job sent from the UI to the worker.
+ * Represents a scoreboard export job sent from the UI thread to the generation worker.
  */
 export interface ScoreboardGenerationRequest {
   contest: ContestData;
@@ -12,7 +12,7 @@ export interface ScoreboardGenerationRequest {
 }
 
 /**
- * Represents a progress update from the generation worker.
+ * Represents an incremental progress update emitted by the generation worker.
  */
 export interface ScoreboardGenerationProgressMessage {
   completed: number;
@@ -21,7 +21,7 @@ export interface ScoreboardGenerationProgressMessage {
 }
 
 /**
- * Represents a successful generation result from the worker.
+ * Represents a successful generation result emitted by the worker.
  */
 export interface ScoreboardGenerationSuccessMessage {
   archiveBytes: Uint8Array;
@@ -30,7 +30,7 @@ export interface ScoreboardGenerationSuccessMessage {
 }
 
 /**
- * Represents a worker failure.
+ * Represents a generation failure emitted by the worker.
  */
 export interface ScoreboardGenerationErrorMessage {
   message: string;
@@ -38,7 +38,7 @@ export interface ScoreboardGenerationErrorMessage {
 }
 
 /**
- * Represents any message posted from the generation worker.
+ * Represents any typed message posted from the generation worker back to the UI thread.
  */
 export type ScoreboardGenerationWorkerMessage =
   | ScoreboardGenerationErrorMessage

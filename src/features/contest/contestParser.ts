@@ -20,7 +20,11 @@ const SONG_COLUMN = 5;
 type WorkbookLoadInput = Parameters<ExcelJS.Workbook['xlsx']['load']>[0];
 
 /**
- * Creates a standardized parse failure result from one or more messages.
+ * Creates a standardized failure result from one or more workbook parsing messages.
+ *
+ * @param messages The user-facing error messages that explain why the workbook could not be parsed.
+ * @returns A failed `ContestParseResult` whose messages are wrapped in `ContestParseError`
+ * objects for direct UI display.
  */
 function createErrorResult(messages: string[]): ContestParseResult {
   return {
@@ -30,7 +34,12 @@ function createErrorResult(messages: string[]): ContestParseResult {
 }
 
 /**
- * Returns trimmed display text for a worksheet cell.
+ * Reads one worksheet cell and returns its trimmed display text.
+ *
+ * @param worksheet The ExcelJS worksheet containing the contest data.
+ * @param rowNumber The 1-based row number of the cell that should be read.
+ * @param columnNumber The 1-based column number of the cell that should be read.
+ * @returns The worksheet cell's display text with leading and trailing whitespace removed.
  */
 function getTrimmedCellText(
   worksheet: ExcelJS.Worksheet,
@@ -42,6 +51,15 @@ function getTrimmedCellText(
 
 /**
  * Builds one parsed contest entry from a worksheet row.
+ *
+ * @param worksheet The ExcelJS worksheet containing the contest data.
+ * @param rowNumber The 1-based row number containing the entry being parsed.
+ * @param voteStartColumn The 1-based column number where voter columns begin for the current
+ * workbook format.
+ * @param totalColumns The total number of worksheet columns that should be considered when reading
+ * vote cells.
+ * @returns A normalized `ContestEntry` containing the row's country, flag, artist, song, and raw
+ * vote values.
  */
 function buildContestEntry(
   worksheet: ExcelJS.Worksheet,
@@ -69,7 +87,13 @@ function buildContestEntry(
 }
 
 /**
- * Parses contest data from workbook bytes using Melbourne-compatible rules.
+ * Parses contest data from an uploaded workbook using the app's expected spreadsheet format.
+ *
+ * @param fileContents The raw workbook bytes read from the user-selected `.xlsx` file.
+ * @param hasCountColumn Whether the workbook format includes the optional `Count` / `# Voters`
+ * column before the voter columns.
+ * @returns A successful `ContestParseResult` containing normalized contest data, or a failed
+ * result with blocking error messages when the workbook is unreadable or structurally invalid.
  */
 export async function parseContestWorkbook(
   fileContents: ArrayBuffer,

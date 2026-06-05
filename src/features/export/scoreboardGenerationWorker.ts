@@ -9,7 +9,9 @@ import type {
 let wasCancelled = false;
 
 /**
- * Posts a typed message back to the main thread.
+ * Posts a typed worker message back to the UI thread.
+ *
+ * @param message The worker message payload that should be delivered to the main thread.
  */
 function postWorkerMessage(message: ScoreboardGenerationWorkerMessage): void {
   self.postMessage(message);

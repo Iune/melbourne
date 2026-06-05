@@ -6,7 +6,14 @@ import type { ContestData, ContestParseError } from '../contest/contestTypes';
 import { hasBundledFlagAsset, normalizeFlagReference } from './flagAssets';
 
 /**
- * Returns blocking validation errors for bundled and uploaded flag references.
+ * Validates every contest flag reference against the bundled packs and current custom uploads.
+ *
+ * @param contest The parsed contest data whose entry flag references should be checked before
+ * generation begins.
+ * @param customFlagFiles The currently selected custom flag upload files, if any, that should be
+ * treated as the `Custom/` flag pack for this validation pass.
+ * @returns A flat list of blocking validation errors covering duplicate custom uploads, invalid
+ * logical flag references, and missing bundled or custom flag assets.
  */
 export function validateFlagReferences(
   contest: ContestData,

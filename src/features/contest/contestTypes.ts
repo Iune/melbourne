@@ -1,5 +1,5 @@
 /**
- * Represents one contest entry row parsed from the spreadsheet.
+ * Represents one entry row parsed from the contest spreadsheet.
  */
 export interface ContestEntry {
   artist: string;
@@ -10,7 +10,7 @@ export interface ContestEntry {
 }
 
 /**
- * Represents contest data parsed from the spreadsheet.
+ * Represents the parsed contest workbook in a normalized in-memory format.
  */
 export interface ContestData {
   entries: ContestEntry[];
@@ -21,14 +21,14 @@ export interface ContestData {
 }
 
 /**
- * Represents a blocking validation error surfaced to the UI.
+ * Represents a blocking validation or parsing error that can be shown directly in the UI.
  */
 export interface ContestParseError {
   message: string;
 }
 
 /**
- * Represents the success or failure result of contest parsing.
+ * Represents the success or failure result of parsing a contest workbook.
  */
 export type ContestParseResult =
   | { contest: ContestData; ok: true }

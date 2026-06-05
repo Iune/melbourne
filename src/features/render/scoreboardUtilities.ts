@@ -106,10 +106,7 @@ export function chooseTextColor(hex: string): Float32Array {
  * @returns A `ScoreboardColors` object containing every resolved fill, border, and text color
  * needed during rendering.
  */
-export function createScoreboardColors(
-  mainColor: string,
-  accentColor: string,
-): ScoreboardColors {
+export function createScoreboardColors(mainColor: string, accentColor: string): ScoreboardColors {
   return {
     background: hexToColor('#EEEEEE'),
     contestHeader: hexToColor(accentColor),
@@ -193,16 +190,8 @@ export function measureText(
   fontSize: number,
   text: string,
 ): TextMeasurement {
-  const paragraphStyle = createParagraphStyle(
-    CanvasKit,
-    fontFamily,
-    fontSize,
-    hexToColor('#000000'),
-  );
-  const paragraphBuilder = CanvasKit.ParagraphBuilder.MakeFromFontProvider(
-    paragraphStyle,
-    fontProvider,
-  );
+  const paragraphStyle = createParagraphStyle(CanvasKit, fontFamily, fontSize, hexToColor('#000000'));
+  const paragraphBuilder = CanvasKit.ParagraphBuilder.MakeFromFontProvider(paragraphStyle, fontProvider);
 
   paragraphBuilder.addText(text);
 
@@ -250,16 +239,8 @@ export function drawText(
   y: number,
   alignment: 'center' | 'left' = 'left',
 ): void {
-  const paragraphStyle = createParagraphStyle(
-    CanvasKit,
-    fontFamily,
-    fontSize,
-    color,
-  );
-  const paragraphBuilder = CanvasKit.ParagraphBuilder.MakeFromFontProvider(
-    paragraphStyle,
-    fontProvider,
-  );
+  const paragraphStyle = createParagraphStyle(CanvasKit, fontFamily, fontSize, color);
+  const paragraphBuilder = CanvasKit.ParagraphBuilder.MakeFromFontProvider(paragraphStyle, fontProvider);
 
   paragraphBuilder.addText(text);
 
@@ -409,13 +390,7 @@ export function calculateScoreboardSizes(
   const voterHeaderText = `Now Voting: ${contest.voterNames[voterIndex]} (${String(voterIndex + 1)}/${String(contest.numVoters)})`;
   const maxCountryWidth = Math.max(
     ...contest.entries.map((entry) => {
-      return measureText(
-        CanvasKit,
-        fontProvider,
-        baseFontFamily,
-        fonts.countrySize,
-        entry.country,
-      ).width;
+      return measureText(CanvasKit, fontProvider, baseFontFamily, fonts.countrySize, entry.country).width;
     }),
   );
   const maxEntryWidth = Math.max(
@@ -444,22 +419,15 @@ export function calculateScoreboardSizes(
     contestHeaderText,
   ).width;
   const flagOffset = displayFlags ? 24 * scalingRatio : 0;
-  const rectangle =
-    Math.max(maxCountryWidth, maxEntryWidth) + flagOffset + 80 * scalingRatio;
+  const rectangle = Math.max(maxCountryWidth, maxEntryWidth) + flagOffset + 80 * scalingRatio;
   const width = Math.ceil(
     Math.max(
-      Math.max(
-        30 * scalingRatio + 2 * rectangle,
-        48 * scalingRatio + contestHeaderWidth,
-      ),
+      Math.max(30 * scalingRatio + 2 * rectangle, 48 * scalingRatio + contestHeaderWidth),
       10 * scalingRatio + voterHeaderWidth,
     ),
   );
-  const leftColumnCount =
-    Math.floor(contest.numEntries / 2) + (contest.numEntries % 2);
-  const height = Math.ceil(
-    10 * scalingRatio + 35 * scalingRatio * leftColumnCount + 70 * scalingRatio,
-  );
+  const leftColumnCount = Math.floor(contest.numEntries / 2) + (contest.numEntries % 2);
+  const height = Math.ceil(10 * scalingRatio + 35 * scalingRatio * leftColumnCount + 70 * scalingRatio);
 
   return {
     entryDetailsWidth: maxEntryWidth,

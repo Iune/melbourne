@@ -1,10 +1,6 @@
 import '@mantine/core/styles.css';
 
-import {
-  createTheme,
-  localStorageColorSchemeManager,
-  MantineProvider,
-} from '@mantine/core';
+import { createTheme, localStorageColorSchemeManager, MantineProvider } from '@mantine/core';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 
@@ -28,11 +24,7 @@ if (!rootElement) {
 
 createRoot(rootElement).render(
   <StrictMode>
-    <MantineProvider
-      colorSchemeManager={colorSchemeManager}
-      defaultColorScheme="dark"
-      theme={theme}
-    >
+    <MantineProvider colorSchemeManager={colorSchemeManager} defaultColorScheme="dark" theme={theme}>
       <App />
     </MantineProvider>
   </StrictMode>,

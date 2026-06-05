@@ -4,10 +4,7 @@ import type { GenerationAssets } from '../assets/generationAssets';
 import { buildRankedContest } from '../contest/contestResults';
 import type { ContestData } from '../contest/contestTypes';
 import { createScoreboardFileName, createZipFileName } from './fileNames';
-import {
-  renderScoreboardPng,
-  type ScoreboardRenderConfig,
-} from '../render/scoreboardRenderer';
+import { renderScoreboardPng, type ScoreboardRenderConfig } from '../render/scoreboardRenderer';
 
 /**
  * Represents the completed ZIP archive produced by one export run.
@@ -64,17 +61,8 @@ export async function buildScoreboardArchive(
       throw new Error('Generation was cancelled.');
     }
 
-    const renderedImageBytes = await renderScoreboardPng(
-      rankedContest,
-      renderConfig,
-      voterIndex,
-      generationAssets,
-    );
-    const fileName = createScoreboardFileName(
-      contest.voterNames[voterIndex] ?? '',
-      voterIndex,
-      totalVoters,
-    );
+    const renderedImageBytes = await renderScoreboardPng(rankedContest, renderConfig, voterIndex, generationAssets);
+    const fileName = createScoreboardFileName(contest.voterNames[voterIndex] ?? '', voterIndex, totalVoters);
 
     zip.file(fileName, renderedImageBytes);
     callbacks.onProgress?.(voterIndex + 1, totalVoters);

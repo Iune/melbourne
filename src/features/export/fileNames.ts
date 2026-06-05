@@ -76,11 +76,7 @@ export function createZipFileName(contestName: string): string {
  * width.
  * @returns A sanitized file name in the `NN - Voter Name.png` format.
  */
-export function createScoreboardFileName(
-  voterName: string,
-  voterIndex: number,
-  totalVoters: number,
-): string {
+export function createScoreboardFileName(voterName: string, voterIndex: number, totalVoters: number): string {
   const indexWidth = Math.max(2, String(totalVoters).length);
   const paddedIndex = String(voterIndex + 1).padStart(indexWidth, '0');
 

@@ -22,9 +22,7 @@ describe('resolveRenderFonts', () => {
 
   it('uses uploaded custom fonts when provided', async () => {
     const customBaseBytes = new TextEncoder().encode('custom-base-font').buffer;
-    const customPointsBytes = new TextEncoder().encode(
-      'custom-points-font',
-    ).buffer;
+    const customPointsBytes = new TextEncoder().encode('custom-points-font').buffer;
     const fonts = await resolveRenderFonts({
       customBaseFont: {
         bytes: customBaseBytes,
@@ -39,11 +37,7 @@ describe('resolveRenderFonts', () => {
 
     expect(fonts.baseFontFamily).toBe('Melbourne Custom Base Font');
     expect(fonts.pointsFontFamily).toBe('Melbourne Custom Points Font');
-    expect(new TextDecoder().decode(fonts.baseFontBytes)).toBe(
-      'custom-base-font',
-    );
-    expect(new TextDecoder().decode(fonts.pointsFontBytes)).toBe(
-      'custom-points-font',
-    );
+    expect(new TextDecoder().decode(fonts.baseFontBytes)).toBe('custom-base-font');
+    expect(new TextDecoder().decode(fonts.pointsFontBytes)).toBe('custom-points-font');
   });
 });

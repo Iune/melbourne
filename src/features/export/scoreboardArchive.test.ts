@@ -62,17 +62,12 @@ function hasPngSignature(bytes: Uint8Array): boolean {
 describe('buildScoreboardArchive', () => {
   it('creates one scoreboard png file per voter in a zip archive', async () => {
     const progressUpdates: Array<[number, number]> = [];
-    const archive = await buildScoreboardArchive(
-      SAMPLE_CONTEST,
-      EMPTY_GENERATION_ASSETS,
-      SAMPLE_RENDER_CONFIG,
-      {
-        isCancelled: () => false,
-        onProgress: (completed, total) => {
-          progressUpdates.push([completed, total]);
-        },
+    const archive = await buildScoreboardArchive(SAMPLE_CONTEST, EMPTY_GENERATION_ASSETS, SAMPLE_RENDER_CONFIG, {
+      isCancelled: () => false,
+      onProgress: (completed, total) => {
+        progressUpdates.push([completed, total]);
       },
-    );
+    });
 
     expect(archive.generatedCount).toBe(3);
     expect(archive.zipFileName).toBe('FSC 281.zip');
@@ -84,15 +79,9 @@ describe('buildScoreboardArchive', () => {
 
     const zip = await JSZip.loadAsync(archive.archiveBytes);
 
-    expect(Object.keys(zip.files).sort()).toEqual([
-      '01 - Denmark.png',
-      '02 - United Kingdom.png',
-      '03 - Sweden.png',
-    ]);
+    expect(Object.keys(zip.files).sort()).toEqual(['01 - Denmark.png', '02 - United Kingdom.png', '03 - Sweden.png']);
 
-    const firstImageBytes = await zip
-      .file('01 - Denmark.png')
-      ?.async('uint8array');
+    const firstImageBytes = await zip.file('01 - Denmark.png')?.async('uint8array');
 
     expect(firstImageBytes).toBeDefined();
     expect(hasPngSignature(firstImageBytes ?? new Uint8Array())).toBe(true);
@@ -102,19 +91,14 @@ describe('buildScoreboardArchive', () => {
     let shouldCancel = false;
 
     await expect(
-      buildScoreboardArchive(
-        SAMPLE_CONTEST,
-        EMPTY_GENERATION_ASSETS,
-        SAMPLE_RENDER_CONFIG,
-        {
-          isCancelled: () => shouldCancel,
-          onProgress: (completed) => {
-            if (completed === 1) {
-              shouldCancel = true;
-            }
-          },
+      buildScoreboardArchive(SAMPLE_CONTEST, EMPTY_GENERATION_ASSETS, SAMPLE_RENDER_CONFIG, {
+        isCancelled: () => shouldCancel,
+        onProgress: (completed) => {
+          if (completed === 1) {
+            shouldCancel = true;
+          }
         },
-      ),
+      }),
     ).rejects.toThrow('Generation was cancelled.');
   });
 });

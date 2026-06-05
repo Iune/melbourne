@@ -20,26 +20,16 @@ describe('scoreboardUtilities', () => {
   });
 
   it('chooses dark text for light colors and light text for dark colors', () => {
-    expect(Array.from(chooseTextColor('#FFFFFF'))).toEqual(
-      Array.from(hexToColor('#212121')),
-    );
-    expect(Array.from(chooseTextColor('#000000'))).toEqual(
-      Array.from(hexToColor('#FFFFFF')),
-    );
+    expect(Array.from(chooseTextColor('#FFFFFF'))).toEqual(Array.from(hexToColor('#212121')));
+    expect(Array.from(chooseTextColor('#000000'))).toEqual(Array.from(hexToColor('#FFFFFF')));
   });
 
   it('builds scoreboard colors from the selected main and accent colors', () => {
     const colors = createScoreboardColors('#2F292B', '#FCB906');
 
-    expect(Array.from(colors.contestHeader)).toEqual(
-      Array.from(hexToColor('#FCB906')),
-    );
-    expect(Array.from(colors.totalPoints)).toEqual(
-      Array.from(hexToColor('#2F292B')),
-    );
-    expect(Array.from(colors.entryDetailsBorder)).toEqual(
-      Array.from(hexToColor('#C4C4C4')),
-    );
+    expect(Array.from(colors.contestHeader)).toEqual(Array.from(hexToColor('#FCB906')));
+    expect(Array.from(colors.totalPoints)).toEqual(Array.from(hexToColor('#2F292B')));
+    expect(Array.from(colors.entryDetailsBorder)).toEqual(Array.from(hexToColor('#C4C4C4')));
   });
 
   it('builds scoreboard fonts from the Melbourne scaling ratio', () => {

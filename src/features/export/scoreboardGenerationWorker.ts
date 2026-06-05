@@ -1,10 +1,7 @@
 /// <reference lib="webworker" />
 
 import { buildScoreboardArchive } from './scoreboardArchive';
-import type {
-  ScoreboardGenerationRequest,
-  ScoreboardGenerationWorkerMessage,
-} from './generationWorkerTypes';
+import type { ScoreboardGenerationRequest, ScoreboardGenerationWorkerMessage } from './generationWorkerTypes';
 
 let wasCancelled = false;
 
@@ -17,9 +14,7 @@ function postWorkerMessage(message: ScoreboardGenerationWorkerMessage): void {
   self.postMessage(message);
 }
 
-self.onmessage = async (
-  event: MessageEvent<ScoreboardGenerationRequest | 'cancel'>,
-) => {
+self.onmessage = async (event: MessageEvent<ScoreboardGenerationRequest | 'cancel'>) => {
   if (event.data === 'cancel') {
     wasCancelled = true;
     return;
@@ -59,10 +54,7 @@ self.onmessage = async (
     }
 
     postWorkerMessage({
-      message:
-        error instanceof Error
-          ? error.message
-          : 'Unable to generate scoreboard exports.',
+      message: error instanceof Error ? error.message : 'Unable to generate scoreboard exports.',
       type: 'error',
     });
   }

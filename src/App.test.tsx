@@ -31,10 +31,7 @@ function renderApp() {
 /**
  * Populates the required fields so the mocked generate flow can start.
  */
-async function populateRequiredFields(
-  user: ReturnType<typeof userEvent.setup>,
-  container: HTMLElement,
-) {
+async function populateRequiredFields(user: ReturnType<typeof userEvent.setup>, container: HTMLElement) {
   const fileInput = container.querySelector('input[type="file"]');
 
   if (!(fileInput instanceof HTMLInputElement)) {
@@ -74,49 +71,27 @@ describe('App', () => {
     });
     renderApp();
 
-    expect(
-      screen.getByRole('link', { name: 'Melbourne Scoreboard Generator' }),
-    ).toHaveAttribute('href', '/');
-    expect(screen.getByRole('link', { name: 'Help' })).toHaveAttribute(
-      'href',
-      '#help',
-    );
-    expect(screen.getByRole('link', { name: 'Flags' })).toHaveAttribute(
-      'href',
-      '#flags',
-    );
-    expect(
-      screen.getByRole('button', { name: 'Switch to dark mode' }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole('heading', { name: 'Generate Scoreboards' }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Melbourne Scoreboard Generator' })).toHaveAttribute('href', '/');
+    expect(screen.getByRole('link', { name: 'Help' })).toHaveAttribute('href', '#help');
+    expect(screen.getByRole('link', { name: 'Flags' })).toHaveAttribute('href', '#flags');
+    expect(screen.getByRole('button', { name: 'Switch to dark mode' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Generate Scoreboards' })).toBeInTheDocument();
     expect(screen.getByLabelText(/Contest Title/)).toBeInTheDocument();
     expect(screen.getByLabelText(/Contest File/)).toBeInTheDocument();
-    expect(
-      screen.getByText('Contest Details', { selector: 'legend' }),
-    ).toBeInTheDocument();
+    expect(screen.getByText('Contest Details', { selector: 'legend' })).toBeInTheDocument();
     expect(
       screen.getByRole('checkbox', {
         name: 'Contest file contains ‘Count’ column',
       }),
     ).toBeInTheDocument();
-    expect(
-      screen.getByText('Colors', { selector: 'legend' }),
-    ).toBeInTheDocument();
+    expect(screen.getByText('Colors', { selector: 'legend' })).toBeInTheDocument();
     expect(screen.getByLabelText('Main color')).toHaveValue('#2F292B');
     expect(screen.getByLabelText('Accent color')).toHaveValue('#FCB906');
     expect(screen.getByLabelText(/Base Font/)).toBeInTheDocument();
     expect(screen.getByLabelText(/Points Font/)).toBeInTheDocument();
-    expect(
-      screen.getByRole('checkbox', { name: 'Include flags' }),
-    ).toBeChecked();
-    expect(
-      screen.getByText('Flags', { selector: 'legend' }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole('checkbox', { name: 'Draw flag borders' }),
-    ).toBeChecked();
+    expect(screen.getByRole('checkbox', { name: 'Include flags' })).toBeChecked();
+    expect(screen.getByText('Flags', { selector: 'legend' })).toBeInTheDocument();
+    expect(screen.getByRole('checkbox', { name: 'Draw flag borders' })).toBeChecked();
     expect(screen.getByLabelText(/Flag Files/)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Generate' })).toBeDisabled();
   });
@@ -141,9 +116,7 @@ describe('App', () => {
 
     await user.click(colorSchemeToggle);
 
-    expect(
-      screen.getByRole('button', { name: 'Switch to light mode' }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Switch to light mode' })).toBeInTheDocument();
   });
 
   it('shows the bundled flags view from the navbar', async () => {
@@ -162,15 +135,11 @@ describe('App', () => {
 
     await user.click(screen.getByRole('link', { name: 'Flags' }));
 
-    expect(
-      screen.getByRole('heading', { name: 'Bundled Flags' }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Bundled Flags' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /ISC \(\d+\)/ })).toBeVisible();
     expect(screen.getByRole('button', { name: /Rect \(\d+\)/ })).toBeVisible();
     expect(screen.getByRole('button', { name: /World \(\d+\)/ })).toBeVisible();
-    expect(
-      screen.queryByRole('heading', { name: 'Generate Scoreboards' }),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'Generate Scoreboards' })).not.toBeInTheDocument();
   });
 
   it('shows the help view from the navbar', async () => {
@@ -190,17 +159,10 @@ describe('App', () => {
     await user.click(screen.getByRole('link', { name: 'Help' }));
 
     expect(screen.getByRole('heading', { name: 'Help' })).toBeInTheDocument();
-    expect(
-      screen.getByRole('heading', { name: 'Input File Format' }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole('heading', { name: 'Generating Scoreboards' }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Input File Format' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Generating Scoreboards' })).toBeInTheDocument();
     expect(screen.getByText('DQ')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: '1988.xlsx' })).toHaveAttribute(
-      'href',
-      '/1988.xlsx',
-    );
+    expect(screen.getByRole('link', { name: '1988.xlsx' })).toHaveAttribute('href', '/1988.xlsx');
   });
 
   it('runs the mocked generation flow through success', async () => {
@@ -217,27 +179,21 @@ describe('App', () => {
       },
       ok: true,
     });
-    mockedStartScoreboardGeneration.mockImplementation(
-      (_contest, _generationAssets, _renderConfig, callbacks) => {
-        callbacks.onProgress(0, 2);
-        callbacks.onProgress(1, 2);
-        callbacks.onSuccess(new Uint8Array([1, 2, 3]), 'Contest 1988.zip');
+    mockedStartScoreboardGeneration.mockImplementation((_contest, _generationAssets, _renderConfig, callbacks) => {
+      callbacks.onProgress(0, 2);
+      callbacks.onProgress(1, 2);
+      callbacks.onSuccess(new Uint8Array([1, 2, 3]), 'Contest 1988.zip');
 
-        return { cancel: vi.fn() };
-      },
-    );
+      return { cancel: vi.fn() };
+    });
     await populateRequiredFields(user, container);
 
     await act(async () => {
       fireEvent.click(screen.getByRole('button', { name: 'Generate' }));
     });
 
-    expect(
-      screen.getByRole('link', { name: 'Download ZIP' }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText('Scoreboards are ready for download.'),
-    ).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Download ZIP' })).toBeInTheDocument();
+    expect(screen.getByText('Scoreboards are ready for download.')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Generate' })).toBeEnabled();
   });
 
@@ -256,13 +212,11 @@ describe('App', () => {
       },
       ok: true,
     });
-    mockedStartScoreboardGeneration.mockImplementation(
-      (_contest, _generationAssets, _renderConfig, callbacks) => {
-        callbacks.onProgress(0, 2);
+    mockedStartScoreboardGeneration.mockImplementation((_contest, _generationAssets, _renderConfig, callbacks) => {
+      callbacks.onProgress(0, 2);
 
-        return { cancel: cancelSpy };
-      },
-    );
+      return { cancel: cancelSpy };
+    });
     await populateRequiredFields(user, container);
 
     await act(async () => {
@@ -270,19 +224,13 @@ describe('App', () => {
     });
 
     expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
-    expect(
-      screen.getByText('0 of 2 scoreboards generated'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('0 of 2 scoreboards generated')).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
 
     expect(cancelSpy).toHaveBeenCalledOnce();
-    expect(
-      screen.queryByRole('button', { name: 'Download ZIP' }),
-    ).not.toBeInTheDocument();
-    expect(
-      screen.queryByText(/scoreboards generated/i),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Download ZIP' })).not.toBeInTheDocument();
+    expect(screen.queryByText(/scoreboards generated/i)).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Generate' })).toBeEnabled();
   });
 
@@ -366,15 +314,9 @@ describe('App', () => {
     });
 
     expect(screen.getByText('Validation Failed')).toBeInTheDocument();
-    expect(
-      screen.getByRole('columnheader', { name: 'Error' }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText('Excel sheet does not have enough columns.'),
-    ).toBeInTheDocument();
-    expect(
-      screen.queryByRole('button', { name: 'Cancel' }),
-    ).not.toBeInTheDocument();
+    expect(screen.getByRole('columnheader', { name: 'Error' })).toBeInTheDocument();
+    expect(screen.getByText('Excel sheet does not have enough columns.')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Cancel' })).not.toBeInTheDocument();
   });
 
   it('shows blocking flag validation errors and does not start generation', async () => {
@@ -414,12 +356,8 @@ describe('App', () => {
     });
 
     expect(screen.getByText('Validation Failed')).toBeInTheDocument();
-    expect(
-      screen.getByText('Invalid flag reference for Alpha: ../World/is.png'),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText('Missing bundled flag for Beta: World/not-real.png'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('Invalid flag reference for Alpha: ../World/is.png')).toBeInTheDocument();
+    expect(screen.getByText('Missing bundled flag for Beta: World/not-real.png')).toBeInTheDocument();
     expect(mockedStartScoreboardGeneration).not.toHaveBeenCalled();
   });
 });

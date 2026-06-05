@@ -3,10 +3,7 @@ import { describe, expect, it } from 'vitest';
 import type { GenerationAssets } from '../assets/generationAssets';
 import { buildRankedContest } from '../contest/contestResults';
 import type { ContestData } from '../contest/contestTypes';
-import {
-  renderScoreboardPng,
-  type ScoreboardRenderConfig,
-} from './scoreboardRenderer';
+import { renderScoreboardPng, type ScoreboardRenderConfig } from './scoreboardRenderer';
 
 const PNG_SIGNATURE = [137, 80, 78, 71, 13, 10, 26, 10];
 const SAMPLE_CONTEST: ContestData = {
@@ -55,13 +52,7 @@ const EMPTY_GENERATION_ASSETS: GenerationAssets = {
  * Reads a big-endian 32-bit integer from PNG bytes.
  */
 function readUint32(bytes: Uint8Array, offset: number): number {
-  return (
-    ((bytes[offset] << 24) |
-      (bytes[offset + 1] << 16) |
-      (bytes[offset + 2] << 8) |
-      bytes[offset + 3]) >>>
-    0
-  );
+  return ((bytes[offset] << 24) | (bytes[offset + 1] << 16) | (bytes[offset + 2] << 8) | bytes[offset + 3]) >>> 0;
 }
 
 describe('renderScoreboardPng', () => {
@@ -85,12 +76,7 @@ describe('renderScoreboardPng', () => {
 
   it('renders wider scoreboards when bundled flags are displayed', async () => {
     const rankedContest = buildRankedContest(SAMPLE_CONTEST);
-    const withoutFlags = await renderScoreboardPng(
-      rankedContest,
-      SAMPLE_RENDER_CONFIG,
-      1,
-      EMPTY_GENERATION_ASSETS,
-    );
+    const withoutFlags = await renderScoreboardPng(rankedContest, SAMPLE_RENDER_CONFIG, 1, EMPTY_GENERATION_ASSETS);
     const withFlags = await renderScoreboardPng(
       rankedContest,
       {
@@ -102,9 +88,7 @@ describe('renderScoreboardPng', () => {
       EMPTY_GENERATION_ASSETS,
     );
 
-    expect(readUint32(withFlags, 16)).toBeGreaterThan(
-      readUint32(withoutFlags, 16),
-    );
+    expect(readUint32(withFlags, 16)).toBeGreaterThan(readUint32(withoutFlags, 16));
     expect(readUint32(withFlags, 20)).toBe(readUint32(withoutFlags, 20));
   });
 });

@@ -2,15 +2,8 @@ import CanvasKitInit from 'canvaskit-wasm/bin/full/canvaskit.js';
 import canvasKitWasmUrl from 'canvaskit-wasm/bin/full/canvaskit.wasm?url';
 
 import type { GenerationAssets } from '../assets/generationAssets';
-import {
-  getResultsAfterVoter,
-  parseVoteValue,
-  type RankedContestData,
-} from '../contest/contestResults';
-import {
-  resolveRenderFonts,
-  type ResolvedRenderFonts,
-} from './scoreboardFonts';
+import { getResultsAfterVoter, parseVoteValue, type RankedContestData } from '../contest/contestResults';
+import { resolveRenderFonts, type ResolvedRenderFonts } from './scoreboardFonts';
 import { ScoreboardPainter } from './scoreboardPainter';
 import {
   calculateScoreboardSizes,
@@ -32,8 +25,7 @@ export interface ScoreboardRenderConfig {
 
 let cachedCanvasKit: Promise<CanvasKitModule> | null = null;
 const canvasKitWasmLocatePath =
-  typeof process !== 'undefined' &&
-  canvasKitWasmUrl.startsWith('/node_modules/')
+  typeof process !== 'undefined' && canvasKitWasmUrl.startsWith('/node_modules/')
     ? `${process.cwd()}${canvasKitWasmUrl}`
     : canvasKitWasmUrl;
 
@@ -112,8 +104,7 @@ async function drawScoreboardEntries(
   const entries = getResultsAfterVoter(contest, voterIndex);
 
   for (const [index, entry] of entries.entries()) {
-    const xOffset =
-      index < numLeft ? 0 : 10 * sizes.scalingRatio + sizes.rectangle;
+    const xOffset = index < numLeft ? 0 : 10 * sizes.scalingRatio + sizes.rectangle;
     const yOffset = index < numLeft ? index : index - numLeft;
     const baseX = 20 * sizes.scalingRatio + xOffset + sizes.flagOffset;
 
@@ -148,18 +139,11 @@ async function drawScoreboardEntries(
     );
 
     // Draw entry's total number of received points
-    const totalPointsColor = entry.dqStatuses[voterIndex]
-      ? colors.dqedPoints
-      : colors.totalPoints;
-    const totalPointsTextColor = entry.dqStatuses[voterIndex]
-      ? colors.dqedPointsText
-      : colors.totalPointsText;
+    const totalPointsColor = entry.dqStatuses[voterIndex] ? colors.dqedPoints : colors.totalPoints;
+    const totalPointsTextColor = entry.dqStatuses[voterIndex] ? colors.dqedPointsText : colors.totalPointsText;
 
     painter.filledRectangle(
-      30 * sizes.scalingRatio +
-        xOffset +
-        sizes.flagOffset +
-        sizes.entryDetailsWidth,
+      30 * sizes.scalingRatio + xOffset + sizes.flagOffset + sizes.entryDetailsWidth,
       77 * sizes.scalingRatio + 35 * sizes.scalingRatio * yOffset,
       29 * sizes.scalingRatio,
       20 * sizes.scalingRatio,
@@ -170,10 +154,7 @@ async function drawScoreboardEntries(
       fonts.pointsSize,
       totalPointsTextColor,
       String(entry.displayPoints[voterIndex]),
-      44.5 * sizes.scalingRatio +
-        xOffset +
-        sizes.flagOffset +
-        sizes.entryDetailsWidth,
+      44.5 * sizes.scalingRatio + xOffset + sizes.flagOffset + sizes.entryDetailsWidth,
       87 * sizes.scalingRatio + 35 * sizes.scalingRatio * yOffset,
       'center',
     );
@@ -182,10 +163,7 @@ async function drawScoreboardEntries(
     const receivedVote = entry.votes[voterIndex]?.trim() ?? '';
     if (receivedVote.length > 0) {
       painter.filledRectangle(
-        59 * sizes.scalingRatio +
-          xOffset +
-          sizes.flagOffset +
-          sizes.entryDetailsWidth,
+        59 * sizes.scalingRatio + xOffset + sizes.flagOffset + sizes.entryDetailsWidth,
         77 * sizes.scalingRatio + 35 * sizes.scalingRatio * yOffset,
         24 * sizes.scalingRatio,
         20 * sizes.scalingRatio,
@@ -196,10 +174,7 @@ async function drawScoreboardEntries(
         fonts.pointsSize,
         colors.receivedPointsText,
         formatReceivedVoteText(receivedVote),
-        71 * sizes.scalingRatio +
-          xOffset +
-          sizes.flagOffset +
-          sizes.entryDetailsWidth,
+        71 * sizes.scalingRatio + xOffset + sizes.flagOffset + sizes.entryDetailsWidth,
         87 * sizes.scalingRatio + 35 * sizes.scalingRatio * yOffset,
         'center',
       );
@@ -235,20 +210,11 @@ export async function renderScoreboardPng(
   voterIndex: number,
   generationAssets: GenerationAssets,
 ): Promise<Uint8Array> {
-  const [CanvasKit, renderFonts] = await Promise.all([
-    loadCanvasKit(),
-    resolveRenderFonts(generationAssets),
-  ]);
+  const [CanvasKit, renderFonts] = await Promise.all([loadCanvasKit(), resolveRenderFonts(generationAssets)]);
   const fontProvider = CanvasKit.TypefaceFontProvider.Make();
 
-  fontProvider.registerFont(
-    renderFonts.baseFontBytes,
-    renderFonts.baseFontFamily,
-  );
-  fontProvider.registerFont(
-    renderFonts.pointsFontBytes,
-    renderFonts.pointsFontFamily,
-  );
+  fontProvider.registerFont(renderFonts.baseFontBytes, renderFonts.baseFontFamily);
+  fontProvider.registerFont(renderFonts.pointsFontBytes, renderFonts.pointsFontFamily);
 
   const colors = createScoreboardColors(config.mainColor, config.accentColor);
   const contestHeaderText = getContestHeaderText(config);
@@ -270,24 +236,13 @@ export async function renderScoreboardPng(
   }
 
   const canvas = surface.getCanvas();
-  const painter = new ScoreboardPainter(
-    CanvasKit,
-    canvas,
-    fontProvider,
-    generationAssets,
-  );
+  const painter = new ScoreboardPainter(CanvasKit, canvas, fontProvider, generationAssets);
 
   // Fill in scoreboard background color
   canvas.clear(colors.background);
 
   // Draw voter details
-  painter.filledRectangle(
-    0,
-    0,
-    sizes.width,
-    30 * sizes.scalingRatio,
-    colors.voterHeader,
-  );
+  painter.filledRectangle(0, 0, sizes.width, 30 * sizes.scalingRatio, colors.voterHeader);
   painter.text(
     renderFonts.baseFontFamily,
     fonts.voterHeaderSize,
@@ -298,13 +253,7 @@ export async function renderScoreboardPng(
   );
 
   // Draw contest title
-  painter.filledRectangle(
-    0,
-    30 * sizes.scalingRatio,
-    sizes.width,
-    30 * sizes.scalingRatio,
-    colors.contestHeader,
-  );
+  painter.filledRectangle(0, 30 * sizes.scalingRatio, sizes.width, 30 * sizes.scalingRatio, colors.contestHeader);
   painter.text(
     renderFonts.baseFontFamily,
     fonts.contestHeaderSize,
@@ -350,16 +299,7 @@ export async function renderScoreboardPng(
   );
 
   // Draw entry details
-  await drawScoreboardEntries(
-    contest,
-    config,
-    voterIndex,
-    painter,
-    renderFonts,
-    fonts,
-    colors,
-    sizes,
-  );
+  await drawScoreboardEntries(contest, config, voterIndex, painter, renderFonts, fonts, colors, sizes);
 
   const image = surface.makeImageSnapshot();
   const encodedBytes = image.encodeToBytes();

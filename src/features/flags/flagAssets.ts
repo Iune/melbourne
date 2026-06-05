@@ -1,7 +1,4 @@
-import {
-  BUNDLED_FLAG_METADATA,
-  type BundledFlagMetadataEntry,
-} from './bundledFlagMetadata';
+import { BUNDLED_FLAG_METADATA, type BundledFlagMetadataEntry } from './bundledFlagMetadata';
 
 const BUNDLED_FLAG_ASSET_URLS = import.meta.glob('/src/assets/flags/**/*', {
   eager: true,
@@ -36,11 +33,7 @@ export interface BundledFlagAssetEntry {
 export function normalizeFlagReference(reference: string): string | null {
   const trimmedReference = reference.trim();
 
-  if (
-    trimmedReference.length === 0 ||
-    trimmedReference.startsWith('/') ||
-    trimmedReference.includes('\\')
-  ) {
+  if (trimmedReference.length === 0 || trimmedReference.startsWith('/') || trimmedReference.includes('\\')) {
     return null;
   }
 
@@ -76,9 +69,7 @@ export function hasBundledFlagAsset(normalizedReference: string): boolean {
  * @returns The Vite-resolved browser URL for the bundled flag asset, or `null` when the reference
  * does not exist in the bundled asset map.
  */
-export function getBundledFlagAssetUrl(
-  normalizedReference: string,
-): string | null {
+export function getBundledFlagAssetUrl(normalizedReference: string): string | null {
   return BUNDLED_FLAG_REFERENCE_TO_URL.get(normalizedReference) ?? null;
 }
 
@@ -88,10 +79,7 @@ export function getBundledFlagAssetUrl(
  * @returns A map keyed by pack name whose values are alphabetically sorted flag entries containing
  * the file name, display details, and full logical reference for each bundled flag.
  */
-export function getBundledFlagAssetEntriesByPack(): Map<
-  string,
-  BundledFlagAssetEntry[]
-> {
+export function getBundledFlagAssetEntriesByPack(): Map<string, BundledFlagAssetEntry[]> {
   return new Map(
     Object.entries(BUNDLED_FLAG_METADATA)
       .sort(([leftPackName], [rightPackName]) => {

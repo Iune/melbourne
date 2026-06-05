@@ -40,22 +40,8 @@ export class ScoreboardPainter {
    * @param height The rectangle's height in scoreboard pixels.
    * @param color The fill color to apply to the rectangle.
    */
-  filledRectangle(
-    x: number,
-    y: number,
-    width: number,
-    height: number,
-    color: Float32Array,
-  ): void {
-    drawFilledRectangle(
-      this.CanvasKit,
-      this.canvas,
-      x,
-      y,
-      width,
-      height,
-      color,
-    );
+  filledRectangle(x: number, y: number, width: number, height: number, color: Float32Array): void {
+    drawFilledRectangle(this.CanvasKit, this.canvas, x, y, width, height, color);
   }
 
   /**
@@ -76,16 +62,7 @@ export class ScoreboardPainter {
     color: Float32Array,
     strokeWidth: number,
   ): void {
-    drawStrokedRectangle(
-      this.CanvasKit,
-      this.canvas,
-      x,
-      y,
-      width,
-      height,
-      color,
-      strokeWidth,
-    );
+    drawStrokedRectangle(this.CanvasKit, this.canvas, x, y, width, height, color, strokeWidth);
   }
 
   /**
@@ -98,24 +75,8 @@ export class ScoreboardPainter {
    * @param color The stroke color to apply to the line.
    * @param strokeWidth The thickness of the line in scoreboard pixels.
    */
-  line(
-    startX: number,
-    startY: number,
-    endX: number,
-    endY: number,
-    color: Float32Array,
-    strokeWidth: number,
-  ): void {
-    drawLine(
-      this.CanvasKit,
-      this.canvas,
-      startX,
-      startY,
-      endX,
-      endY,
-      color,
-      strokeWidth,
-    );
+  line(startX: number, startY: number, endX: number, endY: number, color: Float32Array, strokeWidth: number): void {
+    drawLine(this.CanvasKit, this.canvas, startX, startY, endX, endY, color, strokeWidth);
   }
 
   /**
@@ -139,18 +100,7 @@ export class ScoreboardPainter {
     y: number,
     alignment: 'center' | 'left' = 'left',
   ): void {
-    drawText(
-      this.CanvasKit,
-      this.canvas,
-      this.fontProvider,
-      fontFamily,
-      fontSize,
-      color,
-      text,
-      x,
-      y,
-      alignment,
-    );
+    drawText(this.CanvasKit, this.canvas, this.fontProvider, fontFamily, fontSize, color, text, x, y, alignment);
   }
 
   /**

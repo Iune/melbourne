@@ -46,9 +46,7 @@ function createCustomFlagReference(fileName: string): string | null {
  * @returns A list of blocking validation errors covering invalid file names and duplicate logical
  * `Custom/...` references.
  */
-export function validateCustomFlagUploads(
-  customFlagFiles: File[],
-): ContestParseError[] {
+export function validateCustomFlagUploads(customFlagFiles: File[]): ContestParseError[] {
   const errors: ContestParseError[] = [];
   const seenReferences = new Set<string>();
 
@@ -82,9 +80,7 @@ export function validateCustomFlagUploads(
  * @returns A set of normalized `Custom/...` references that can be matched against contest entry
  * flag values.
  */
-export function createCustomFlagReferenceSet(
-  customFlagFiles: File[],
-): Set<string> {
+export function createCustomFlagReferenceSet(customFlagFiles: File[]): Set<string> {
   const references = new Set<string>();
 
   for (const customFlagFile of customFlagFiles) {
@@ -106,9 +102,7 @@ export function createCustomFlagReferenceSet(
  * @returns A `GenerationFontAsset` containing the uploaded file name and raw bytes, or `null` when
  * no custom font was supplied.
  */
-async function loadFontAsset(
-  fontFile: File | null,
-): Promise<GenerationFontAsset | null> {
+async function loadFontAsset(fontFile: File | null): Promise<GenerationFontAsset | null> {
   if (fontFile === null) {
     return null;
   }
@@ -128,24 +122,18 @@ async function loadFontAsset(
  * @throws When a custom flag file name is invalid or when multiple uploaded files would resolve to
  * the same logical `Custom/...` reference.
  */
-export async function buildGenerationAssets(
-  uploadedFiles: UploadedGenerationFiles,
-): Promise<GenerationAssets> {
+export async function buildGenerationAssets(uploadedFiles: UploadedGenerationFiles): Promise<GenerationAssets> {
   const customFlags: Record<string, ArrayBuffer> = {};
 
   for (const customFlagFile of uploadedFiles.customFlagFiles) {
     const normalizedReference = createCustomFlagReference(customFlagFile.name);
 
     if (normalizedReference === null) {
-      throw new Error(
-        `Invalid uploaded custom flag file: ${customFlagFile.name || '(empty)'}`,
-      );
+      throw new Error(`Invalid uploaded custom flag file: ${customFlagFile.name || '(empty)'}`);
     }
 
     if (normalizedReference in customFlags) {
-      throw new Error(
-        `Duplicate uploaded custom flag file: ${normalizedReference}`,
-      );
+      throw new Error(`Duplicate uploaded custom flag file: ${normalizedReference}`);
     }
 
     customFlags[normalizedReference] = await customFlagFile.arrayBuffer();

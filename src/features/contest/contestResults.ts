@@ -99,10 +99,7 @@ function calculateDqStatuses(votes: string[]): boolean[] {
  * @returns A per-voter score array suitable for ranking, where disqualified states are forced to a
  * low sentinel value so they sort below non-disqualified entries.
  */
-function calculateSortingPoints(
-  displayPoints: number[],
-  dqStatuses: boolean[],
-): number[] {
+function calculateSortingPoints(displayPoints: number[], dqStatuses: boolean[]): number[] {
   return displayPoints.map((points, index) => {
     return dqStatuses[index] ? -1000 : points;
   });
@@ -134,10 +131,7 @@ function buildRankedEntry(entry: ContestEntry): RankedContestEntry {
  * @param voterIndex The zero-based voter index up to which votes should be counted.
  * @returns The number of non-zero numeric votes received through the specified voter.
  */
-export function getVoterCountAfterVoter(
-  entry: RankedContestEntry,
-  voterIndex: number,
-): number {
+export function getVoterCountAfterVoter(entry: RankedContestEntry, voterIndex: number): number {
   let count = 0;
 
   for (let index = 0; index <= voterIndex; index += 1) {
@@ -159,11 +153,7 @@ export function getVoterCountAfterVoter(
  * @param voterIndex The zero-based voter index up to which votes should be counted.
  * @returns The number of occurrences of the requested score through the specified voter.
  */
-export function getPointsCountAfterVoter(
-  entry: RankedContestEntry,
-  points: number,
-  voterIndex: number,
-): number {
+export function getPointsCountAfterVoter(entry: RankedContestEntry, points: number, voterIndex: number): number {
   let count = 0;
 
   for (let index = 0; index <= voterIndex; index += 1) {
@@ -251,32 +241,25 @@ export function buildRankedContest(contest: ContestData): RankedContestData {
  * @param voterIndex The zero-based voter index whose post-vote standings should be produced.
  * @returns A newly sorted array of ranked entries in standing order after the specified voter.
  */
-export function getResultsAfterVoter(
-  contest: RankedContestData,
-  voterIndex: number,
-): RankedContestEntry[] {
+export function getResultsAfterVoter(contest: RankedContestData, voterIndex: number): RankedContestEntry[] {
   if (voterIndex < 0 || voterIndex >= contest.numVoters) {
     throw new RangeError(`Voter index ${String(voterIndex)} is out of range.`);
   }
 
   return [...contest.entries].sort((left, right) => {
-    const sortingPointsDifference =
-      right.sortingPoints[voterIndex] - left.sortingPoints[voterIndex];
+    const sortingPointsDifference = right.sortingPoints[voterIndex] - left.sortingPoints[voterIndex];
 
     if (sortingPointsDifference !== 0) {
       return sortingPointsDifference;
     }
 
-    const displayPointsDifference =
-      right.displayPoints[voterIndex] - left.displayPoints[voterIndex];
+    const displayPointsDifference = right.displayPoints[voterIndex] - left.displayPoints[voterIndex];
 
     if (displayPointsDifference !== 0) {
       return displayPointsDifference;
     }
 
-    const voterCountDifference =
-      getVoterCountAfterVoter(right, voterIndex) -
-      getVoterCountAfterVoter(left, voterIndex);
+    const voterCountDifference = getVoterCountAfterVoter(right, voterIndex) - getVoterCountAfterVoter(left, voterIndex);
 
     if (voterCountDifference !== 0) {
       return voterCountDifference;
@@ -284,8 +267,7 @@ export function getResultsAfterVoter(
 
     for (const points of contest.uniquePoints) {
       const pointsDifference =
-        getPointsCountAfterVoter(right, points, voterIndex) -
-        getPointsCountAfterVoter(left, points, voterIndex);
+        getPointsCountAfterVoter(right, points, voterIndex) - getPointsCountAfterVoter(left, points, voterIndex);
 
       if (pointsDifference !== 0) {
         return pointsDifference;

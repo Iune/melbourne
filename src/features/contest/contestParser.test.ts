@@ -3,10 +3,7 @@ import { resolve } from 'node:path';
 
 import { describe, expect, it } from 'vitest';
 
-import {
-  createTooFewColumnsWorkbookBuffer,
-  createValidContestWorkbookBuffer,
-} from '../../test/workbookBuilders';
+import { createTooFewColumnsWorkbookBuffer, createValidContestWorkbookBuffer } from '../../test/workbookBuilders';
 import { parseContestWorkbook } from './contestParser';
 
 /**
@@ -15,17 +12,12 @@ import { parseContestWorkbook } from './contestParser';
 async function readWorkbookFixture(filePath: string): Promise<ArrayBuffer> {
   const fileBuffer = await readFile(filePath);
 
-  return fileBuffer.buffer.slice(
-    fileBuffer.byteOffset,
-    fileBuffer.byteOffset + fileBuffer.byteLength,
-  );
+  return fileBuffer.buffer.slice(fileBuffer.byteOffset, fileBuffer.byteOffset + fileBuffer.byteLength);
 }
 
 describe('parseContestWorkbook', () => {
   it('parses the bundled Melbourne 1988 workbook', async () => {
-    const workbookBuffer = await readWorkbookFixture(
-      resolve(process.cwd(), '../melbourne/resources/1988.xlsx'),
-    );
+    const workbookBuffer = await readWorkbookFixture(resolve(process.cwd(), '../melbourne/resources/1988.xlsx'));
     const result = await parseContestWorkbook(workbookBuffer, false);
 
     expect(result.ok).toBe(true);

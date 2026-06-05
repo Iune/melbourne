@@ -1,25 +1,19 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const {
-  drawFilledRectangleMock,
-  drawStrokedRectangleMock,
-  drawLineMock,
-  drawTextMock,
-  drawFlagMock,
-} = vi.hoisted(() => {
-  return {
-    drawFilledRectangleMock: vi.fn(),
-    drawStrokedRectangleMock: vi.fn(),
-    drawLineMock: vi.fn(),
-    drawTextMock: vi.fn(),
-    drawFlagMock: vi.fn(),
-  };
-});
+const { drawFilledRectangleMock, drawStrokedRectangleMock, drawLineMock, drawTextMock, drawFlagMock } = vi.hoisted(
+  () => {
+    return {
+      drawFilledRectangleMock: vi.fn(),
+      drawStrokedRectangleMock: vi.fn(),
+      drawLineMock: vi.fn(),
+      drawTextMock: vi.fn(),
+      drawFlagMock: vi.fn(),
+    };
+  },
+);
 
 vi.mock('./scoreboardUtilities', async () => {
-  const actual = await vi.importActual<typeof import('./scoreboardUtilities')>(
-    './scoreboardUtilities',
-  );
+  const actual = await vi.importActual<typeof import('./scoreboardUtilities')>('./scoreboardUtilities');
 
   return {
     ...actual,
@@ -54,55 +48,19 @@ describe('ScoreboardPainter', () => {
   });
 
   it('delegates rectangle and line drawing helpers', () => {
-    const painter = new ScoreboardPainter(
-      CanvasKit,
-      canvas,
-      fontProvider,
-      generationAssets,
-    );
+    const painter = new ScoreboardPainter(CanvasKit, canvas, fontProvider, generationAssets);
 
     painter.filledRectangle(1, 2, 3, 4, color);
     painter.strokedRectangle(5, 6, 7, 8, color, 2);
     painter.line(9, 10, 11, 12, color, 0.5);
 
-    expect(drawFilledRectangleMock).toHaveBeenCalledWith(
-      CanvasKit,
-      canvas,
-      1,
-      2,
-      3,
-      4,
-      color,
-    );
-    expect(drawStrokedRectangleMock).toHaveBeenCalledWith(
-      CanvasKit,
-      canvas,
-      5,
-      6,
-      7,
-      8,
-      color,
-      2,
-    );
-    expect(drawLineMock).toHaveBeenCalledWith(
-      CanvasKit,
-      canvas,
-      9,
-      10,
-      11,
-      12,
-      color,
-      0.5,
-    );
+    expect(drawFilledRectangleMock).toHaveBeenCalledWith(CanvasKit, canvas, 1, 2, 3, 4, color);
+    expect(drawStrokedRectangleMock).toHaveBeenCalledWith(CanvasKit, canvas, 5, 6, 7, 8, color, 2);
+    expect(drawLineMock).toHaveBeenCalledWith(CanvasKit, canvas, 9, 10, 11, 12, color, 0.5);
   });
 
   it('delegates text and flag drawing helpers', async () => {
-    const painter = new ScoreboardPainter(
-      CanvasKit,
-      canvas,
-      fontProvider,
-      generationAssets,
-    );
+    const painter = new ScoreboardPainter(CanvasKit, canvas, fontProvider, generationAssets);
 
     painter.text('Fira Sans', 14, color, '12', 50, 60, 'center');
     await painter.flag('World/is.png', 1, 2, 2.5, true, color);

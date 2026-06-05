@@ -41,10 +41,7 @@ import { useEffect, useRef, useState } from 'react';
 
 import { buildGenerationAssets } from './features/assets/generationAssets';
 import { parseContestWorkbook } from './features/contest/contestParser';
-import type {
-  ContestData,
-  ContestParseError,
-} from './features/contest/contestTypes';
+import type { ContestData, ContestParseError } from './features/contest/contestTypes';
 import type { ScoreboardGenerationController } from './features/export/scoreboardGenerationClient';
 import { startScoreboardGeneration } from './features/export/scoreboardGenerationClient';
 import { getBundledFlagAssetEntriesByPack } from './features/flags/flagAssets';
@@ -79,24 +76,17 @@ export function App() {
   const [appState, setAppState] = useState<AppState>('idle');
   const [progressValue, setProgressValue] = useState(0);
   const [progressTotal, setProgressTotal] = useState(0);
-  const [generatedArchiveUrl, setGeneratedArchiveUrl] = useState<string | null>(
-    null,
-  );
+  const [generatedArchiveUrl, setGeneratedArchiveUrl] = useState<string | null>(null);
   const [generatedZipFileName, setGeneratedZipFileName] = useState('');
   const [generationErrorMessage, setGenerationErrorMessage] = useState('');
-  const [validationErrors, setValidationErrors] = useState<ContestParseError[]>(
-    [],
-  );
-  const generationControllerRef = useRef<ScoreboardGenerationController | null>(
-    null,
-  );
+  const [validationErrors, setValidationErrors] = useState<ContestParseError[]>([]);
+  const generationControllerRef = useRef<ScoreboardGenerationController | null>(null);
 
   const canGenerate = contestName.trim().length > 0 && contestFile !== null;
   const isGenerating = appState === 'generating';
   const hasSucceeded = appState === 'succeeded';
   const hasValidationFailed = appState === 'validationFailed';
-  const progressPercent =
-    progressTotal === 0 ? 0 : (progressValue / progressTotal) * 100;
+  const progressPercent = progressTotal === 0 ? 0 : (progressValue / progressTotal) * 100;
   const hasStatusContent =
     isGenerating ||
     hasSucceeded ||
@@ -138,41 +128,34 @@ export function App() {
       title: contestName.trim(),
     };
 
-    generationControllerRef.current = startScoreboardGeneration(
-      contest,
-      customGenerationAssets,
-      renderConfig,
-      {
-        onError: (message) => {
-          generationControllerRef.current = null;
-          setGenerationErrorMessage(message);
-          setAppState('idle');
-          setProgressValue(0);
-          setProgressTotal(0);
-        },
-        onProgress: (completed, total) => {
-          setProgressValue(completed);
-          setProgressTotal(total);
-        },
-        onSuccess: (archiveBytes, zipFileName) => {
-          generationControllerRef.current = null;
-          const normalizedArchiveBytes = new Uint8Array(
-            archiveBytes.byteLength,
-          );
-
-          normalizedArchiveBytes.set(archiveBytes);
-
-          const archiveBlob = new Blob([normalizedArchiveBytes], {
-            type: 'application/zip',
-          });
-          const archiveUrl = URL.createObjectURL(archiveBlob);
-
-          setGeneratedArchiveUrl(archiveUrl);
-          setGeneratedZipFileName(zipFileName);
-          setAppState('succeeded');
-        },
+    generationControllerRef.current = startScoreboardGeneration(contest, customGenerationAssets, renderConfig, {
+      onError: (message) => {
+        generationControllerRef.current = null;
+        setGenerationErrorMessage(message);
+        setAppState('idle');
+        setProgressValue(0);
+        setProgressTotal(0);
       },
-    );
+      onProgress: (completed, total) => {
+        setProgressValue(completed);
+        setProgressTotal(total);
+      },
+      onSuccess: (archiveBytes, zipFileName) => {
+        generationControllerRef.current = null;
+        const normalizedArchiveBytes = new Uint8Array(archiveBytes.byteLength);
+
+        normalizedArchiveBytes.set(archiveBytes);
+
+        const archiveBlob = new Blob([normalizedArchiveBytes], {
+          type: 'application/zip',
+        });
+        const archiveUrl = URL.createObjectURL(archiveBlob);
+
+        setGeneratedArchiveUrl(archiveUrl);
+        setGeneratedZipFileName(zipFileName);
+        setAppState('succeeded');
+      },
+    });
   }
 
   /**
@@ -190,10 +173,7 @@ export function App() {
     setProgressValue(0);
     setProgressTotal(0);
 
-    const parseResult = await parseContestWorkbook(
-      await contestFile.arrayBuffer(),
-      hasCountColumn,
-    );
+    const parseResult = await parseContestWorkbook(await contestFile.arrayBuffer(), hasCountColumn);
 
     if (!parseResult.ok) {
       setValidationErrors(parseResult.errors);
@@ -205,10 +185,7 @@ export function App() {
     const activeCustomFlagFiles = includeFlags ? customFlagFiles : [];
 
     if (includeFlags) {
-      const flagValidationErrors = validateFlagReferences(
-        parseResult.contest,
-        activeCustomFlagFiles,
-      );
+      const flagValidationErrors = validateFlagReferences(parseResult.contest, activeCustomFlagFiles);
 
       if (flagValidationErrors.length > 0) {
         setValidationErrors(flagValidationErrors);
@@ -218,9 +195,7 @@ export function App() {
       }
     }
 
-    let customGenerationAssets: Awaited<
-      ReturnType<typeof buildGenerationAssets>
-    >;
+    let customGenerationAssets: Awaited<ReturnType<typeof buildGenerationAssets>>;
 
     try {
       customGenerationAssets = await buildGenerationAssets({
@@ -231,10 +206,7 @@ export function App() {
     } catch (error) {
       setValidationErrors([
         {
-          message:
-            error instanceof Error
-              ? error.message
-              : 'Unable to load the selected custom assets.',
+          message: error instanceof Error ? error.message : 'Unable to load the selected custom assets.',
         },
       ]);
       setAppState('validationFailed');
@@ -366,35 +338,20 @@ export function App() {
                     <span>Flags</span>
                   </Group>
                 </Anchor>
-                <Anchor
-                  href="https://github.com/Iune/melbourne"
-                  underline="hover"
-                >
+                <Anchor href="https://github.com/Iune/melbourne" underline="hover">
                   <Group gap={4} wrap="nowrap">
                     <IconBrandGithub size={16} />
                     <span>GitHub</span>
                   </Group>
                 </Anchor>
-                <Tooltip
-                  label={
-                    isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'
-                  }
-                >
+                <Tooltip label={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}>
                   <ActionIcon
-                    aria-label={
-                      isDarkMode
-                        ? 'Switch to light mode'
-                        : 'Switch to dark mode'
-                    }
+                    aria-label={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
                     onClick={handleToggleColorScheme}
                     size="lg"
                     variant="subtle"
                   >
-                    {isDarkMode ? (
-                      <IconSun size={18} stroke={1.8} />
-                    ) : (
-                      <IconMoon size={18} stroke={1.8} />
-                    )}
+                    {isDarkMode ? <IconSun size={18} stroke={1.8} /> : <IconMoon size={18} stroke={1.8} />}
                   </ActionIcon>
                 </Tooltip>
               </Group>
@@ -442,35 +399,20 @@ export function App() {
                     <span>Flags</span>
                   </Group>
                 </Anchor>
-                <Anchor
-                  href="https://github.com/Iune/melbourne"
-                  underline="hover"
-                >
+                <Anchor href="https://github.com/Iune/melbourne" underline="hover">
                   <Group gap={4} wrap="nowrap">
                     <IconBrandGithub size={16} />
                     <span>GitHub</span>
                   </Group>
                 </Anchor>
-                <Tooltip
-                  label={
-                    isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'
-                  }
-                >
+                <Tooltip label={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}>
                   <ActionIcon
-                    aria-label={
-                      isDarkMode
-                        ? 'Switch to light mode'
-                        : 'Switch to dark mode'
-                    }
+                    aria-label={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
                     onClick={handleToggleColorScheme}
                     size="lg"
                     variant="subtle"
                   >
-                    {isDarkMode ? (
-                      <IconSun size={18} stroke={1.8} />
-                    ) : (
-                      <IconMoon size={18} stroke={1.8} />
-                    )}
+                    {isDarkMode ? <IconSun size={18} stroke={1.8} /> : <IconMoon size={18} stroke={1.8} />}
                   </ActionIcon>
                 </Tooltip>
               </Group>
@@ -486,20 +428,14 @@ export function App() {
               <Title order={1}>Generate Scoreboards</Title>
               <form onSubmit={handleSubmit}>
                 <Stack gap="md">
-                  <SimpleGrid
-                    cols={{ base: 1, md: 2 }}
-                    spacing="md"
-                    verticalSpacing="md"
-                  >
+                  <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md" verticalSpacing="md">
                     <Stack gap="md">
                       <Fieldset legend="Contest Details">
                         <Stack gap="md">
                           <TextInput
                             disabled={isGenerating}
                             label="Contest Title"
-                            onChange={(event) =>
-                              setContestName(event.currentTarget.value)
-                            }
+                            onChange={(event) => setContestName(event.currentTarget.value)}
                             placeholder="Contest Results"
                             value={contestName}
                           />
@@ -516,9 +452,7 @@ export function App() {
                             checked={hasCountColumn}
                             disabled={isGenerating}
                             label="Contest file contains ‘Count’ column"
-                            onChange={(event) =>
-                              setHasCountColumn(event.currentTarget.checked)
-                            }
+                            onChange={(event) => setHasCountColumn(event.currentTarget.checked)}
                           />
                         </Stack>
                       </Fieldset>
@@ -535,9 +469,7 @@ export function App() {
                                 <ActionIcon
                                   aria-label="Reset main color"
                                   disabled={isGenerating}
-                                  onClick={() =>
-                                    setMainColor(DEFAULT_MAIN_COLOR)
-                                  }
+                                  onClick={() => setMainColor(DEFAULT_MAIN_COLOR)}
                                   size="sm"
                                   type="button"
                                   variant="subtle"
@@ -563,9 +495,7 @@ export function App() {
                                 <ActionIcon
                                   aria-label="Reset accent color"
                                   disabled={isGenerating}
-                                  onClick={() =>
-                                    setAccentColor(DEFAULT_ACCENT_COLOR)
-                                  }
+                                  onClick={() => setAccentColor(DEFAULT_ACCENT_COLOR)}
                                   size="sm"
                                   type="button"
                                   variant="subtle"
@@ -591,17 +521,13 @@ export function App() {
                               checked={includeFlags}
                               disabled={isGenerating}
                               label="Include flags"
-                              onChange={(event) =>
-                                setIncludeFlags(event.currentTarget.checked)
-                              }
+                              onChange={(event) => setIncludeFlags(event.currentTarget.checked)}
                             />
                             <Checkbox
                               checked={drawFlagBorders}
                               disabled={!includeFlags || isGenerating}
                               label="Draw flag borders"
-                              onChange={(event) =>
-                                setDrawFlagBorders(event.currentTarget.checked)
-                              }
+                              onChange={(event) => setDrawFlagBorders(event.currentTarget.checked)}
                             />
                           </Group>
                           <FileInput
@@ -610,9 +536,7 @@ export function App() {
                             disabled={!includeFlags || isGenerating}
                             label="Custom Flag Files"
                             multiple
-                            onChange={(files) =>
-                              setCustomFlagFiles(files ?? [])
-                            }
+                            onChange={(files) => setCustomFlagFiles(files ?? [])}
                             placeholder="Select .png or .jpg file(s)"
                             value={customFlagFiles}
                           />
@@ -661,39 +585,20 @@ export function App() {
                   <Stack aria-live="polite" gap="sm">
                     {hasStatusContent ? <Title order={3}>Status</Title> : null}
                     {isGenerating ? (
-                      <Alert
-                        icon={<IconLoader2 size={18} />}
-                        title="Generating Scoreboards"
-                        variant="default"
-                      >
+                      <Alert icon={<IconLoader2 size={18} />} title="Generating Scoreboards" variant="default">
                         <Stack gap="xs">
                           <Text size="sm">
-                            {progressValue} of {progressTotal} scoreboards
-                            generated
+                            {progressValue} of {progressTotal} scoreboards generated
                           </Text>
-                          <Progress
-                            size="xl"
-                            aria-label="Generation progress"
-                            value={progressPercent}
-                          />
+                          <Progress size="xl" aria-label="Generation progress" value={progressPercent} />
                         </Stack>
                       </Alert>
                     ) : null}
                     {hasSucceeded ? (
-                      <Alert
-                        icon={<IconCheck size={18} />}
-                        title="Generation Complete"
-                        variant="default"
-                      >
+                      <Alert icon={<IconCheck size={18} />} title="Generation Complete" variant="default">
                         <Stack gap="xs">
-                          <Text size="sm">
-                            Scoreboards are ready for download.
-                          </Text>
-                          <Progress
-                            size="xl"
-                            aria-label="Generation progress"
-                            value={progressPercent}
-                          />
+                          <Text size="sm">Scoreboards are ready for download.</Text>
+                          <Progress size="xl" aria-label="Generation progress" value={progressPercent} />
                           <Group justify="flex-start">
                             <Button
                               component="a"
@@ -738,37 +643,35 @@ export function App() {
             <Stack gap="lg" py="xl">
               <Title order={1}>Bundled Flags</Title>
               <Text c="dimmed" size="sm">
-                The bundled flag packs below are available for spreadsheet
-                references. Use the reference shown in the Details column.
+                The bundled flag packs below are available for spreadsheet references. Use the reference shown in the
+                Details column.
               </Text>
               <Accordion chevronPosition="right" multiple variant="separated">
-                {[...bundledFlagEntriesByPack.entries()].map(
-                  ([packName, entries]) => (
-                    <Accordion.Item key={packName} value={packName}>
-                      <Accordion.Control>
-                        {packName} ({entries.length})
-                      </Accordion.Control>
-                      <Accordion.Panel>
-                        <Table highlightOnHover striped>
-                          <Table.Thead>
-                            <Table.Tr>
-                              <Table.Th>File Name</Table.Th>
-                              <Table.Th>Details</Table.Th>
+                {[...bundledFlagEntriesByPack.entries()].map(([packName, entries]) => (
+                  <Accordion.Item key={packName} value={packName}>
+                    <Accordion.Control>
+                      {packName} ({entries.length})
+                    </Accordion.Control>
+                    <Accordion.Panel>
+                      <Table highlightOnHover striped>
+                        <Table.Thead>
+                          <Table.Tr>
+                            <Table.Th>File Name</Table.Th>
+                            <Table.Th>Details</Table.Th>
+                          </Table.Tr>
+                        </Table.Thead>
+                        <Table.Tbody>
+                          {entries.map((entry) => (
+                            <Table.Tr key={entry.reference}>
+                              <Table.Td>{entry.fileName}</Table.Td>
+                              <Table.Td>{entry.details}</Table.Td>
                             </Table.Tr>
-                          </Table.Thead>
-                          <Table.Tbody>
-                            {entries.map((entry) => (
-                              <Table.Tr key={entry.reference}>
-                                <Table.Td>{entry.fileName}</Table.Td>
-                                <Table.Td>{entry.details}</Table.Td>
-                              </Table.Tr>
-                            ))}
-                          </Table.Tbody>
-                        </Table>
-                      </Accordion.Panel>
-                    </Accordion.Item>
-                  ),
-                )}
+                          ))}
+                        </Table.Tbody>
+                      </Table>
+                    </Accordion.Panel>
+                  </Accordion.Item>
+                ))}
               </Accordion>
             </Stack>
           ) : (
@@ -778,18 +681,14 @@ export function App() {
                 <Stack gap="sm" key={section.title}>
                   <Title order={section.titleLevel}>{section.title}</Title>
                   {section.body?.map((paragraph) => (
-                    <Text
-                      key={paragraph.map((fragment) => fragment.text).join('')}
-                    >
+                    <Text key={paragraph.map((fragment) => fragment.text).join('')}>
                       {renderHelpRichText(paragraph)}
                     </Text>
                   ))}
                   {section.items !== undefined ? (
                     <List spacing="xs">
                       {section.items.map((item) => (
-                        <List.Item
-                          key={item.map((fragment) => fragment.text).join('')}
-                        >
+                        <List.Item key={item.map((fragment) => fragment.text).join('')}>
                           {renderHelpRichText(item)}
                         </List.Item>
                       ))}

@@ -2,14 +2,8 @@ import resizeImageData from '@jsquash/resize';
 import type { Canvas } from 'canvaskit-wasm';
 
 import type { GenerationAssets } from '../assets/generationAssets';
-import {
-  getBundledFlagAssetUrl,
-  normalizeFlagReference,
-} from '../flags/flagAssets';
-import {
-  drawStrokedRectangle,
-  type CanvasKitModule,
-} from './scoreboardUtilities';
+import { getBundledFlagAssetUrl, normalizeFlagReference } from '../flags/flagAssets';
+import { drawStrokedRectangle, type CanvasKitModule } from './scoreboardUtilities';
 
 const FLAG_WIDTH = 20;
 const FLAG_CENTER_X = 27;
@@ -48,9 +42,7 @@ async function loadFlagBytes(flagReference: string): Promise<ArrayBuffer> {
     const response = await fetch(assetUrl);
 
     if (!response.ok) {
-      throw new Error(
-        `Unable to load bundled flag data for ${normalizedReference}.`,
-      );
+      throw new Error(`Unable to load bundled flag data for ${normalizedReference}.`);
     }
 
     return response.arrayBuffer();
@@ -70,10 +62,7 @@ async function loadFlagBytes(flagReference: string): Promise<ArrayBuffer> {
  * uploaded custom flags.
  * @returns The encoded image bytes that should be decoded and rendered for the requested flag.
  */
-async function loadResolvedFlagBytes(
-  flagReference: string,
-  generationAssets: GenerationAssets,
-): Promise<ArrayBuffer> {
+async function loadResolvedFlagBytes(flagReference: string, generationAssets: GenerationAssets): Promise<ArrayBuffer> {
   const normalizedReference = normalizeFlagReference(flagReference);
 
   if (normalizedReference === null) {
@@ -158,11 +147,7 @@ async function resizeFlagImage(
     height: resizedImageData.height,
     width: resizedImageData.width,
   };
-  const resizedImage = CanvasKit.MakeImage(
-    imageInfo,
-    resizedImageData.data,
-    resizedImageData.width * 4,
-  );
+  const resizedImage = CanvasKit.MakeImage(imageInfo, resizedImageData.data, resizedImageData.width * 4);
 
   if (resizedImage === null) {
     throw new Error('Unable to create resized flag image.');
@@ -200,16 +185,11 @@ export async function drawFlag(
   drawBorder: boolean,
   borderColor: Float32Array,
 ): Promise<void> {
-  const imageBytes = await loadResolvedFlagBytes(
-    entryFlagReference,
-    generationAssets,
-  );
+  const imageBytes = await loadResolvedFlagBytes(entryFlagReference, generationAssets);
   const image = CanvasKit.MakeImageFromEncoded(imageBytes);
 
   if (image === null) {
-    throw new Error(
-      `Unable to decode bundled flag image: ${entryFlagReference}`,
-    );
+    throw new Error(`Unable to decode bundled flag image: ${entryFlagReference}`);
   }
 
   const targetWidth = FLAG_WIDTH * scalingRatio;
@@ -217,38 +197,18 @@ export async function drawFlag(
   const targetHeight = targetWidth * aspectRatio;
   const resizedWidth = Math.max(1, Math.round(targetWidth));
   const resizedHeight = Math.max(1, Math.round(targetHeight));
-  const resizedImage = await resizeFlagImage(
-    CanvasKit,
-    image,
-    resizedWidth,
-    resizedHeight,
-  );
+  const resizedImage = await resizeFlagImage(CanvasKit, image, resizedWidth, resizedHeight);
   const paint = new CanvasKit.Paint();
 
   paint.setAntiAlias(true);
 
-  const left = Math.round(
-    FLAG_CENTER_X * scalingRatio - resizedWidth / 2 + xOffset,
-  );
-  const top = Math.round(
-    FLAG_CENTER_Y * scalingRatio -
-      resizedHeight / 2 +
-      FLAG_ROW_HEIGHT * scalingRatio * yOffset,
-  );
+  const left = Math.round(FLAG_CENTER_X * scalingRatio - resizedWidth / 2 + xOffset);
+  const top = Math.round(FLAG_CENTER_Y * scalingRatio - resizedHeight / 2 + FLAG_ROW_HEIGHT * scalingRatio * yOffset);
 
   canvas.drawImage(resizedImage, left, top, paint);
 
   if (drawBorder) {
-    drawStrokedRectangle(
-      CanvasKit,
-      canvas,
-      left,
-      top,
-      resizedWidth,
-      resizedHeight,
-      borderColor,
-      1,
-    );
+    drawStrokedRectangle(CanvasKit, canvas, left, top, resizedWidth, resizedHeight, borderColor, 1);
   }
 
   resizedImage.delete();

@@ -30,6 +30,4 @@ export interface ContestParseError {
 /**
  * Represents the success or failure result of parsing a contest workbook.
  */
-export type ContestParseResult =
-  | { contest: ContestData; ok: true }
-  | { errors: ContestParseError[]; ok: false };
+export type ContestParseResult = { contest: ContestData; ok: true } | { errors: ContestParseError[]; ok: false };

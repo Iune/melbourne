@@ -1,7 +1,4 @@
-import {
-  createCustomFlagReferenceSet,
-  validateCustomFlagUploads,
-} from '../assets/generationAssets';
+import { createCustomFlagReferenceSet, validateCustomFlagUploads } from '../assets/generationAssets';
 import type { ContestData, ContestParseError } from '../contest/contestTypes';
 import { hasBundledFlagAsset, normalizeFlagReference } from './flagAssets';
 
@@ -15,10 +12,7 @@ import { hasBundledFlagAsset, normalizeFlagReference } from './flagAssets';
  * @returns A flat list of blocking validation errors covering duplicate custom uploads, invalid
  * logical flag references, and missing bundled or custom flag assets.
  */
-export function validateFlagReferences(
-  contest: ContestData,
-  customFlagFiles: File[] = [],
-): ContestParseError[] {
+export function validateFlagReferences(contest: ContestData, customFlagFiles: File[] = []): ContestParseError[] {
   const errors = validateCustomFlagUploads(customFlagFiles);
   const customFlagReferences = createCustomFlagReferenceSet(customFlagFiles);
 

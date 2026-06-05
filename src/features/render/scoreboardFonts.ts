@@ -1,9 +1,6 @@
 import baseFontUrl from '../../assets/fonts/ZillaSlab-Regular.otf?url';
 import pointsFontUrl from '../../assets/fonts/FiraSans-Regular.otf?url';
-import type {
-  GenerationAssets,
-  GenerationFontAsset,
-} from '../assets/generationAssets';
+import type { GenerationAssets, GenerationFontAsset } from '../assets/generationAssets';
 
 const DEFAULT_BASE_FONT_FAMILY = 'Zilla Slab';
 const DEFAULT_POINTS_FONT_FAMILY = 'Fira Sans';
@@ -31,10 +28,7 @@ let cachedPointsFontBytes: Promise<ArrayBuffer> | null = null;
  * cannot be loaded.
  * @returns The raw bytes for the bundled font file.
  */
-async function loadFontBytes(
-  fontUrl: string,
-  fileName: string,
-): Promise<ArrayBuffer> {
+async function loadFontBytes(fontUrl: string, fileName: string): Promise<ArrayBuffer> {
   const response = await fetch(fontUrl);
 
   if (!response.ok) {
@@ -64,10 +58,7 @@ async function loadBaseFontBytes(): Promise<ArrayBuffer> {
  */
 async function loadPointsFontBytes(): Promise<ArrayBuffer> {
   if (cachedPointsFontBytes === null) {
-    cachedPointsFontBytes = loadFontBytes(
-      pointsFontUrl,
-      'FiraSans-Regular.otf',
-    );
+    cachedPointsFontBytes = loadFontBytes(pointsFontUrl, 'FiraSans-Regular.otf');
   }
 
   return cachedPointsFontBytes;
@@ -113,9 +104,7 @@ function resolveFontAsset(
  * @returns The font family names and raw bytes that should be registered with CanvasKit before the
  * scoreboard is drawn.
  */
-export async function resolveRenderFonts(
-  generationAssets: GenerationAssets,
-): Promise<ResolvedRenderFonts> {
+export async function resolveRenderFonts(generationAssets: GenerationAssets): Promise<ResolvedRenderFonts> {
   const [defaultBaseFontBytes, defaultPointsFontBytes] = await Promise.all([
     loadBaseFontBytes(),
     loadPointsFontBytes(),

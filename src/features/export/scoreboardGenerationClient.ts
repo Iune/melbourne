@@ -1,10 +1,7 @@
 import type { GenerationAssets } from '../assets/generationAssets';
 import type { ContestData } from '../contest/contestTypes';
 import type { ScoreboardRenderConfig } from '../render/scoreboardRenderer';
-import type {
-  ScoreboardGenerationRequest,
-  ScoreboardGenerationWorkerMessage,
-} from './generationWorkerTypes';
+import type { ScoreboardGenerationRequest, ScoreboardGenerationWorkerMessage } from './generationWorkerTypes';
 
 /**
  * Represents the callbacks used by the UI while a worker is generating exports.
@@ -39,14 +36,9 @@ export function startScoreboardGeneration(
   renderConfig: ScoreboardRenderConfig,
   callbacks: ScoreboardGenerationCallbacks,
 ): ScoreboardGenerationController {
-  const worker = new Worker(
-    new URL('./scoreboardGenerationWorker.ts', import.meta.url),
-    { type: 'module' },
-  );
+  const worker = new Worker(new URL('./scoreboardGenerationWorker.ts', import.meta.url), { type: 'module' });
 
-  worker.onmessage = (
-    event: MessageEvent<ScoreboardGenerationWorkerMessage>,
-  ) => {
+  worker.onmessage = (event: MessageEvent<ScoreboardGenerationWorkerMessage>) => {
     if (event.data.type === 'progress') {
       callbacks.onProgress(event.data.completed, event.data.total);
       return;

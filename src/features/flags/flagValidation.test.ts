@@ -33,17 +33,13 @@ function createCustomFlagFile(fileName: string): File {
 
 describe('validateFlagReferences', () => {
   it('accepts valid bundled flag references', () => {
-    const errors = validateFlagReferences(
-      createContestWithFlags(['World/is.png', 'ISC/Kaledonii.png']),
-    );
+    const errors = validateFlagReferences(createContestWithFlags(['World/is.png', 'ISC/Kaledonii.png']));
 
     expect(errors).toEqual([]);
   });
 
   it('reports missing bundled flags as blocking errors', () => {
-    const errors = validateFlagReferences(
-      createContestWithFlags(['World/not-real.png']),
-    );
+    const errors = validateFlagReferences(createContestWithFlags(['World/not-real.png']));
 
     expect(errors).toEqual([
       {
@@ -54,11 +50,7 @@ describe('validateFlagReferences', () => {
 
   it('rejects escaping or otherwise unsafe flag references', () => {
     const errors = validateFlagReferences(
-      createContestWithFlags([
-        '../World/is.png',
-        'World\\is.png',
-        '/World/is.png',
-      ]),
+      createContestWithFlags(['../World/is.png', 'World\\is.png', '/World/is.png']),
     );
 
     expect(errors).toEqual([
@@ -75,18 +67,13 @@ describe('validateFlagReferences', () => {
   });
 
   it('accepts valid uploaded custom flag references', () => {
-    const errors = validateFlagReferences(
-      createContestWithFlags(['Custom/A.png']),
-      [createCustomFlagFile('A.png')],
-    );
+    const errors = validateFlagReferences(createContestWithFlags(['Custom/A.png']), [createCustomFlagFile('A.png')]);
 
     expect(errors).toEqual([]);
   });
 
   it('reports missing uploaded custom flags as blocking errors', () => {
-    const errors = validateFlagReferences(
-      createContestWithFlags(['Custom/A.png']),
-    );
+    const errors = validateFlagReferences(createContestWithFlags(['Custom/A.png']));
 
     expect(errors).toEqual([
       {
@@ -96,10 +83,7 @@ describe('validateFlagReferences', () => {
   });
 
   it('uses only the current uploaded custom flag selection', () => {
-    const errors = validateFlagReferences(
-      createContestWithFlags(['Custom/A.png']),
-      [createCustomFlagFile('B.png')],
-    );
+    const errors = validateFlagReferences(createContestWithFlags(['Custom/A.png']), [createCustomFlagFile('B.png')]);
 
     expect(errors).toEqual([
       {

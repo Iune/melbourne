@@ -58,17 +58,11 @@ export const HELP_SECTIONS: HelpSection[] = [
     title: 'Input File Format',
     titleLevel: 2,
     body: [
-      [
-        text(
-          'Melbourne expects an Excel spreadsheet with a specific structure.',
-        ),
-      ],
+      [text('Melbourne expects an Excel spreadsheet with a specific structure.')],
       [
         text('The first row is the header row and is '),
         bold('required'),
-        text(
-          '. The first six (or seven) columns must be present in the workbook, followed by one column per voter.',
-        ),
+        text('. The first six (or seven) columns must be present in the workbook, followed by one column per voter.'),
       ],
     ],
     items: [
@@ -78,15 +72,10 @@ export const HELP_SECTIONS: HelpSection[] = [
           ': Helper column for draw or placing values. Melbourne does not read these values, but the column must still be present.',
         ),
       ],
-      [
-        bold('Entry User/Country'),
-        text(': User, country, or other entry owner.'),
-      ],
+      [bold('Entry User/Country'), text(': User, country, or other entry owner.')],
       [
         bold('Flag Details'),
-        text(
-          ': Flag reference for the entry. This can be left blank if you are not using flags.',
-        ),
+        text(': Flag reference for the entry. This can be left blank if you are not using flags.'),
       ],
       [bold('Entry Artist'), text(': Entry artist.')],
       [bold('Entry Song'), text(': Song title.')],
@@ -121,21 +110,13 @@ export const HELP_SECTIONS: HelpSection[] = [
           ' in the relevant voter cell. The disqualified entry is then sorted after non-disqualified entries for that scoreboard and the remaining scoreboards.',
         ),
       ],
-      [
-        text(
-          'Even helper columns that are not actively read or populated must still be present in the sheet.',
-        ),
-      ],
+      [text('Even helper columns that are not actively read or populated must still be present in the sheet.')],
       [
         text(
           'Avoid leaving extra content in rows after the final entry, since that can be misread as another contest entry.',
         ),
       ],
-      [
-        text('You can view a sample contest file here: '),
-        link('1988.xlsx', '/1988.xlsx'),
-        text('.'),
-      ],
+      [text('You can view a sample contest file here: '), link('1988.xlsx', '/1988.xlsx'), text('.')],
     ],
   },
   {
@@ -162,9 +143,7 @@ export const HELP_SECTIONS: HelpSection[] = [
       [bold('ISC'), text(': flags for Internatia Song Contest countries.')],
       [
         bold('World'),
-        text(
-          ': square real-world country flags, named with lowercase two-letter ISO codes where applicable.',
-        ),
+        text(': square real-world country flags, named with lowercase two-letter ISO codes where applicable.'),
       ],
       [
         bold('Rect'),
@@ -186,20 +165,10 @@ export const HELP_SECTIONS: HelpSection[] = [
   {
     title: 'Generating Scoreboards',
     titleLevel: 2,
-    body: [
-      [
-        text(
-          'Once the contest workbook is prepared, fill out the form and generate the scoreboards.',
-        ),
-      ],
-    ],
+    body: [[text('Once the contest workbook is prepared, fill out the form and generate the scoreboards.')]],
     items: [
       [text('Enter the contest title.')],
-      [
-        text(
-          'Choose the contest file. If the file contains the Count column, make sure to tick the checkbox.',
-        ),
-      ],
+      [text('Choose the contest file. If the file contains the Count column, make sure to tick the checkbox.')],
       [text('Set the main and accent colors, or reset them to the defaults.')],
       [
         text(
@@ -207,9 +176,7 @@ export const HELP_SECTIONS: HelpSection[] = [
         ),
       ],
       [
-        text(
-          'If using custom fonts, select both the base font and points font ',
-        ),
+        text('If using custom fonts, select both the base font and points font '),
         code('.ttf'),
         text('/'),
         code('.otf'),
@@ -217,25 +184,15 @@ export const HELP_SECTIONS: HelpSection[] = [
           " files for the font(s) you wish to override. You do not need to specify both, and can only override one if you'd like. By default, the program uses Zilla Slab as the base and points font.",
         ),
       ],
-      [
-        text('When all required inputs are present, the '),
-        bold('Generate'),
-        text(' button becomes available.'),
-      ],
+      [text('When all required inputs are present, the '), bold('Generate'), text(' button becomes available.')],
       [
         text('Press '),
         bold('Generate'),
-        text(
-          ' to begin rendering. While rendering is in progress, the button changes to ',
-        ),
+        text(' to begin rendering. While rendering is in progress, the button changes to '),
         bold('Cancel'),
         text(' so the job can be stopped.'),
       ],
-      [
-        text(
-          'Generation time varies by contest size, but should complete within a few seconds.',
-        ),
-      ],
+      [text('Generation time varies by contest size, but should complete within a few seconds.')],
     ],
   },
 ];

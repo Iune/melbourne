@@ -1,11 +1,6 @@
 import ExcelJS from 'exceljs';
 
-import type {
-  ContestData,
-  ContestEntry,
-  ContestParseError,
-  ContestParseResult,
-} from './contestTypes';
+import type { ContestData, ContestEntry, ContestParseError, ContestParseResult } from './contestTypes';
 
 const MIN_REQUIRED_COLUMNS_WITHOUT_COUNT = 7;
 const MIN_REQUIRED_COLUMNS_WITH_COUNT = 8;
@@ -41,11 +36,7 @@ function createErrorResult(messages: string[]): ContestParseResult {
  * @param columnNumber The 1-based column number of the cell that should be read.
  * @returns The worksheet cell's display text with leading and trailing whitespace removed.
  */
-function getTrimmedCellText(
-  worksheet: ExcelJS.Worksheet,
-  rowNumber: number,
-  columnNumber: number,
-): string {
+function getTrimmedCellText(worksheet: ExcelJS.Worksheet, rowNumber: number, columnNumber: number): string {
   return worksheet.getRow(rowNumber).getCell(columnNumber).text.trim();
 }
 
@@ -69,11 +60,7 @@ function buildContestEntry(
 ): ContestEntry {
   const votes: string[] = [];
 
-  for (
-    let columnNumber = voteStartColumn;
-    columnNumber <= totalColumns;
-    columnNumber += 1
-  ) {
+  for (let columnNumber = voteStartColumn; columnNumber <= totalColumns; columnNumber += 1) {
     votes.push(getTrimmedCellText(worksheet, rowNumber, columnNumber));
   }
 
@@ -102,9 +89,7 @@ export async function parseContestWorkbook(
   const workbook = new ExcelJS.Workbook();
 
   try {
-    await workbook.xlsx.load(
-      new Uint8Array(fileContents) as unknown as WorkbookLoadInput,
-    );
+    await workbook.xlsx.load(new Uint8Array(fileContents) as unknown as WorkbookLoadInput);
   } catch {
     return createErrorResult(['Unable to read the Excel workbook.']);
   }
@@ -112,17 +97,11 @@ export async function parseContestWorkbook(
   const worksheet = workbook.worksheets[0];
 
   if (worksheet === undefined) {
-    return createErrorResult([
-      'Excel workbook does not contain any worksheets.',
-    ]);
+    return createErrorResult(['Excel workbook does not contain any worksheets.']);
   }
 
-  const minRequiredColumns = hasCountColumn
-    ? MIN_REQUIRED_COLUMNS_WITH_COUNT
-    : MIN_REQUIRED_COLUMNS_WITHOUT_COUNT;
-  const voteStartColumn = hasCountColumn
-    ? VOTE_START_COLUMN_WITH_COUNT
-    : VOTE_START_COLUMN_WITHOUT_COUNT;
+  const minRequiredColumns = hasCountColumn ? MIN_REQUIRED_COLUMNS_WITH_COUNT : MIN_REQUIRED_COLUMNS_WITHOUT_COUNT;
+  const voteStartColumn = hasCountColumn ? VOTE_START_COLUMN_WITH_COUNT : VOTE_START_COLUMN_WITHOUT_COUNT;
   const totalColumns = worksheet.actualColumnCount;
   const totalRows = worksheet.actualRowCount;
 
@@ -136,35 +115,16 @@ export async function parseContestWorkbook(
 
   const voterNames: string[] = [];
 
-  for (
-    let columnNumber = voteStartColumn;
-    columnNumber <= totalColumns;
-    columnNumber += 1
-  ) {
-    voterNames.push(
-      getTrimmedCellText(worksheet, HEADER_ROW_NUMBER, columnNumber),
-    );
+  for (let columnNumber = voteStartColumn; columnNumber <= totalColumns; columnNumber += 1) {
+    voterNames.push(getTrimmedCellText(worksheet, HEADER_ROW_NUMBER, columnNumber));
   }
 
   const entries: ContestEntry[] = [];
 
-  for (
-    let rowNumber = FIRST_DATA_ROW_NUMBER;
-    rowNumber <= totalRows;
-    rowNumber += 1
-  ) {
-    const entry = buildContestEntry(
-      worksheet,
-      rowNumber,
-      voteStartColumn,
-      totalColumns,
-    );
+  for (let rowNumber = FIRST_DATA_ROW_NUMBER; rowNumber <= totalRows; rowNumber += 1) {
+    const entry = buildContestEntry(worksheet, rowNumber, voteStartColumn, totalColumns);
 
-    if (
-      entry.country.length === 0 ||
-      entry.artist.length === 0 ||
-      entry.song.length === 0
-    ) {
+    if (entry.country.length === 0 || entry.artist.length === 0 || entry.song.length === 0) {
       break;
     }
 

@@ -8,6 +8,8 @@ _Melbourne_ is a program that generates scoreboard images for online music song 
 
 ## Building and Running Locally
 
+You will need [Node](https://nodejs.org/en) and [pnpm](https://pnpm.io/).
+
 Install dependencies:
 
 ```bash

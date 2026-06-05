@@ -194,7 +194,7 @@ describe('App', () => {
       screen.getByRole('heading', { name: 'Input File Format' }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole('heading', { name: 'Running the Program' }),
+      screen.getByRole('heading', { name: 'Generating Scoreboards' }),
     ).toBeInTheDocument();
     expect(screen.getByText('DQ')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: '1988.xlsx' })).toHaveAttribute(

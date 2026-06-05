@@ -30,7 +30,7 @@ createRoot(rootElement).render(
   <StrictMode>
     <MantineProvider
       colorSchemeManager={colorSchemeManager}
-      defaultColorScheme="light"
+      defaultColorScheme="dark"
       theme={theme}
     >
       <App />

@@ -173,12 +173,14 @@ export const HELP_SECTIONS: HelpSection[] = [
         ),
       ],
       [
-        text('Custom flags can be loaded and used when generating scoreboards. Select the flag files you wish to use in the Custom Flags Files input field. You can reference these custom flags using '),
+        text(
+          'Custom flags can be loaded and used when generating scoreboards. Select the flag files you wish to use in the Custom Flags Files input field. You can reference these custom flags using ',
+        ),
         code('Custom/<flag file name>'),
         text(', such as '),
         code('Custom/A.png'),
-        text('.')
-      ]
+        text('.'),
+      ],
     ],
   },
   {
@@ -192,8 +194,12 @@ export const HELP_SECTIONS: HelpSection[] = [
       ],
     ],
     items: [
-      [        text('Enter the contest title.')      ],
-      [text('Choose the contest file. If the file contains the Count column, make sure to tick the checkbox.')],
+      [text('Enter the contest title.')],
+      [
+        text(
+          'Choose the contest file. If the file contains the Count column, make sure to tick the checkbox.',
+        ),
+      ],
       [text('Set the main and accent colors, or reset them to the defaults.')],
       [
         text(
@@ -201,11 +207,15 @@ export const HELP_SECTIONS: HelpSection[] = [
         ),
       ],
       [
-        text('If using custom fonts, select both the base font and points font '),
+        text(
+          'If using custom fonts, select both the base font and points font ',
+        ),
         code('.ttf'),
         text('/'),
         code('.otf'),
-        text(' files for the font(s) you wish to override. You do not need to specify both, and can only override one if you\'d like. By default, the program uses Zilla Slab as the base and points font.')
+        text(
+          " files for the font(s) you wish to override. You do not need to specify both, and can only override one if you'd like. By default, the program uses Zilla Slab as the base and points font.",
+        ),
       ],
       [
         text('When all required inputs are present, the '),

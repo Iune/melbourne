@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This document defines developer-facing guidelines for implementing and maintaining the Melbourne Canvas web application. These guidelines are intended to keep the codebase consistent, testable, and easy to evolve over time.
+This document defines developer-facing guidelines for implementing and maintaining the Melbourne web application. These guidelines are intended to keep the codebase consistent, testable, and easy to evolve over time.
 
 ## Coding Standards
 

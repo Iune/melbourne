@@ -24,7 +24,12 @@ let cachedBaseFontBytes: Promise<ArrayBuffer> | null = null;
 let cachedPointsFontBytes: Promise<ArrayBuffer> | null = null;
 
 /**
- * Loads bundled font bytes once and reuses them across renders.
+ * Fetches the bytes for a bundled font file and returns them as an `ArrayBuffer`.
+ *
+ * @param fontUrl The resolved Vite asset URL for the bundled font file that should be fetched.
+ * @param fileName The human-readable file name used when constructing error messages if the font
+ * cannot be loaded.
+ * @returns The raw bytes for the bundled font file.
  */
 async function loadFontBytes(
   fontUrl: string,
@@ -40,7 +45,9 @@ async function loadFontBytes(
 }
 
 /**
- * Loads the bundled base font bytes once for reuse across renders.
+ * Lazily loads and caches the default base font bytes used for scoreboard body text.
+ *
+ * @returns The raw bytes for the bundled base font asset.
  */
 async function loadBaseFontBytes(): Promise<ArrayBuffer> {
   if (cachedBaseFontBytes === null) {
@@ -51,7 +58,9 @@ async function loadBaseFontBytes(): Promise<ArrayBuffer> {
 }
 
 /**
- * Loads the bundled points font bytes once for reuse across renders.
+ * Lazily loads and caches the default points font bytes used for scoreboard point totals.
+ *
+ * @returns The raw bytes for the bundled points font asset.
  */
 async function loadPointsFontBytes(): Promise<ArrayBuffer> {
   if (cachedPointsFontBytes === null) {
@@ -65,7 +74,17 @@ async function loadPointsFontBytes(): Promise<ArrayBuffer> {
 }
 
 /**
- * Returns the correct font family name and bytes for one optional custom font.
+ * Resolves one font choice, preferring a custom upload when one is available.
+ *
+ * @param customFont The optional custom font uploaded by the user for the current generation run.
+ * When this is `null`, the bundled fallback font is used instead.
+ * @param customFamilyName The internal family name that should be registered with CanvasKit when a
+ * custom font is supplied.
+ * @param fallbackFamilyName The bundled family name that should be used when no custom font is
+ * provided.
+ * @param fallbackBytes The bundled font bytes that should be returned when no custom font is
+ * provided.
+ * @returns The font bytes and family name that should be registered for rendering.
  */
 function resolveFontAsset(
   customFont: GenerationFontAsset | null,
@@ -87,7 +106,12 @@ function resolveFontAsset(
 }
 
 /**
- * Resolves bundled or custom font assets for one render.
+ * Resolves the base and points fonts that should be registered for a single render pass.
+ *
+ * @param generationAssets The in-memory asset bundle for the current export run, including any
+ * user-uploaded custom fonts.
+ * @returns The font family names and raw bytes that should be registered with CanvasKit before the
+ * scoreboard is drawn.
  */
 export async function resolveRenderFonts(
   generationAssets: GenerationAssets,

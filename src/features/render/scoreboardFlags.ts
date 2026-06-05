@@ -19,7 +19,11 @@ const FLAG_ROW_HEIGHT = 35;
 const cachedFlagBytes = new Map<string, Promise<ArrayBuffer>>();
 
 /**
- * Loads the encoded bytes for one bundled flag reference.
+ * Loads and caches the encoded bytes for one bundled flag asset.
+ *
+ * @param flagReference The logical flag reference from contest data, such as `World/is.png`,
+ * before any uploaded custom flags are considered.
+ * @returns The encoded bytes for the bundled flag image referenced by the contest data.
  */
 async function loadFlagBytes(flagReference: string): Promise<ArrayBuffer> {
   const normalizedReference = normalizeFlagReference(flagReference);
@@ -58,7 +62,13 @@ async function loadFlagBytes(flagReference: string): Promise<ArrayBuffer> {
 }
 
 /**
- * Resolves one flag image from uploaded custom assets or bundled assets.
+ * Resolves flag bytes from either uploaded custom assets or the bundled flag packs.
+ *
+ * @param flagReference The logical flag reference from contest data, such as `ISC/Kaledonii.png`
+ * or `Custom/A.png`.
+ * @param generationAssets The in-memory asset bundle for the current export run, including any
+ * uploaded custom flags.
+ * @returns The encoded image bytes that should be decoded and rendered for the requested flag.
  */
 async function loadResolvedFlagBytes(
   flagReference: string,
@@ -80,7 +90,11 @@ async function loadResolvedFlagBytes(
 }
 
 /**
- * Decodes one encoded flag image into RGBA pixels that can be resized in JS.
+ * Decodes an encoded flag image into RGBA pixel data that can be resized before drawing.
+ *
+ * @param CanvasKit The initialized CanvasKit module used to read pixels from the decoded image.
+ * @param image The decoded CanvasKit image created from encoded bundled or uploaded flag bytes.
+ * @returns An `ImageData` instance containing unpremultiplied RGBA pixels for the decoded image.
  */
 function decodeFlagImageData(
   CanvasKit: CanvasKitModule,
@@ -113,7 +127,14 @@ function decodeFlagImageData(
 }
 
 /**
- * Resizes one decoded flag image to the exact scoreboard slot dimensions.
+ * Resizes a decoded flag image to the exact pixel dimensions needed for the current row slot.
+ *
+ * @param CanvasKit The initialized CanvasKit module used to reconstruct an image from resized
+ * pixel data.
+ * @param image The decoded CanvasKit image that should be resized.
+ * @param width The exact output width, in device pixels, that the flag should occupy.
+ * @param height The exact output height, in device pixels, that the flag should occupy.
+ * @returns A new CanvasKit image already resized to the target slot dimensions.
  */
 async function resizeFlagImage(
   CanvasKit: CanvasKitModule,
@@ -151,7 +172,22 @@ async function resizeFlagImage(
 }
 
 /**
- * Draws one bundled or uploaded flag into the Melbourne row slot.
+ * Draws a single bundled or uploaded flag into an entry row.
+ *
+ * @param CanvasKit The initialized CanvasKit module used for image decoding, resizing, and
+ * painting.
+ * @param canvas The destination canvas belonging to the scoreboard surface being rendered.
+ * @param entryFlagReference The logical flag reference from the contest entry, such as
+ * `World/is.png` or `Custom/A.png`.
+ * @param generationAssets The in-memory asset bundle for the current export run, including any
+ * uploaded custom flags.
+ * @param xOffset The horizontal offset for the current scoreboard column, already scaled for the
+ * left or right half of the layout.
+ * @param yOffset The zero-based row offset within the current column.
+ * @param scalingRatio The global scoreboard scaling ratio used to convert layout constants into
+ * rendered pixel sizes.
+ * @param drawBorder Whether a border should be drawn around the resized flag image.
+ * @param borderColor The resolved border color to use when `drawBorder` is enabled.
  */
 export async function drawFlag(
   CanvasKit: CanvasKitModule,

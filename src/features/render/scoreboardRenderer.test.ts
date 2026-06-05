@@ -40,7 +40,6 @@ const SAMPLE_CONTEST: ContestData = {
 };
 const SAMPLE_RENDER_CONFIG: ScoreboardRenderConfig = {
   accentColor: '#FCB906',
-  appendResultsToTitle: true,
   displayFlagBorders: false,
   displayFlags: false,
   mainColor: '#2F292B',

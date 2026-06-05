@@ -132,11 +132,10 @@ export function App() {
 
     const renderConfig: ScoreboardRenderConfig = {
       accentColor,
-      appendResultsToTitle: true,
       displayFlagBorders: drawFlagBorders,
       displayFlags: includeFlags,
       mainColor,
-      title: contestName,
+      title: contestName.trim(),
     };
 
     generationControllerRef.current = startScoreboardGeneration(
@@ -383,7 +382,9 @@ export function App() {
                 >
                   <ActionIcon
                     aria-label={
-                      isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'
+                      isDarkMode
+                        ? 'Switch to light mode'
+                        : 'Switch to dark mode'
                     }
                     onClick={handleToggleColorScheme}
                     size="lg"
@@ -457,7 +458,9 @@ export function App() {
                 >
                   <ActionIcon
                     aria-label={
-                      isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'
+                      isDarkMode
+                        ? 'Switch to light mode'
+                        : 'Switch to dark mode'
                     }
                     onClick={handleToggleColorScheme}
                     size="lg"

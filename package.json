@@ -16,6 +16,7 @@
     "test:e2e": "playwright test"
   },
   "dependencies": {
+    "@jsquash/resize": "^2.1.1",
     "@mantine/core": "latest",
     "@mantine/hooks": "latest",
     "@tabler/icons-react": "latest",

@@ -2,6 +2,27 @@ import '@testing-library/jest-dom/vitest';
 import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 
+if (typeof globalThis.ImageData === 'undefined') {
+  class ImageDataPolyfill {
+    readonly colorSpace = 'srgb' as const;
+    readonly data: Uint8ClampedArray;
+    readonly height: number;
+    readonly width: number;
+
+    constructor(data: Uint8ClampedArray, width: number, height: number) {
+      this.data = data;
+      this.height = height;
+      this.width = width;
+    }
+  }
+
+  Object.defineProperty(globalThis, 'ImageData', {
+    configurable: true,
+    value: ImageDataPolyfill as typeof ImageData,
+    writable: true,
+  });
+}
+
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
   value: (query: string) => ({
@@ -22,6 +43,10 @@ const originalFetch = globalThis.fetch.bind(globalThis);
  * Resolves a local Vite-served asset URL to an on-disk file path for tests.
  */
 function resolveLocalAssetPath(url: URL): string | null {
+  if (url.protocol === 'file:') {
+    return url.pathname;
+  }
+
   if (url.origin !== 'http://localhost') {
     return null;
   }

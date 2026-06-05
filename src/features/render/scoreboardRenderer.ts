@@ -1,5 +1,6 @@
 import CanvasKitInit from 'canvaskit-wasm/bin/full/canvaskit.js';
 import canvasKitWasmUrl from 'canvaskit-wasm/bin/full/canvaskit.wasm?url';
+import resizeImageData from '@jsquash/resize';
 import baseFontUrl from '../../assets/fonts/ZillaSlab-Regular.otf?url';
 import pointsFontUrl from '../../assets/fonts/FiraSans-Regular.otf?url';
 import type { Canvas, TypefaceFontProvider } from 'canvaskit-wasm';
@@ -281,6 +282,76 @@ async function loadResolvedFlagBytes(
 }
 
 /**
+ * Decodes one encoded flag image into RGBA pixels that can be resized in JS.
+ */
+function decodeFlagImageData(
+  CanvasKit: CanvasKitModule,
+  image: ReturnType<CanvasKitModule['MakeImageFromEncoded']>,
+): ImageData {
+  if (image === null) {
+    throw new Error('Unable to decode flag image bytes.');
+  }
+
+  const width = image.width();
+  const height = image.height();
+  const imageInfo = {
+    alphaType: CanvasKit.AlphaType.Unpremul,
+    colorSpace: CanvasKit.ColorSpace.SRGB,
+    colorType: CanvasKit.ColorType.RGBA_8888,
+    height,
+    width,
+  };
+  const pixels = image.readPixels(0, 0, imageInfo);
+
+  if (pixels === null) {
+    throw new Error('Unable to read decoded flag pixels.');
+  }
+
+  if (typeof ImageData === 'undefined') {
+    throw new Error('ImageData is not available in this environment.');
+  }
+
+  return new ImageData(new Uint8ClampedArray(pixels), width, height);
+}
+
+/**
+ * Resizes one decoded flag image to the exact scoreboard slot dimensions.
+ */
+async function resizeFlagImage(
+  CanvasKit: CanvasKitModule,
+  image: ReturnType<CanvasKitModule['MakeImageFromEncoded']>,
+  width: number,
+  height: number,
+) {
+  const decodedImageData = decodeFlagImageData(CanvasKit, image);
+  // Use the @jsquash/resize library for resizing the image, as CanvasKit's resizing results in pixelated images
+  const resizedImageData = await resizeImageData(decodedImageData, {
+    fitMethod: 'stretch',
+    height,
+    method: 'mitchell',
+    width,
+  });
+  const imageInfo = {
+    alphaType: CanvasKit.AlphaType.Unpremul,
+    colorSpace: CanvasKit.ColorSpace.SRGB,
+    colorType: CanvasKit.ColorType.RGBA_8888,
+    height: resizedImageData.height,
+    width: resizedImageData.width,
+  };
+  const resizedImage = CanvasKit.MakeImage(
+    imageInfo,
+    resizedImageData.data,
+    resizedImageData.width * 4,
+  );
+
+  if (resizedImage === null) {
+    throw new Error('Unable to create resized flag image.');
+  }
+
+  return resizedImage;
+}
+
+/**
  * Converts a `#RRGGBB` hex color into a CanvasKit color array.
  */
 function hexToColor(hex: string): Float32Array {
@@ -543,24 +614,24 @@ async function drawFlag(
   const targetWidth = 20 * scalingRatio;
   const aspectRatio = image.height() / image.width();
   const targetHeight = targetWidth * aspectRatio;
-  const left = 27 * scalingRatio - targetWidth / 2 + xOffset;
-  const top =
-    87 * scalingRatio - targetHeight / 2 + 35 * scalingRatio * yOffset;
-  const sourceRect = CanvasKit.XYWHRect(0, 0, image.width(), image.height());
-  const destinationRect = CanvasKit.XYWHRect(
-    left,
-    top,
-    targetWidth,
-    targetHeight,
+  const resizedWidth = Math.max(1, Math.round(targetWidth));
+  const resizedHeight = Math.max(1, Math.round(targetHeight));
+  const resizedImage = await resizeFlagImage(
+    CanvasKit,
+    image,
+    resizedWidth,
+    resizedHeight,
+  );
+  const paint = new CanvasKit.Paint();
+
+  paint.setAntiAlias(true);
+
+  const left = Math.round(27 * scalingRatio - resizedWidth / 2 + xOffset);
+  const top = Math.round(
+    87 * scalingRatio - resizedHeight / 2 + 35 * scalingRatio * yOffset,
   );
 
-  canvas.drawImageRectOptions(
-    image,
-    sourceRect,
-    destinationRect,
-    CanvasKit.FilterMode.Linear,
-    CanvasKit.MipmapMode.None,
-  );
+  canvas.drawImage(resizedImage, left, top, paint);
 
   if (drawBorder) {
     drawStrokedRectangle(
@@ -568,13 +639,15 @@ async function drawFlag(
       canvas,
       left,
       top,
-      targetWidth,
-      targetHeight,
+      resizedWidth,
+      resizedHeight,
       borderColor,
       1,
     );
   }
 
+  resizedImage.delete();
+  paint.delete();
   image.delete();
 }
 

@@ -9,89 +9,89 @@ importers:
   .:
     dependencies:
       '@jsquash/resize':
-        specifier: ^2.1.1
+        specifier: 2.1.1
         version: 2.1.1
       '@mantine/core':
-        specifier: latest
+        specifier: ^9.3.0
         version: 9.3.0(@mantine/hooks@9.3.0(react@19.2.7))(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@mantine/hooks':
-        specifier: latest
+        specifier: ^9.3.0
         version: 9.3.0(react@19.2.7)
       '@tabler/icons-react':
-        specifier: latest
+        specifier: ^3.44.0
         version: 3.44.0(react@19.2.7)
       canvaskit-wasm:
-        specifier: ^0.41.1
+        specifier: 0.41.1
         version: 0.41.1
       exceljs:
-        specifier: ^4.4.0
+        specifier: 4.4.0
         version: 4.4.0
       jszip:
-        specifier: ^3.10.1
+        specifier: 3.10.1
         version: 3.10.1
       react:
-        specifier: latest
+        specifier: 19.2.7
         version: 19.2.7
       react-dom:
-        specifier: latest
+        specifier: 19.2.7
         version: 19.2.7(react@19.2.7)
     devDependencies:
       '@eslint/js':
-        specifier: latest
+        specifier: ^10.0.1
         version: 10.0.1(eslint@10.4.1)
       '@playwright/test':
-        specifier: latest
+        specifier: ^1.60.0
         version: 1.60.0
       '@testing-library/jest-dom':
-        specifier: latest
+        specifier: ^6.9.1
         version: 6.9.1
       '@testing-library/react':
-        specifier: latest
+        specifier: ^16.3.2
         version: 16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@testing-library/user-event':
-        specifier: latest
+        specifier: ^14.6.1
         version: 14.6.1(@testing-library/dom@10.4.1)
       '@types/node':
-        specifier: latest
+        specifier: ^25.9.1
         version: 25.9.1
       '@types/react':
-        specifier: latest
+        specifier: ^19.2.16
         version: 19.2.16
       '@types/react-dom':
-        specifier: latest
+        specifier: ^19.2.3
         version: 19.2.3(@types/react@19.2.16)
       '@vitejs/plugin-react':
-        specifier: latest
+        specifier: ^6.0.2
         version: 6.0.2(vite@8.0.16(@types/node@25.9.1))
       eslint:
-        specifier: latest
+        specifier: ^10.4.1
         version: 10.4.1
       eslint-plugin-react-hooks:
-        specifier: latest
+        specifier: ^7.1.1
         version: 7.1.1(eslint@10.4.1)
       eslint-plugin-react-refresh:
-        specifier: latest
+        specifier: ^0.5.2
         version: 0.5.2(eslint@10.4.1)
       globals:
-        specifier: latest
+        specifier: ^17.6.0
         version: 17.6.0
       jsdom:
-        specifier: latest
+        specifier: ^29.1.1
         version: 29.1.1
       prettier:
-        specifier: latest
+        specifier: ^3.8.3
         version: 3.8.3
       typescript:
-        specifier: latest
+        specifier: ^6.0.3
         version: 6.0.3
       typescript-eslint:
-        specifier: latest
+        specifier: ^8.60.1
         version: 8.60.1(eslint@10.4.1)(typescript@6.0.3)
       vite:
-        specifier: latest
+        specifier: ^8.0.16
         version: 8.0.16(@types/node@25.9.1)
       vitest:
-        specifier: latest
+        specifier: ^4.1.8
         version: 4.1.8(@types/node@25.9.1)(jsdom@29.1.1)(vite@8.0.16(@types/node@25.9.1))
 
 packages:

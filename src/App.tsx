@@ -24,6 +24,7 @@ import {
   useComputedColorScheme,
   useMantineColorScheme,
 } from '@mantine/core';
+import { useMediaQuery } from '@mantine/hooks';
 import {
   IconBrandGithub,
   IconCheck,
@@ -63,6 +64,7 @@ type AppView = 'generator' | 'flags' | 'help';
 export function App() {
   const { setColorScheme } = useMantineColorScheme();
   const computedColorScheme = useComputedColorScheme('dark');
+  const isMobileHeader = useMediaQuery('(max-width: 48em)');
   const [currentView, setCurrentView] = useState<AppView>('generator');
   const [contestName, setContestName] = useState('');
   const [contestFile, setContestFile] = useState<File | null>(null);
@@ -318,82 +320,159 @@ export function App() {
   }
 
   return (
-    <AppShell header={{ height: 64 }} padding="md">
+    <AppShell header={{ height: isMobileHeader ? 112 : 64 }} padding="md">
       <AppShell.Header>
-        <Container h="100%" size="lg">
-          <Group h="100%" justify="space-between">
-            <Anchor
-              fw={700}
-              href="/"
-              onClick={(event) => {
-                event.preventDefault();
-                setCurrentView('generator');
-              }}
-              size="xl"
-              underline="never"
-              variant="gradient"
-              gradient={{ from: '#ff5e3a', to: '#ff2a68' }}
-            >
-              Melbourne Scoreboard Generator
-            </Anchor>
-            <Group gap="lg">
+        <Container h="100%" py={isMobileHeader ? 'xs' : 0} size="lg">
+          {isMobileHeader ? (
+            <Stack gap={6} h="100%" justify="center">
               <Anchor
-                href="#help"
+                fw={700}
+                href="/"
                 onClick={(event) => {
                   event.preventDefault();
-                  setCurrentView('help');
+                  setCurrentView('generator');
                 }}
-                underline="hover"
+                style={{ fontSize: 'clamp(1.2rem, 5vw, 2rem)' }}
+                ta="center"
+                underline="never"
+                variant="gradient"
+                gradient={{ from: '#ff5e3a', to: '#ff2a68' }}
               >
-                <Group gap={4} wrap="nowrap">
-                  <IconHelp size={16} />
-                  <span>Help</span>
-                </Group>
+                Melbourne Scoreboard Generator
               </Anchor>
-              <Anchor
-                href="#flags"
-                onClick={(event) => {
-                  event.preventDefault();
-                  setCurrentView('flags');
-                }}
-                underline="hover"
-              >
-                <Group gap={4} wrap="nowrap">
-                  <IconFlag size={16} />
-                  <span>Flags</span>
-                </Group>
-              </Anchor>
-              <Anchor
-                href="https://github.com/Iune/melbourne"
-                underline="hover"
-              >
-                <Group gap={4} wrap="nowrap">
-                  <IconBrandGithub size={16} />
-                  <span>GitHub</span>
-                </Group>
-              </Anchor>
-              <Tooltip
-                label={
-                  isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'
-                }
-              >
-                <ActionIcon
-                  aria-label={
+              <Group gap="md" justify="center" wrap="wrap">
+                <Anchor
+                  href="#help"
+                  onClick={(event) => {
+                    event.preventDefault();
+                    setCurrentView('help');
+                  }}
+                  underline="hover"
+                >
+                  <Group gap={4} wrap="nowrap">
+                    <IconHelp size={16} />
+                    <span>Help</span>
+                  </Group>
+                </Anchor>
+                <Anchor
+                  href="#flags"
+                  onClick={(event) => {
+                    event.preventDefault();
+                    setCurrentView('flags');
+                  }}
+                  underline="hover"
+                >
+                  <Group gap={4} wrap="nowrap">
+                    <IconFlag size={16} />
+                    <span>Flags</span>
+                  </Group>
+                </Anchor>
+                <Anchor
+                  href="https://github.com/Iune/melbourne"
+                  underline="hover"
+                >
+                  <Group gap={4} wrap="nowrap">
+                    <IconBrandGithub size={16} />
+                    <span>GitHub</span>
+                  </Group>
+                </Anchor>
+                <Tooltip
+                  label={
                     isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'
                   }
-                  onClick={handleToggleColorScheme}
-                  size="lg"
-                  variant="subtle"
                 >
-                  {isDarkMode ? (
-                    <IconSun size={18} stroke={1.8} />
-                  ) : (
-                    <IconMoon size={18} stroke={1.8} />
-                  )}
-                </ActionIcon>
-              </Tooltip>
+                  <ActionIcon
+                    aria-label={
+                      isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'
+                    }
+                    onClick={handleToggleColorScheme}
+                    size="lg"
+                    variant="subtle"
+                  >
+                    {isDarkMode ? (
+                      <IconSun size={18} stroke={1.8} />
+                    ) : (
+                      <IconMoon size={18} stroke={1.8} />
+                    )}
+                  </ActionIcon>
+                </Tooltip>
+              </Group>
+            </Stack>
+          ) : (
+            <Group h="100%" justify="space-between" wrap="nowrap">
+              <Anchor
+                fw={700}
+                href="/"
+                onClick={(event) => {
+                  event.preventDefault();
+                  setCurrentView('generator');
+                }}
+                size="xl"
+                underline="never"
+                variant="gradient"
+                gradient={{ from: '#ff5e3a', to: '#ff2a68' }}
+              >
+                Melbourne Scoreboard Generator
+              </Anchor>
+              <Group gap="lg" wrap="nowrap">
+                <Anchor
+                  href="#help"
+                  onClick={(event) => {
+                    event.preventDefault();
+                    setCurrentView('help');
+                  }}
+                  underline="hover"
+                >
+                  <Group gap={4} wrap="nowrap">
+                    <IconHelp size={16} />
+                    <span>Help</span>
+                  </Group>
+                </Anchor>
+                <Anchor
+                  href="#flags"
+                  onClick={(event) => {
+                    event.preventDefault();
+                    setCurrentView('flags');
+                  }}
+                  underline="hover"
+                >
+                  <Group gap={4} wrap="nowrap">
+                    <IconFlag size={16} />
+                    <span>Flags</span>
+                  </Group>
+                </Anchor>
+                <Anchor
+                  href="https://github.com/Iune/melbourne"
+                  underline="hover"
+                >
+                  <Group gap={4} wrap="nowrap">
+                    <IconBrandGithub size={16} />
+                    <span>GitHub</span>
+                  </Group>
+                </Anchor>
+                <Tooltip
+                  label={
+                    isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'
+                  }
+                >
+                  <ActionIcon
+                    aria-label={
+                      isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'
+                    }
+                    onClick={handleToggleColorScheme}
+                    size="lg"
+                    variant="subtle"
+                  >
+                    {isDarkMode ? (
+                      <IconSun size={18} stroke={1.8} />
+                    ) : (
+                      <IconMoon size={18} stroke={1.8} />
+                    )}
+                  </ActionIcon>
+                </Tooltip>
+              </Group>
             </Group>
-          </Group>
+          )}
         </Container>
       </AppShell.Header>
 
